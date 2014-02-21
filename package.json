@@ -1,0 +1,15 @@
+{
+  "name": "funflow",
+  "version": "0.0.1",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "scripts": {
+    "test": "jasmine-node --captureExceptions specs"
+  },
+  "dependencies": {
+    "jasmine-node": "~1.13.1",
+    "util-is": "~0.1.0",
+    "util": "~0.10.3"
+  }
+}
