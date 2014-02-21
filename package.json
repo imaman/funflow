@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jasmine-node --captureExceptions specs"
   },
+  "main": "./lib/funflow.js",
   "keywords": [
     "async",
     "control-flow",
