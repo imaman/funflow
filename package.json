@@ -1,15 +1,23 @@
 {
   "name": "funflow",
   "version": "0.0.1",
-  "engines": {
-    "node": "0.10.x"
-  },
+  "author": "imaman",
+  "description": "powerful async control-flow based on a data-flow-graph of functions",
   "scripts": {
     "test": "jasmine-node --captureExceptions specs"
   },
+  "keywords": [
+    "async",
+    "control-flow",
+    "data-flow"
+  ],
   "dependencies": {
     "jasmine-node": "~1.13.1",
     "util-is": "~0.1.0",
     "util": "~0.10.3"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": "0.10.x"
   }
 }
