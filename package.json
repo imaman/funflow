@@ -7,6 +7,10 @@
     "test": "jasmine-node --captureExceptions specs"
   },
   "main": "./lib/funflow.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imaman/funflow.git"
+  },
   "keywords": [
     "async",
     "control-flow",
