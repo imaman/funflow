@@ -211,6 +211,21 @@ describe('FunFlow', function() {
         function (v, next) { next(null, v + ', and this one from the second') },
       ]).run();
     });
+    it('array of with a single object is essentially a concurrent flow', function(done) {
+      function trap(err, result) {
+        expect(err).toBe(null);
+        expect(result).toEqual({
+          a: [ 'value from a' ], 
+          b: [ 'value', 'from', 'b' ]
+        });
+        expect(arguments.length).toEqual(2);
+        done();
+      }
+      flow(trap).graph([{
+        a: function (next) { next(null, 'value from a') },
+        b: function (next) { next(null, 'value', 'from', 'b') },
+      }]).run();
+    });
   });
 });
 
