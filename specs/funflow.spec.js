@@ -153,110 +153,6 @@ describe('FunFlow', function() {
   });
 
   describe('conc', function() {
-    describe('with array of functions', function() {
-      it('can execute a single function that emits a single value', function(done) {
-        function trap(err, arr) {
-          expect(arr).toEqual([ 'first' ]);
-          done();
-        }
-        flow(trap).conc(
-          function (next) { next(null, 'first') }
-        ).run();
-      });
-      it('passes a failure from that single function to the trap funtion', function(done) {
-        function trap(err) {
-          expect(err).toEqual('WE HAVE A PROBLEM');
-          expect(arguments.length).toEqual(1);
-          done();
-        }
-        flow(trap).conc(
-          function (next) { next('WE HAVE A PROBLEM', 'ignored') }
-        ).run();
-      });
-      it('emits two arrays when two functions are specified', function(done) {
-        function trap(err, arr1, arr2) {
-          expect(arr1).toEqual([ 'FROM FIRST FUNCTION' ]);
-          expect(arr2).toEqual([ 'FROM SECOND FUNCTION' ]);
-          done();
-        }
-        flow(trap).conc(
-          function(next) { next(null, 'FROM FIRST FUNCTION') },
-          function(next) { next(null, 'FROM SECOND FUNCTION') }
-        ).run();
-      });
-      it('emits results using the ordering of the functions that were passed to it', function(done) {
-        function trap(err, arr1, arr2) {
-          expect(arr1).toEqual([ 'FROM FIRST FUNCTION' ]);
-          expect(arr2).toEqual([ 'FROM SECOND FUNCTION' ]);
-          done();
-        }
-        flow(trap).conc(
-          function(next) { process.nextTick(function() { next(null, 'FROM FIRST FUNCTION') }) },
-          function(next) { next(null, 'FROM SECOND FUNCTION') }
-        ).run();
-      });
-      it('supports multiple function with multiple emitted values', function(done) {
-        function trap(err) {
-          expect(err).toBe(null);
-          expect(Array.prototype.slice.call(arguments, 1)).toEqual([ 
-            ['v0_0', 'v0_1', 'v0_2'],
-            ['v1_0'],
-            ['v2_0', 'v2_1', 'v2_2', 'v2_3', 'v2_4'],
-            ['v3_0', 'v3_1', 'v3_2'],
-          ]);
-          done();
-        }
-        flow(trap).conc(
-          function(next) { next(null, 'v0_0', 'v0_1', 'v0_2') },
-          function(next) { next(null, 'v1_0') },
-          function(next) { next(null, 'v2_0', 'v2_1', 'v2_2', 'v2_3', 'v2_4') },
-          function(next) { next(null, 'v3_0', 'v3_1', 'v3_2') }
-        ).run();
-      });
-      it('wraps all the emitted values of the function in a single array', function(done) {
-        function trap(err, arr) {
-          expect(arr).toEqual([ 'first', 'second', 'third' ]);
-          done();
-        }
-        flow(trap).conc(
-          function (next) { next(null, 'first', 'second', 'third') }
-        ).run();
-      });
-      it('passes external arguments to each of the functions', function(done) {
-        function trap(err, arr1, arr2) {
-          if (err) throw err;
-          expect(arr1).toEqual([20, 40]);
-          expect(arr2).toEqual([2, 4]);
-          done();
-        }
-        flow(trap).conc(
-          function byFive(v1, v2, next) { next(null, v1 / 5, v2 / 5); },
-          function ByFifty(v1, v2, next) { next(null, v1 / 50, v2 / 50) }
-        ).run(100, 200);
-      });
-      it('can be used in conjunction with seq()', function(done) {
-        function trap(err, v) {
-          expect(err).toBe(null);
-          expect(v).toEqual([ '/1/', '/2/' ]);
-          expect(arguments.length).toEqual(2);
-          done();
-        }
-        var base = 'BASE';
-        var f = flow(trap, {verbose: true});
-        f.seq(function r(next) { base = '/'; next(); });
-        f.conc(
-          function r1(next) { next(null, base + '1/'); },
-          function r2(next) { next(null, base + '2/'); 
-          }
-        );
-        f.seq(function r3(v1, v2, next) {
-          next(null, [v1[0], v2[0]]);
-        });
-
-        f.asFunction()();
-      });
-    });
-
     describe('with object of functions', function() {
       it('emits an object with the result of a function stored in the same key as the function', function(done) {
         function trap(err, result) {
@@ -284,6 +180,24 @@ describe('FunFlow', function() {
           b: function (next) { next(null, 'value', 'from', 'b') },
         }).run();
       });
+    });
+  });
+
+  describe('graph', function() {
+    it('treats an object as concurrent flows', function(done) {
+      function trap(err, result) {
+        expect(err).toBe(null);
+        expect(result).toEqual({
+          a: [ 'value from a' ], 
+          b: [ 'value', 'from', 'b' ]
+        });
+        expect(arguments.length).toEqual(2);
+        done();
+      }
+      flow(trap).graph({
+        a: function (next) { next(null, 'value from a') },
+        b: function (next) { next(null, 'value', 'from', 'b') },
+      }).run();
     });
   });
 });
