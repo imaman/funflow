@@ -199,6 +199,18 @@ describe('FunFlow', function() {
         b: function (next) { next(null, 'value', 'from', 'b') },
       }).run();
     });
+    it('treats an array as sequential flows', function(done) {
+      function trap(err, result) {
+        expect(err).toBe(null);
+        expect(result).toEqual('this is coming from the first function, and this one from the second');
+        expect(arguments.length).toEqual(2);
+        done();
+      }
+      flow(trap).graph([
+        function (next) { next(null, 'this is coming from the first function') },
+        function (v, next) { next(null, v + ', and this one from the second') },
+      ]).run();
+    });
   });
 });
 
