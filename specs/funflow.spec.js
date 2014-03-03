@@ -211,7 +211,7 @@ describe('FunFlow', function() {
         function (v, next) { next(null, v + ', and this one from the second') },
       ]).run();
     });
-    it('array of with a single object is essentially a concurrent flow', function(done) {
+    it('array of with a single object is just like an object', function(done) {
       function trap(err, result) {
         expect(err).toBe(null);
         expect(result).toEqual({
@@ -224,6 +224,25 @@ describe('FunFlow', function() {
       flow(trap).graph([{
         a: function (next) { next(null, 'value from a') },
         b: function (next) { next(null, 'value', 'from', 'b') },
+      }]).run();
+    });
+    it('array of two objects is two concurrent flows running sequentailly', function(done) {
+      function trap(err, result) {
+        expect(err).toBe(null);
+        expect(result).toEqual({
+          c: [ 'In c: a=A, b=B' ],
+          d: [ 'In d: a=A, b=B' ]
+        });
+        expect(arguments.length).toEqual(2);
+        done();
+      }
+      flow(trap).graph([{
+        a: function (next) { next(null, 'A') },
+        b: function (next) { next(null, 'B') },
+      },
+      {
+        c: function (v, next) { next(null, 'In c: a=' + v.a + ', b=' + v.b) },
+        d: function (v, next) { next(null, 'In d: a=' + v.a + ', b=' + v.b) }
       }]).run();
     });
   });
