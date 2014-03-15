@@ -247,7 +247,7 @@ describe('FunFlow', function() {
     });
     it('object with array value is a sequential flow running concurrently', function(done) {
       function trap(err, result) {
-        expect(err).toBe(null);
+        if (err) return done(err);
         expect(result).toEqual('a=A1_A2, b=B1_B2');
         expect(arguments.length).toEqual(2);
         done();
@@ -260,6 +260,25 @@ describe('FunFlow', function() {
                function(v, next) { next(null, v + '_B2') } ]
         },
         function(v, next) { next(null, 'a=' + v.a + ', b=' + v.b) }
+      ]).run();
+    });
+    it('arrayed functions can take variable number of args', function(done) {
+      function trap(err, result) {
+        if (err) return done(err);
+        expect(result).toEqual(['A1_A2_A3']);
+        expect(arguments.length).toEqual(2);
+        done();
+      }
+      flow(trap).graph([
+        {
+          a: [ function first(next) { next(null, 'A1') }, 
+               function second(v, next) { next(null, v, 'A2') },
+               function third(v1, v2, next) { 
+                next(null, v1 + '_' + v2 + '_A3') 
+              }
+            ],
+        },
+        function(v, next) { next(null, v.a) }
       ]).run();
     });
   });
