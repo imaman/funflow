@@ -245,17 +245,19 @@ describe('FunFlow', function() {
         d: function (v, next) { next(null, 'In d: a=' + v.a + ', b=' + v.b) }
       }]).run();
     });
-    xit('object with array value is a sequential flow running concurrently', function(done) {
+    it('object with array value is a sequential flow running concurrently', function(done) {
       function trap(err, result) {
         expect(err).toBe(null);
         expect(result).toEqual('a=A1_A2, b=B1_B2');
-        expect(arguments.length).toEqual(1);
+        expect(arguments.length).toEqual(2);
         done();
       }
       flow(trap).graph([
         {
-          a: [ function (next) { next(null, 'A1') }, function(v, next) { next(null, v + '_A2') } ],
-          b: [ function (next) { next(null, 'B1') }, function(v, next) { next(null, v + '_B2') } ]
+          a: [ function (next) { next(null, 'A1') }, 
+               function(v, next) { next(null, v + '_A2') } ],
+          b: [ function (next) { next(null, 'B1') }, 
+               function(v, next) { next(null, v + '_B2') } ]
         },
         function(v, next) { next(null, 'a=' + v.a + ', b=' + v.b) }
       ]).run();
