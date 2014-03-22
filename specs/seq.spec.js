@@ -20,7 +20,6 @@ describe('Seq', function() {
     expect(args).toEqual([null, 11]);
   });
   it('translates a sequence of two functions', function() {
-    console.log('\n------------------------------------------\n');
     var seq = new Seq([
       new Fun(function(v1, next) {
         next(null, v1 + 4) }),
@@ -35,7 +34,6 @@ describe('Seq', function() {
     expect(args).toEqual([null, 36]);
   });
   it('translates a sequence of three functions', function() {
-    console.log('\n------------------------------------------\n');
     var seq = new Seq([
       new Fun(function(v, next) {
         next(null, v * 2) }),
