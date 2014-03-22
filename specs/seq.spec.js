@@ -67,4 +67,20 @@ describe('Seq', function() {
     });
     expect(args).toEqual([null, 8, 16, 20, 84]);
   });
+  it('supports arbitrary long sequences', function() {
+    var arr = [];
+    for (var i = 0; i < 50; ++i) {
+      var fun = new Fun(function(v, next) {
+        next(null, v + 1) });
+      arr.push(fun);
+    }
+    var seq = new Seq(arr);
+
+    var wrapped = seq.wrap();
+    var args;
+    wrapped(null, 0, function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(args).toEqual([null, 50]);
+  });
 });
