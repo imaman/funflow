@@ -16,12 +16,12 @@ describe('Fun', function() {
     var wrapped = fun.wrap();
 
     var args;
-    wrapped(2, 5, function(e, v1, v2) {
+    wrapped(null, 2, 5, function(e, v1, v2) {
       args = Array.prototype.slice.call(arguments, 0);
     });
     expect(args).toEqual([null, 7, 10]);
   });
-  it('translates exception into err-calls on the next function', 
+  it('translates exception into err-calls on the next function',
       function() {
     function f1(v1, v2, next) {
       throw new Error('SOME_ERROR');
@@ -31,7 +31,7 @@ describe('Fun', function() {
     var wrapped = fun.wrap();
 
     var args;
-    wrapped(2, 5, function(e, v1, v2) {
+    wrapped(null, 2, 5, function(e, v1, v2) {
       args = Array.prototype.slice.call(arguments, 0);
     });
     expect(args.length).toEqual(1);
