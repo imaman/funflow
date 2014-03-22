@@ -49,4 +49,22 @@ describe('Seq', function() {
     });
     expect(args).toEqual([null, 210]);
   });
+  it('supports var args', function() {
+    var seq = new Seq([
+      new Fun(function(v1, v2, next) {
+        next(null, v1+v2, v1*v2, v1-v2) }),
+      new Fun(function(a, b, c, next) {
+        var avg = (a+b+c) / 7;
+        var arr = [a,b,c,avg];
+        arr.sort(function(a,b) { return a -b });
+        next(null, arr[0], arr[1], arr[2], arr[3])
+      })
+    ]);
+    var wrapped = seq.wrap();
+    var args;
+    wrapped(null, 14, 6, function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(args).toEqual([null, 8, 16, 20, 84]);
+  });
 });
