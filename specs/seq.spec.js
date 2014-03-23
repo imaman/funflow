@@ -113,4 +113,21 @@ describe('Seq', function() {
     expect(args.length).toEqual(1);
     expect(args[0].message).toEqual('INTERNAL_ERROR');
   });
+  it('does not invoke subsequent functions after an internal error', function() {
+    var secondFunction = 'not_invoked';
+    var seq = new Seq([
+      new Fun(function(next) {
+        throw new Error('INTERNAL_ERROR');
+      }),
+      new Fun(function(v, next) {
+        secondFunction = 'invoked';
+      })
+    ]);
+    var wrapped = seq.wrap();
+    var args;
+    wrapped(null, function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(secondFunction).toEqual('not_invoked');
+  });
 });
