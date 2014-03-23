@@ -98,4 +98,19 @@ describe('Seq', function() {
     expect(args.length).toEqual(1);
     expect(args[0].message).toEqual('EXTERNAL_ERROR');
   });
+  it('propagates an internal error directly to the trap function', function() {
+    var seq = new Seq([
+      new Fun(function(v, next) {
+        next(new Error('INTERNAL_ERROR'), v + '_1') }),
+      new Fun(function(v, next) {
+        next(null, v + '_2') })
+    ]);
+    var wrapped = seq.wrap();
+    var args;
+    wrapped(null, '0', function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(args.length).toEqual(1);
+    expect(args[0].message).toEqual('INTERNAL_ERROR');
+  });
 });
