@@ -20,4 +20,18 @@ describe('Conc', function() {
     expect(args.length).toEqual(2);
     expect(args).toEqual([null, { plus5: 8 }]);
   });
+  it('executes several functions', function() {
+    var conc = new Conc({
+      plus5: new Fun(function(v, next) { next(null, v + 5) }),
+      plus7: new Fun(function(v, next) { next(null, v + 7) }),
+      plus9: new Fun(function(v, next) { next(null, v + 9) })
+    });
+    var wrapped = conc.wrap();
+    var args;
+    wrapped(null, 3, function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(args.length).toEqual(2);
+    expect(args).toEqual([null, { plus5: 8, plus7: 10, plus9: 12 }]);
+  });
 });
