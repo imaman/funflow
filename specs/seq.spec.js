@@ -83,4 +83,19 @@ describe('Seq', function() {
     });
     expect(args).toEqual([null, 50]);
   });
+  it('propagates an external error directly to the trap function', function() {
+    var seq = new Seq([
+      new Fun(function(v, next) {
+        next(null, v + '_1') }),
+      new Fun(function(v, next) {
+        next(null, v + '_2') })
+    ]);
+    var wrapped = seq.wrap();
+    var args;
+    wrapped(new Error('EXTERNAL_ERROR'), '0', function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(args.length).toEqual(1);
+    expect(args[0].message).toEqual('EXTERNAL_ERROR');
+  });
 });
