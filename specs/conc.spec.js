@@ -18,6 +18,6 @@ describe('Conc', function() {
       args = Array.prototype.slice.call(arguments, 0);
     });
     expect(args.length).toEqual(2);
-    expect(args).toEqual([null, 8]);
+    expect(args).toEqual([null, { plus5: 8 }]);
   });
 });
