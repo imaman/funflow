@@ -59,4 +59,18 @@ describe('Conc', function() {
     expect(args.length).toEqual(2);
     expect(args).toEqual([null, { plus123: [101,102,103] }]);
   });
+  it('propagates an external error', function() {
+    var conc = new Conc({
+      a: new Fun(function(v, next) { next(null, v + '_a') }),
+      b: new Fun(function(v, next) { next(null, v + '_b') })
+    });
+    var externalError = new Error('EXTERNAL_ERROR');
+    var wrapped = conc.wrap();
+    var args;
+    wrapped(externalError, 'ab', function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(args.length).toEqual(1);
+    expect(args[0]).toBe(externalError);
+  });
 });
