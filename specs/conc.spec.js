@@ -81,8 +81,21 @@ describe('Conc', function() {
     });
     var externalError = new Error('EXTERNAL_ERROR');
     var wrapped = conc.wrap();
-    var args;
     wrapped(externalError, 'ab', function() {});
     expect(evaluated).toEqual([]);
+  });
+  it('produces no result if any of the functions produces an error', function() {
+    var error = new Error('A HAS FAILED');
+    var conc = new Conc({
+      a: new Fun(function(next) { throw error; }),
+      b: new Fun(function(next) { next(null, 'b'); })
+    });
+    var wrapped = conc.wrap();
+    var args;
+    wrapped(null, function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(args.length).toEqual(1);
+    expect(args[0]).toBe(error);
   });
 });
