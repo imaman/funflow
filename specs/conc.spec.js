@@ -73,4 +73,16 @@ describe('Conc', function() {
     expect(args.length).toEqual(1);
     expect(args[0]).toBe(externalError);
   });
+  it('nothing is evaluated in the face of an external error', function() {
+    var evaluated = [];
+    var conc = new Conc({
+      a: new Fun(function(v, next) { evaluated.push('a'); next(null, 'a'); }),
+      b: new Fun(function(v, next) { evaluated.push('b'); next(null, 'b'); })
+    });
+    var externalError = new Error('EXTERNAL_ERROR');
+    var wrapped = conc.wrap();
+    var args;
+    wrapped(externalError, 'ab', function() {});
+    expect(evaluated).toEqual([]);
+  });
 });
