@@ -47,4 +47,16 @@ describe('Conc', function() {
     expect(args.length).toEqual(2);
     expect(args).toEqual([null, { sum: 20, diff: 12 }]);
   });
+  it('generates an array output if next() is called with several values', function() {
+    var conc = new Conc({
+      plus123: new Fun(function(v, next) { next(null, v+1, v+2, v+3) })
+    });
+    var wrapped = conc.wrap();
+    var args;
+    wrapped(null, 100, function() {
+      args = Array.prototype.slice.call(arguments, 0);
+    });
+    expect(args.length).toEqual(2);
+    expect(args).toEqual([null, { plus123: [101,102,103] }]);
+  });
 });
