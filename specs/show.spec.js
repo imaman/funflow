@@ -14,16 +14,29 @@ describe('visualization', function() {
     });
   });
   describe('of a map', function() {
-    it('is single line adjusted by one when map has a single function', function() {
+    it('is single vertical line when map has a single entry', function() {
       var f = new Conc({
         a: new Fun(function plusOne(v, next) { next(null, v+1) })
       });
       expect('\n' + f.show()).toEqual('\n' + [
-        '+----+',
-        '     plusOne()',
-        '     |',
-        '     a:',
-        '+----+'
+        '----------+',
+        '          plusOne()',
+        '          |',
+        '          a:',
+        '----------+'
+      ].join('\n'));
+    });
+    it('is two parallel verical lines when map has two entries', function() {
+      var f = new Conc({
+        a: new Fun(function plusOne(v, next) { next(null, v+1) }),
+        b: new Fun(function plusTwo(v, next) { next(null, v+2) })
+      });
+      expect('\n' + f.show()).toEqual('\n' + [
+        '----------+---------+',
+        '          plusOne() plusTwo()',
+        '          |         |',
+        '          a:        b:',
+        '----------+---------+'
       ].join('\n'));
     });
   });
