@@ -18,15 +18,13 @@ describe('visualization', function() {
       var f = new Conc({
         a: new Fun(function plusOne(v, next) { next(null, v+1) })
       });
-      expect(f.show().split('\n')).toEqual([
+      expect('\n' + f.show()).toEqual('\n' + [
         '+----+',
         '     plusOne()',
+        '     |',
+        '     a:',
         '+----+'
-      ]);
-    });
-    it('is adjusted by the given offset', function() {
-      var f = new Fun(function plusOne(v, next) { next(null, v+1) });
-      expect(f.show(5)).toEqual('     plusOne()');
+      ].join('\n'));
     });
   });
 });
