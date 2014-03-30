@@ -51,10 +51,16 @@ describe('Top', function() {
     });
     it('init function wins when it conflicts with the defs', function() {
       var s = Top.create({a: 'A_FROM_DEFS'}, function() { this.a = 'A_FROM_INIT'; });
-      //TODO: expect(s.a).toBe('A_FROM_DEFS');
-
       var t = s.create();
       expect(t.a).toEqual('A_FROM_INIT');
+    });
+    it('init function is not applied to the template object', function() {
+      var s = Top.create({a: 'A_FROM_DEFS'}, function() {
+        this.a = 'A_FROM_INIT';
+        this.b = 'B_FROM_INIT';
+      });
+      expect(s.a).toBe('A_FROM_DEFS');
+      expect(s.b).toBe(undefined);
     });
   });
   describe('spawn function', function() {
