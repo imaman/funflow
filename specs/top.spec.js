@@ -84,6 +84,12 @@ describe('Top', function() {
       expect(s.a).toBe('A_FROM_DEFS');
       expect(s.b).toBe(undefined);
     });
+    it('init function runs with an empty object as this', function() {
+      var capturedThis = 'NOT_AN_EMPTY_OBJECT';
+      var s = Top.create(function() { capturedThis = this; });
+      s.create();
+      expect(capturedThis).toEqual({});
+    });
   });
   describe('spawn function', function() {
     it('has sll props of parents', function() {
