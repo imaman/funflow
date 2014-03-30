@@ -49,6 +49,13 @@ describe('Top', function() {
       expect(t.b).toEqual('B');
       expect(t.c).toEqual('AB');
     });
+    it('init function wins when it conflicts with the defs', function() {
+      var s = Top.create({a: 'A_FROM_DEFS'}, function() { this.a = 'A_FROM_INIT'; });
+      //TODO: expect(s.a).toBe('A_FROM_DEFS');
+
+      var t = s.create();
+      expect(t.a).toEqual('A_FROM_INIT');
+    });
   });
   describe('spawn function', function() {
     it('has sll props of parents', function() {
