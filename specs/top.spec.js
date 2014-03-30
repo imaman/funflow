@@ -15,7 +15,7 @@ describe('Top', function() {
       expect(t.b).toEqual('B');
     });
     it('allows each new objects to be initialized with its own data', function() {
-      var s = Top.create({arr: []});
+      var s = Top.create(function() { return { arr: []}});
       var t1 = s.create();
       t1.arr.push('t1');
 
