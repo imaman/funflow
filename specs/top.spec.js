@@ -25,6 +25,22 @@ describe('Top', function() {
       expect(t1.arr).toEqual(['t1']);
       expect(t2.arr).toEqual(['t2']);
     });
+    it('allows an object to be defined with both properties and an init function', function() {
+      var s = Top.create({a: 'A', b: 'B'}, function() { return { arr: []}});
+      var t1 = s.create();
+      t1.arr.push('t1');
+
+      var t2 = s.create();
+      t2.arr.push('t2');
+
+      expect(t1.arr).toEqual(['t1']);
+      expect(t1.a).toEqual('A');
+      expect(t1.b).toEqual('B');
+
+      expect(t2.arr).toEqual(['t2']);
+      expect(t2.a).toEqual('A');
+      expect(t2.b).toEqual('B');
+    });
   });
   describe('spawn function', function() {
     it('has sll props of parents', function() {
