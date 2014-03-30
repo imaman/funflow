@@ -1,6 +1,20 @@
 var spawn = require('../lib/top').spawn;
+var Top = require('../lib/top').Top;
 
-describe('top', function() {
+describe('Top', function() {
+  describe('object', function() {
+    it('offers a create method', function() {
+      var s = Top.create({a: 'A', b: 'B' });
+      expect(s.a).toEqual('A');
+      expect(s.b).toEqual('B');
+    });
+    it('allows new objects to be created from previously .create()-ed objects', function() {
+      var s = Top.create({a: 'A'});
+      var t = s.create({b: 'B' });
+      expect(t.a).toEqual('A');
+      expect(t.b).toEqual('B');
+    });
+  });
   describe('spawn function', function() {
     it('has sll props of parents', function() {
       var p = { a: 'A', b: 'B' };
