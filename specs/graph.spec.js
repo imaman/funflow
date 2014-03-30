@@ -10,28 +10,31 @@ function spawn(parent, props) {
 
 
 var Vertex = spawn({}, {
-  create: function(key) {
-    return spawn(this, {incoming_: [], outgoing_: [], key: key});
+  create: function(graph, key) {
+    return spawn(this, {graph_: graph, incoming_: [], outgoing_: [], key: key});
   },
   outgoing: function() {
     return this.outgoing_;
   },
   incoming: function() {
     return this.incoming_;
-  }
+  },
+  connectTo: function(that) {
+    this.graph_.connect(this.key, that);
+  },
 });
 
 var Graph = spawn({}, {
   connect: function (from, to) {
     var vfrom = this.vertexByKey_[from];
     if (!vfrom) {
-      vfrom = Vertex.create(from);
+      vfrom = Vertex.create(this, from);
       this.vertices_.push(vfrom);
       this.vertexByKey_[from] = vfrom;
     }
     var vto = this.vertexByKey_[to];
     if (!vto) {
-      var vto = Vertex.create(to);
+      var vto = Vertex.create(this, to);
       this.vertices_.push(vto);
       this.vertexByKey_[to] = vto;
     }
@@ -81,6 +84,20 @@ describe('graph', function() {
       var v = e.to;
       g.connect(4, 2);
       expect(v.incoming().map(function(x) { return x.from.key })).toEqual([6, 4]);
+    });
+    it('can create an edge', function() {
+      var g = Graph.create();
+      var e = g.connect(6, 2);
+      var v = e.from;
+      v.connectTo(3);
+      expect(v.outgoing().map(function(x) { return x.to.key })).toEqual([2, 3]);
+    });
+    it('can create an edge when it started as a to vertex', function() {
+      var g = Graph.create();
+      var e = g.connect(12, 6);
+      var v = e.to;
+      v.connectTo(2);
+      expect(v.outgoing().map(function(x) { return x.to.key })).toEqual([2]);
     });
   });
 });
