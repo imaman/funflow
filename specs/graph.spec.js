@@ -38,18 +38,8 @@ var Edge = spawn({}, {
 
 var Graph = spawn({}, {
   connect: function (from, to) {
-    var vfrom = this.vertexByKey_[from];
-    if (!vfrom) {
-      vfrom = Vertex.create(this, from);
-      this.vertices_.push(vfrom);
-      this.vertexByKey_[from] = vfrom;
-    }
-    var vto = this.vertexByKey_[to];
-    if (!vto) {
-      var vto = Vertex.create(this, to);
-      this.vertices_.push(vto);
-      this.vertexByKey_[to] = vto;
-    }
+    var vfrom = this.vertex(from);
+    var vto = this.vertex(to);
     var e = Edge.create(vfrom, vto);
     this.edges_.push(e);
     vfrom.outgoing_.push(e);
