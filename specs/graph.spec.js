@@ -44,10 +44,6 @@ var Graph = spawn({}, {
   vertices: function() {
     return this.vertices_;
   },
-  neighbors: function(v) {
-    return this.edges_.filter(function(e) {
-      return e.from.key === v }).map(function(e) { return e.to.key });
-  },
   create: function() {
     return spawn(this, { vertices_: [], vertexByKey_: {}, edges_: [] });
   }
@@ -85,15 +81,6 @@ describe('graph', function() {
       var v = e.to;
       g.connect(4, 2);
       expect(v.incoming().map(function(x) { return x.from.key })).toEqual([6, 4]);
-    });
-  });
-
-  describe('neighbors', function() {
-    it('are all vertices connected from a given vertex', function() {
-      var g = Graph.create();
-      g.connect(6, 3);
-      g.connect(6, 2);
-      expect(g.neighbors(6)).toEqual([3, 2]);
     });
   });
 });
