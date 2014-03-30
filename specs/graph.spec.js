@@ -22,6 +22,9 @@ var Vertex = spawn({}, {
   connectTo: function(that) {
     this.graph_.connect(this.key, that);
   },
+  toString: function() {
+    return '' + this.key;
+  }
 });
 
 var Graph = spawn({}, {
@@ -98,6 +101,11 @@ describe('graph', function() {
       var v = e.to;
       v.connectTo(2);
       expect(v.outgoing().map(function(x) { return x.to.key })).toEqual([2]);
+    });
+    it('is string-representable by its key', function() {
+      var g = Graph.create();
+      var v = g.connect(12, 6).from;
+      expect(v.toString()).toEqual('12');
     });
   });
 });
