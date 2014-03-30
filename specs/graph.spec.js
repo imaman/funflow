@@ -59,6 +59,15 @@ var Graph = spawn({}, {
   vertices: function() {
     return this.vertices_;
   },
+  vertex: function(key) {
+    var result = this.vertexByKey_[key];
+    if (!result) {
+      result = Vertex.create(this, key);
+      this.vertices_.push(result);
+      this.vertexByKey_[key] = result;
+    }
+    return result;
+  },
   create: function() {
     return spawn(this, { vertices_: [], vertexByKey_: {}, edges_: [] });
   }
@@ -75,6 +84,12 @@ describe('graph', function() {
     g.connect(6, 3);
     g.connect(6, 2);
     expect(g.vertices().map(function(v) { return v.key })).toEqual([6, 3, 2]);
+  });
+  it('allows a vertex to be created without an edge', function() {
+    var g = Graph.create();
+    g.vertex(6);
+    g.vertex(3);
+    expect(g.vertices().map(function(v) { return v.key })).toEqual([6, 3]);
   });
   it('returns an edge object when an edge is defined', function() {
     var g = Graph.create();
