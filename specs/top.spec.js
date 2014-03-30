@@ -25,7 +25,7 @@ describe('Top', function() {
       expect(t1.arr).toEqual(['t1']);
       expect(t2.arr).toEqual(['t2']);
     });
-    it('allows an object to be defined with both properties and an init function', function() {
+    it('allows .create() to take defs and an init function at the same time', function() {
       var s = Top.create({a: 'A', b: 'B'}, function() { return { arr: []}});
       var t1 = s.create();
       t1.arr.push('t1');
