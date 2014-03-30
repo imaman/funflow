@@ -14,6 +14,17 @@ describe('Top', function() {
       expect(t.a).toEqual('A');
       expect(t.b).toEqual('B');
     });
+    it('allows each new objects to be initialized with its own data', function() {
+      var s = Top.create({arr: []});
+      var t1 = s.create();
+      t1.arr.push('t1');
+
+      var t2 = s.create();
+      t2.arr.push('t2');
+
+      expect(t1.arr).toEqual(['t1']);
+      expect(t2.arr).toEqual(['t2']);
+    });
   });
   describe('spawn function', function() {
     it('has sll props of parents', function() {
