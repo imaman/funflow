@@ -42,7 +42,7 @@ describe('Top', function() {
       expect(t2.b).toEqual('B');
     });
     it('allows the init function to access an already initialized this', function() {
-      var s = Top.create({a: 'A'}, function() { this.c = this.a + this.b; });
+      var s = Top.create({a: 'A'}, function(defs) { return { c: defs.a + defs.b }});
       var t = s.create({b: 'B'});
 
       expect(t.a).toEqual('A');
@@ -50,7 +50,7 @@ describe('Top', function() {
       expect(t.c).toEqual('AB');
     });
     it('init function wins when it conflicts with the defs', function() {
-      var s = Top.create({a: 'A_FROM_DEFS'}, function() { this.a = 'A_FROM_INIT'; });
+      var s = Top.create({a: 'A_FROM_DEFS'}, function() { return { a: 'A_FROM_INIT' }});
       var t = s.create();
       expect(t.a).toEqual('A_FROM_INIT');
     });
@@ -67,7 +67,12 @@ describe('Top', function() {
       // creationDefs as it can run some logic that is affected by creationDefs.
       //
       // Bottom line: init function wins.
-      var s = Top.create({a: 'DEFS'}, function() { this.a = 'INIT'; });
+      //
+      // Continued: After some more thinking changed the init function such that
+      // it takes the object to be created as a parameter (thus avoiding
+      // confusion regarding 'what is the value of this when the init function
+      // runs?'. This make the 'init should win' argument even stronger.
+      var s = Top.create({a: 'DEFS'}, function() { return { a: 'INIT' }});
       var t = s.create({a: 'CHILD'});
       expect(t.a).toEqual('INIT');
     });
