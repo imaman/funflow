@@ -116,7 +116,7 @@ describe('graph', function() {
       v.connectTo(3);
       expect(v.outgoing().map(function(x) { return x.to.key })).toEqual([2, 3]);
     });
-    it('can by key when it started as a to vertex', function() {
+    it('can connect by key when it started as a to vertex', function() {
       var g = Graph.create();
       var e = g.connect(12, 6);
       var v = e.to;
