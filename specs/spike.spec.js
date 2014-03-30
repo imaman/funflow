@@ -1,7 +1,7 @@
 require('util-is');
 var util = require('util');
 var Graph = require('../lib/graph');
-var spawn = require('../lib/top');
+var spawn = require('../lib/top').spawn;
 
 function intoDiagram(a) {
   var res = [];

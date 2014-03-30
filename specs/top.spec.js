@@ -1,4 +1,4 @@
-var spawn = require('../lib/top');
+var spawn = require('../lib/top').spawn;
 
 describe('spwned object', function() {
     it('has sll props of parents', function() {
