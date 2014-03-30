@@ -8,7 +8,6 @@ function spawn(parent, props) {
   return Object.create(parent, defs);
 }
 
-
 var Vertex = spawn({}, {
   create: function(graph, key) {
     return spawn(this, {graph_: graph, incoming_: [], outgoing_: [], key: key});
@@ -122,6 +121,16 @@ describe('graph', function() {
       var v = e.to;
       v.connectTo(2);
       expect(v.outgoing().map(function(x) { return x.to.key })).toEqual([2]);
+    });
+    it('can connect by vertex', function() {
+      var g = Graph.create();
+      var v6 = g.vertex(6);
+      var v2 = g.vertex(2);
+
+      v6.connectTo(v2);
+      expect(v6.outgoing().map(function(x) { return x.toString() })).toEqual(['6 -> 2']);
+      expect(v2.incoming().map(function(x) { return x.toString() })).toEqual(['6 -> 2']);
+      expect(g.vertices().map(function(v) { return v.toString() })).toEqual(['6', '2']);
     });
     it('is string-representable by its key', function() {
       var g = Graph.create();
