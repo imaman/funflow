@@ -41,6 +41,14 @@ describe('Top', function() {
       expect(t2.a).toEqual('A');
       expect(t2.b).toEqual('B');
     });
+    it('allows the init function to access an already initialized this', function() {
+      var s = Top.create({a: 'A'}, function() { this.c = this.a + this.b; });
+      var t = s.create({b: 'B'});
+
+      expect(t.a).toEqual('A');
+      expect(t.b).toEqual('B');
+      expect(t.c).toEqual('AB');
+    });
   });
   describe('spawn function', function() {
     it('has sll props of parents', function() {
