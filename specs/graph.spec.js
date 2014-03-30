@@ -11,7 +11,13 @@ function spawn(parent, props) {
 
 var Vertex = spawn({}, {
   create: function(key) {
-    return spawn(this, {key: key});
+    return spawn(this, {incoming_: [], outgoing_: [], key: key});
+  },
+  outgoing: function() {
+    return this.outgoing_;
+  },
+  incoming: function() {
+    return this.incoming_;
   }
 });
 
@@ -31,6 +37,8 @@ var Graph = spawn({}, {
     }
     var e = {from: vfrom, to: vto};
     this.edges_.push(e);
+    vfrom.outgoing_.push(e);
+    vto.incoming_.push(e);
     return e;
   },
   vertices: function() {
@@ -62,6 +70,22 @@ describe('graph', function() {
     var e = g.connect(6, 3);
     expect(e.from.key).toEqual(6);
     expect(e.to.key).toEqual(3);
+  });
+  describe('vertex', function() {
+    it('provides access to outgoing edges', function() {
+      var g = Graph.create();
+      var e = g.connect(6, 3);
+      var v = e.from;
+      g.connect(6, 2);
+      expect(v.outgoing().map(function(x) { return x.to.key })).toEqual([3, 2]);
+    });
+    it('provides access to incoming edges', function() {
+      var g = Graph.create();
+      var e = g.connect(6, 2);
+      var v = e.to;
+      g.connect(4, 2);
+      expect(v.incoming().map(function(x) { return x.from.key })).toEqual([6, 4]);
+    });
   });
 
   describe('neighbors', function() {
