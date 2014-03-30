@@ -27,6 +27,15 @@ var Vertex = spawn({}, {
   }
 });
 
+var Edge = spawn({}, {
+  create: function(vfrom, vto) {
+    return spawn(this, {from: vfrom, to: vto});
+  },
+  toString: function() {
+    return this.from + ' -> ' + this.to;
+  }
+});
+
 var Graph = spawn({}, {
   connect: function (from, to) {
     var vfrom = this.vertexByKey_[from];
@@ -41,7 +50,7 @@ var Graph = spawn({}, {
       this.vertices_.push(vto);
       this.vertexByKey_[to] = vto;
     }
-    var e = {from: vfrom, to: vto};
+    var e = Edge.create(vfrom, vto);
     this.edges_.push(e);
     vfrom.outgoing_.push(e);
     vto.incoming_.push(e);
@@ -72,6 +81,13 @@ describe('graph', function() {
     var e = g.connect(6, 3);
     expect(e.from.key).toEqual(6);
     expect(e.to.key).toEqual(3);
+  });
+  describe('edge', function() {
+    it('is string-representable by the keys of the vertices it connects', function() {
+      var g = Graph.create();
+      var e = g.connect(6, 3);
+      expect(e.toString()).toEqual('6 -> 3');
+    });
   });
   describe('vertex', function() {
     it('provides access to outgoing edges', function() {
