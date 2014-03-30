@@ -1,6 +1,7 @@
 var spawn = require('../lib/top').spawn;
 
-describe('spwned object', function() {
+describe('top', function() {
+  describe('spawn function', function() {
     it('has sll props of parents', function() {
       var p = { a: 'A', b: 'B' };
       var s = spawn(p);
@@ -56,4 +57,5 @@ describe('spwned object', function() {
       expect(s.f()).toEqual('_s_');
     });
   });
+});
 
