@@ -153,12 +153,11 @@ describe('Top', function() {
         s.create();
         expect(capturedThis).toEqual({});
       });
-      it('runs after init function of template has been run', function() {
-        var s = Top.create(function() { return { a: 's' }});
-        var t = s.create(function(defs) { return { a: defs.a + 't' }});
-        var u = t.create(function(defs) { return { a: defs.a + 'u' }});
-        var v = u.create();
-        expect(v.a).toEqual('stu');
+      it('can take var. args', function() {
+        var s = Top.create(function(a, b) { return { a: a, b: b }});
+        var t = s.init('A', 'B');
+        expect(t.a).toEqual('A');
+        expect(t.b).toEqual('B');
       });
     });
   });
