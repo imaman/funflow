@@ -66,6 +66,12 @@ describe('Top', function() {
         expect(u1.f('A')).toEqual('u1:A');
         expect(u2.f('A')).toEqual('u1:A');
       });
+      it('allows access to template object via .up()', function() {
+        var t = Top.create({f: function(v) { return '<' + v + '>' }});
+        var u = t.create({f: function(v) { return '*' + this.up().f(v) + '*' }});
+
+        expect(u.f('A')).toEqual('*<A>*');
+      });
     });
     it('allows each new object to be initialized with its own data', function() {
       var s = Top.create(function() { return { arr: []}});
