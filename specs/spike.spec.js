@@ -1,7 +1,7 @@
 require('util-is');
 var util = require('util');
 var Graph = require('../lib/graph');
-var spawn = require('../lib/top').spawn;
+var Top = require('../lib/top').Top;
 
 function intoDiagram(a) {
   var res = [];
@@ -13,16 +13,16 @@ function intoDiagram(a) {
   });
 }
 
-var Node = spawn({}, {
+var Node = Top.create({
   addKid: function(k) {
     this.kids.push(k);
   },
   followedBy: function(n) {
     this.addKid(n);
   }
-});
+}, function() { return { kids: [] }});
 
-var Scanner = spawn({}, {
+var Scanner = Top.create({
   waitlist: [],
   addToWaitList: function(v) {
     this.waitlist.push(v);
@@ -48,8 +48,8 @@ var Scanner = spawn({}, {
   translateObject: function(o) {
     console.log('OBJECT ' + JSON.stringify(o));
     var self = this;
-    var node = spawn(Node, { kids: [], ownValue: '+', followedBy: function(x) { merge.addKid(x); }});
-    var merge = spawn(Node, { kids: [], ownValue: '---' });
+    var node =  Node.create({ ownValue: '+', followedBy: function(x) { merge.addKid(x); }});
+    var merge = Node.create({ownValue: '---' });
     Object.keys(o).forEach(function(k) {
       var v = o[k];
       console.log('  k=' + k + ', v=' + v);
@@ -64,7 +64,7 @@ var Scanner = spawn({}, {
 
   translateTerminal: function(o) {
     console.log('TERMINAL ' + JSON.stringify(o));
-    var node = spawn(Node, { kids: [], ownValue: o });
+    var node = Node.create({ownValue: o });
     return node;
   },
 
@@ -115,7 +115,7 @@ function order(a) {
   if (!util.isArray(a)) {
     throw new Error('Expected array, but go ' + a);
   }
-  var scanner = spawn(Scanner);
+  var scanner = Scanner.create();
   scanner.schedule(a);
   var result = [];
   scanner.run(result);
