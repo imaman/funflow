@@ -14,7 +14,60 @@ describe('Top', function() {
       expect(t.a).toEqual('A');
       expect(t.b).toEqual('B');
     });
-    it('allows each new objects to be initialized with its own data', function() {
+    describe('inherited fields', function() {
+      it('reference the same object as those in the template object', function() {
+        var s = Top.create({a: []});
+        var t = s.create();
+        s.a.push('added to s.a');
+        expect(t.a).toEqual(['added to s.a']);
+      });
+      it('can be overriden at which case they reference a separate object', function() {
+        var s = Top.create({a: []});
+        var t = s.create({a: []});
+        s.a.push('added to s.a');
+        t.a.push('added to t.a');
+        expect(s.a).toEqual(['added to s.a']);
+        expect(t.a).toEqual(['added to t.a']);
+      });
+    });
+    describe('methods defined at the template', function() {
+      it('made available to all object created from that template', function() {
+        var t = Top.create({sum: function(a,b) { return a + b; }});
+        var u1 = t.create();
+        var u2 = t.create();
+        expect(u1.sum(5,3)).toEqual(8);
+        expect(u2.sum(5,3)).toEqual(8);
+      });
+      it('are this-bounded to the concrete object, not to the template', function() {
+        var t = Top.create({name_: 't', name: function() { return this.name_ }});
+        var u1 = t.create({name_: 'u1'});
+        var u2 = t.create({name_: 'u2'});
+
+        expect(t.name()).toEqual('t');
+        expect(u1.name()).toEqual('u1');
+        expect(u2.name()).toEqual('u2');
+      });
+      it('can be overridden', function() {
+        var t = Top.create({store: function(v) { this.v = 't:' + v; }});
+        var u1 = t.create({store: function(v) { this.v = 'u1:' + v; }});
+
+        t.store('A');
+        u1.store('A');
+
+        expect(t.v).toEqual('t:A');
+        expect(u1.v).toEqual('u1:A');
+      });
+      it('overriding method is in effect for all object created from its object', function() {
+        var t = Top.create({f: function(v) { return 't:' + v }});
+        var u1 = t.create({f: function(v) { return 'u1:' + v }});
+        var u2 = u1.create();
+
+        expect(t.f('A')).toEqual('t:A');
+        expect(u1.f('A')).toEqual('u1:A');
+        expect(u2.f('A')).toEqual('u1:A');
+      });
+    });
+    it('allows each new object to be initialized with its own data', function() {
       var s = Top.create(function() { return { arr: []}});
       var t1 = s.create();
       t1.arr.push('t1');
