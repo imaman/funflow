@@ -41,54 +41,66 @@ describe('Top', function() {
       expect(t2.a).toEqual('A');
       expect(t2.b).toEqual('B');
     });
-    it('allows the init function to access an already initialized this', function() {
-      var s = Top.create({a: 'A'}, function(defs) { return { c: defs.a + defs.b }});
-      var t = s.create({b: 'B'});
+    it('treats _init_ as a reserved key', function() {
+      expect(function() { Top.create({ _init_: 'something' }) }).toThrow();
+    });
+    describe('init function', function() {
+      it('receives a combination of the template and creation defs', function() {
+        var s = Top.create({a: 'A'}, function(defs) { return { c: defs.a + defs.b }});
+        var t = s.create({b: 'B'});
 
-      expect(t.a).toEqual('A');
-      expect(t.b).toEqual('B');
-      expect(t.c).toEqual('AB');
-    });
-    it('init function wins when it conflicts with the defs', function() {
-      var s = Top.create({a: 'A_FROM_DEFS'}, function() { return { a: 'A_FROM_INIT' }});
-      var t = s.create();
-      expect(t.a).toEqual('A_FROM_INIT');
-    });
-    it('init function wins when it conflicts with the defs passed to the child', function() {
-      // Discussion: if s has an init function and we call s.create(creationDefs)
-      // then who should win: the init function or creationDefs?
-      // On the one hand, creationDefs is specific to the instantiation point
-      // whereas init is generic to all instansitation of s so it makes sense to
-      // give higher priority to creationDefs.
-      // On the other hand, guven that client code can change the created
-      // object as he see fit (immediatley after creation), there is no added
-      // value in letting it achieve the same via creationDefs. There is
-      // certainly great value in letting the init() function gain full access to
-      // creationDefs as it can run some logic that is affected by creationDefs.
-      //
-      // Bottom line: init function wins.
-      //
-      // Continued: After some more thinking changed the init function such that
-      // it takes the object to be created as a parameter (thus avoiding
-      // confusion regarding 'what is the value of this when the init function
-      // runs?'. This make the 'init should win' argument even stronger.
-      var s = Top.create({a: 'DEFS'}, function() { return { a: 'INIT' }});
-      var t = s.create({a: 'CHILD'});
-      expect(t.a).toEqual('INIT');
-    });
-    it('init function is not applied to the template object', function() {
-      var s = Top.create({a: 'A_FROM_DEFS'}, function() {
-        this.a = 'A_FROM_INIT';
-        this.b = 'B_FROM_INIT';
+        expect(t.a).toEqual('A');
+        expect(t.b).toEqual('B');
+        expect(t.c).toEqual('AB');
       });
-      expect(s.a).toBe('A_FROM_DEFS');
-      expect(s.b).toBe(undefined);
-    });
-    it('init function runs with an empty object as this', function() {
-      var capturedThis = 'NOT_AN_EMPTY_OBJECT';
-      var s = Top.create(function() { capturedThis = this; });
-      s.create();
-      expect(capturedThis).toEqual({});
+      it('wins when it conflicts with the parent (template) defs', function() {
+        var s = Top.create({a: 'TEMPLATE'}, function() { return { a: 'INIT' }});
+        var t = s.create();
+        expect(t.a).toEqual('INIT');
+      });
+      it('wins when it conflicts with the creation defs', function() {
+        // Discussion: if s has an init function and we call s.create(creationDefs)
+        // then who should win: the init function or creationDefs?
+        // On the one hand, creationDefs is specific to the instantiation point
+        // whereas init is generic to all instansitation of s so it makes sense to
+        // give higher priority to creationDefs.
+        // On the other hand, guven that client code can change the created
+        // object as he see fit (immediatley after creation), there is no added
+        // value in letting it achieve the same via creationDefs. There is
+        // certainly great value in letting the init() function gain full access to
+        // creationDefs as it can run some logic that is affected by creationDefs.
+        //
+        // Bottom line: init function wins.
+        //
+        // Continued: After some more thinking changed the init function such that
+        // it takes the object to be created as a parameter (thus avoiding
+        // confusion regarding 'what is the value of this when the init function
+        // runs?'. This make the 'init should win' argument even stronger.
+        var s = Top.create({a: 'TEMPLATE'}, function() { return { a: 'INIT' }});
+        var t = s.create({a: 'CHILD'});
+        expect(t.a).toEqual('INIT');
+      });
+      it('is not applied to the template object', function() {
+        var s = Top.create({a: 'A_FROM_DEFS'}, function() {
+          this.a = 'A_FROM_INIT';
+          this.b = 'B_FROM_INIT';
+        });
+        expect(s.a).toBe('A_FROM_DEFS');
+        expect(s.b).toBe(undefined);
+      });
+      it('runs with "this" bound to an empty object', function() {
+        var capturedThis = 'NOT_AN_EMPTY_OBJECT';
+        var s = Top.create(function() { capturedThis = this; });
+        s.create();
+        expect(capturedThis).toEqual({});
+      });
+      it('runs after init function of template has been run', function() {
+        var s = Top.create(function() { return { a: 's' }});
+        var t = s.create(function(defs) { return { a: defs.a + 't' }});
+        var u = t.create(function(defs) { return { a: defs.a + 'u' }});
+        var v = u.create();
+        expect(v.a).toEqual('stu');
+      });
     });
   });
   describe('spawn function', function() {
