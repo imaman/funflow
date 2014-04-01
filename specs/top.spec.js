@@ -153,12 +153,6 @@ describe('Top', function() {
         s.extend();
         expect(capturedThis).toEqual({});
       });
-      it('can take var. args', function() {
-        var s = Top.extend(function(a, b) { return { a: a, b: b }});
-        var t = s.new_('A', 'B');
-        expect(t.a).toEqual('A');
-        expect(t.b).toEqual('B');
-      });
       it('is inherited if not overridden', function() {
         var t = Top.extend({name: 't'}, function(defs) { return { upper: defs.name.toUpperCase() }});
 
@@ -167,6 +161,21 @@ describe('Top', function() {
 
         var v = u.extend({name: 'v'});
         expect(v.upper).toEqual('V');
+      });
+    });
+    describe('new_', function() {
+      it('can crate an object with var. args', function() {
+        var s = Top.extend(function(defs, a, b) { return { a: a, b: b }});
+        var t = s.new_('A', 'B');
+        expect(t.a).toEqual('A');
+        expect(t.b).toEqual('B');
+      });
+      it('recevies defs as first parameter', function() {
+        var t = Top.extend({a: 'A', b: 'B' }, function(defs, sep) { return { c: defs.a + sep + defs.b }});
+        var u = t.new_('_');
+        expect(u.a).toEqual('A');
+        expect(u.b).toEqual('B');
+        expect(u.c).toEqual('A_B');
       });
     });
   });
