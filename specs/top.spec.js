@@ -155,7 +155,7 @@ describe('Top', function() {
       });
       it('can take var. args', function() {
         var s = Top.extend(function(a, b) { return { a: a, b: b }});
-        var t = s.init('A', 'B');
+        var t = s.new_('A', 'B');
         expect(t.a).toEqual('A');
         expect(t.b).toEqual('B');
       });
