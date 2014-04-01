@@ -3,27 +3,27 @@ var Top = require('../lib/top').Top;
 
 describe('Top', function() {
   describe('object', function() {
-    it('offers a create method', function() {
-      var s = Top.create({a: 'A', b: 'B' });
+    it('offers a extend method', function() {
+      var s = Top.extend({a: 'A', b: 'B' });
       expect(s.a).toEqual('A');
       expect(s.b).toEqual('B');
     });
-    it('allows new objects to be created from previously .create()-ed objects', function() {
-      var s = Top.create({a: 'A'});
-      var t = s.create({b: 'B' });
+    it('allows new objects to be extendd from previously .extend()-ed objects', function() {
+      var s = Top.extend({a: 'A'});
+      var t = s.extend({b: 'B' });
       expect(t.a).toEqual('A');
       expect(t.b).toEqual('B');
     });
     describe('inherited fields', function() {
       it('reference the same object as those in the template object', function() {
-        var s = Top.create({a: []});
-        var t = s.create();
+        var s = Top.extend({a: []});
+        var t = s.extend();
         s.a.push('added to s.a');
         expect(t.a).toEqual(['added to s.a']);
       });
       it('can be overriden at which case they reference a separate object', function() {
-        var s = Top.create({a: []});
-        var t = s.create({a: []});
+        var s = Top.extend({a: []});
+        var t = s.extend({a: []});
         s.a.push('added to s.a');
         t.a.push('added to t.a');
         expect(s.a).toEqual(['added to s.a']);
@@ -31,25 +31,25 @@ describe('Top', function() {
       });
     });
     describe('methods defined at the template', function() {
-      it('made available to all object created from that template', function() {
-        var t = Top.create({sum: function(a,b) { return a + b; }});
-        var u1 = t.create();
-        var u2 = t.create();
+      it('made available to all object extendd from that template', function() {
+        var t = Top.extend({sum: function(a,b) { return a + b; }});
+        var u1 = t.extend();
+        var u2 = t.extend();
         expect(u1.sum(5,3)).toEqual(8);
         expect(u2.sum(5,3)).toEqual(8);
       });
       it('are this-bounded to the concrete object, not to the template', function() {
-        var t = Top.create({name_: 't', name: function() { return this.name_ }});
-        var u1 = t.create({name_: 'u1'});
-        var u2 = t.create({name_: 'u2'});
+        var t = Top.extend({name_: 't', name: function() { return this.name_ }});
+        var u1 = t.extend({name_: 'u1'});
+        var u2 = t.extend({name_: 'u2'});
 
         expect(t.name()).toEqual('t');
         expect(u1.name()).toEqual('u1');
         expect(u2.name()).toEqual('u2');
       });
       it('can be overridden', function() {
-        var t = Top.create({store: function(v) { this.v = 't:' + v; }});
-        var u1 = t.create({store: function(v) { this.v = 'u1:' + v; }});
+        var t = Top.extend({store: function(v) { this.v = 't:' + v; }});
+        var u1 = t.extend({store: function(v) { this.v = 'u1:' + v; }});
 
         t.store('A');
         u1.store('A');
@@ -57,39 +57,39 @@ describe('Top', function() {
         expect(t.v).toEqual('t:A');
         expect(u1.v).toEqual('u1:A');
       });
-      it('overriding method is in effect for all object created from its object', function() {
-        var t = Top.create({f: function(v) { return 't:' + v }});
-        var u1 = t.create({f: function(v) { return 'u1:' + v }});
-        var u2 = u1.create();
+      it('overriding method is in effect for all object extendd from its object', function() {
+        var t = Top.extend({f: function(v) { return 't:' + v }});
+        var u1 = t.extend({f: function(v) { return 'u1:' + v }});
+        var u2 = u1.extend();
 
         expect(t.f('A')).toEqual('t:A');
         expect(u1.f('A')).toEqual('u1:A');
         expect(u2.f('A')).toEqual('u1:A');
       });
       it('allows access to template object via .up()', function() {
-        var t = Top.create({f: function(v) { return '<' + v + '>' }});
-        var u = t.create({f: function(v) { return '*' + this.up().f(v) + '*' }});
+        var t = Top.extend({f: function(v) { return '<' + v + '>' }});
+        var u = t.extend({f: function(v) { return '*' + this.up().f(v) + '*' }});
 
         expect(u.f('A')).toEqual('*<A>*');
       });
     });
     it('allows each new object to be initialized with its own data', function() {
-      var s = Top.create(function() { return { arr: []}});
-      var t1 = s.create();
+      var s = Top.extend(function() { return { arr: []}});
+      var t1 = s.extend();
       t1.arr.push('t1');
 
-      var t2 = s.create();
+      var t2 = s.extend();
       t2.arr.push('t2');
 
       expect(t1.arr).toEqual(['t1']);
       expect(t2.arr).toEqual(['t2']);
     });
-    it('allows .create() to take defs and an init function at the same time', function() {
-      var s = Top.create({a: 'A', b: 'B'}, function() { return { arr: []}});
-      var t1 = s.create();
+    it('allows .extend() to take defs and an init function at the same time', function() {
+      var s = Top.extend({a: 'A', b: 'B'}, function() { return { arr: []}});
+      var t1 = s.extend();
       t1.arr.push('t1');
 
-      var t2 = s.create();
+      var t2 = s.extend();
       t2.arr.push('t2');
 
       expect(t1.arr).toEqual(['t1']);
@@ -101,29 +101,29 @@ describe('Top', function() {
       expect(t2.b).toEqual('B');
     });
     it('treats _init_ as a reserved key', function() {
-      expect(function() { Top.create({ _init_: 'something' }) }).toThrow();
+      expect(function() { Top.extend({ _init_: 'something' }) }).toThrow();
     });
     describe('init function', function() {
       it('receives a combination of the template and creation defs', function() {
-        var s = Top.create({a: 'A'}, function(defs) { return { c: defs.a + defs.b }});
-        var t = s.create({b: 'B'});
+        var s = Top.extend({a: 'A'}, function(defs) { return { c: defs.a + defs.b }});
+        var t = s.extend({b: 'B'});
 
         expect(t.a).toEqual('A');
         expect(t.b).toEqual('B');
         expect(t.c).toEqual('AB');
       });
       it('wins when it conflicts with the parent (template) defs', function() {
-        var s = Top.create({a: 'TEMPLATE'}, function() { return { a: 'INIT' }});
-        var t = s.create();
+        var s = Top.extend({a: 'TEMPLATE'}, function() { return { a: 'INIT' }});
+        var t = s.extend();
         expect(t.a).toEqual('INIT');
       });
       it('wins when it conflicts with the creation defs', function() {
-        // Discussion: if s has an init function and we call s.create(creationDefs)
+        // Discussion: if s has an init function and we call s.extend(creationDefs)
         // then who should win: the init function or creationDefs?
         // On the one hand, creationDefs is specific to the instantiation point
         // whereas init is generic to all instansitation of s so it makes sense to
         // give higher priority to creationDefs.
-        // On the other hand, guven that client code can change the created
+        // On the other hand, guven that client code can change the extendd
         // object as he see fit (immediatley after creation), there is no added
         // value in letting it achieve the same via creationDefs. There is
         // certainly great value in letting the init() function gain full access to
@@ -132,15 +132,15 @@ describe('Top', function() {
         // Bottom line: init function wins.
         //
         // Continued: After some more thinking changed the init function such that
-        // it takes the object to be created as a parameter (thus avoiding
+        // it takes the object to be extendd as a parameter (thus avoiding
         // confusion regarding 'what is the value of this when the init function
         // runs?'. This make the 'init should win' argument even stronger.
-        var s = Top.create({a: 'TEMPLATE'}, function() { return { a: 'INIT' }});
-        var t = s.create({a: 'CHILD'});
+        var s = Top.extend({a: 'TEMPLATE'}, function() { return { a: 'INIT' }});
+        var t = s.extend({a: 'CHILD'});
         expect(t.a).toEqual('INIT');
       });
       it('is not applied to the template object', function() {
-        var s = Top.create({a: 'A_FROM_DEFS'}, function() {
+        var s = Top.extend({a: 'A_FROM_DEFS'}, function() {
           this.a = 'A_FROM_INIT';
           this.b = 'B_FROM_INIT';
         });
@@ -149,15 +149,24 @@ describe('Top', function() {
       });
       it('runs with "this" bound to an empty object', function() {
         var capturedThis = 'NOT_AN_EMPTY_OBJECT';
-        var s = Top.create(function() { capturedThis = this; });
-        s.create();
+        var s = Top.extend(function() { capturedThis = this; });
+        s.extend();
         expect(capturedThis).toEqual({});
       });
       it('can take var. args', function() {
-        var s = Top.create(function(a, b) { return { a: a, b: b }});
+        var s = Top.extend(function(a, b) { return { a: a, b: b }});
         var t = s.init('A', 'B');
         expect(t.a).toEqual('A');
         expect(t.b).toEqual('B');
+      });
+      it('is inherited if not overridden', function() {
+        var t = Top.extend({name: 't'}, function(defs) { return { upper: defs.name.toUpperCase() }});
+
+        var u = t.extend({name: 'u'});
+        expect(u.upper).toEqual('U');
+
+        var v = u.extend({name: 'v'});
+        expect(v.upper).toEqual('V');
       });
     });
   });
@@ -185,7 +194,7 @@ describe('Top', function() {
       var s = spawn(p);
       expect(JSON.stringify(s)).toEqual('{}');
     });
-    it('can be created with its own props', function() {
+    it('can be extendd with its own props', function() {
       var p = { a: 'A', b: 'B' };
       var s = spawn(p, { c: 'C', d: 'D'});
       expect(s.c).toEqual('C');

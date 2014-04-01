@@ -13,7 +13,7 @@ function intoDiagram(a) {
   });
 }
 
-var Node = Top.create({
+var Node = Top.extend({
   addKid: function(k) {
     this.kids.push(k);
   },
@@ -22,7 +22,7 @@ var Node = Top.create({
   }
 }, function() { return { kids: [] }});
 
-var Scanner = Top.create({
+var Scanner = Top.extend({
   waitlist: [],
   addToWaitList: function(v) {
     this.waitlist.push(v);
