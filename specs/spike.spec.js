@@ -48,8 +48,8 @@ var Scanner = Top.extend({
   translateObject: function(o) {
     console.log('OBJECT ' + JSON.stringify(o));
     var self = this;
-    var node =  Node.create({ ownValue: '+', followedBy: function(x) { merge.addKid(x); }});
-    var merge = Node.create({ownValue: '---' });
+    var node =  Node.extend({ ownValue: '+', followedBy: function(x) { merge.addKid(x); }});
+    var merge = Node.extend({ownValue: '---' });
     Object.keys(o).forEach(function(k) {
       var v = o[k];
       console.log('  k=' + k + ', v=' + v);
@@ -64,7 +64,7 @@ var Scanner = Top.extend({
 
   translateTerminal: function(o) {
     console.log('TERMINAL ' + JSON.stringify(o));
-    var node = Node.create({ownValue: o });
+    var node = Node.extend({ownValue: o });
     return node;
   },
 
@@ -115,7 +115,7 @@ function order(a) {
   if (!util.isArray(a)) {
     throw new Error('Expected array, but go ' + a);
   }
-  var scanner = Scanner.create();
+  var scanner = Scanner.new_();
   scanner.schedule(a);
   var result = [];
   scanner.run(result);
