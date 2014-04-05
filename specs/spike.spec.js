@@ -235,11 +235,18 @@ describe('ASCII diagram', function() {
   });
   function treeFromDsl(dsl) {
     var g = Graph.new_();
-    dsl.reduce(function(prev, current) {
-      var result = g.vertex(current);
-      prev && prev.connectTo(result);
-      return result;
-    }, null);
+    if (util.isArray(dsl)) {
+      dsl.reduce(function(prev, current) {
+        var result = g.vertex(current);
+        prev && prev.connectTo(result);
+        return result;
+      }, null);
+    } else if (util.isPureObject(dsl)) {
+      var root = g.vertex('r');
+      Object.keys(dsl).forEach(function(k) {
+        root.connectTo(k);
+      });
+    }
     return g;
   }
   describe('DSL translation into a tree', function() {
@@ -249,6 +256,14 @@ describe('ASCII diagram', function() {
       expect(g.edges().map(function(e) { return e.toString() })).toEqual([
         '100 -> 200',
         '200 -> 300']);
+    });
+    it('converts a pure-object into a multi-child node', function() {
+      var input = {a: 'A', b: 'B', c: 'C' };
+      var g = treeFromDsl(input);
+      expect(g.edges().map(function(e) { return e.toString() })).toEqual([
+        'r -> a',
+        'r -> b',
+        'r -> c' ]);
     });
   });
 });
