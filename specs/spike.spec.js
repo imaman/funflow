@@ -140,16 +140,21 @@ describe('ASCII diagram', function() {
         toEqual(['a'], ['+', 'B1', 'B2'], ['c']);
   });
   function transform(g, visited, v) {
-    v.outgoing().map(function(e) { return e.to }).forEach(function(v) {
-      transform(g, visited, v);
-    });
-    if (v.type !== 'split')
-      return;
+    var targets = v.targets();
+    if (targets.length === 0)
+      return v;
+
+    if (targets.length === 1) {
+      return transform(g, visited, targets[0]);
+    }
 
     var merge = g.vertex(- Number(v));
-    v.outgoing().forEach(function(e) {
-      g.connect(e.to, merge);
+    targets.forEach(function(t) {
+      var bottom = transform(g, visited, t);
+      g.connect(bottom, merge);
     });
+
+    return merge;
   }
   describe('tree to dag transformation', function() {
     function keys(vertices) {
@@ -158,7 +163,6 @@ describe('ASCII diagram', function() {
 
     it('adds a merge vertex for each split vertex', function() {
       var g = Graph.new_();
-      g.vertex(1).type = 'split';
       g.connect(1, 100);
       g.connect(1, 200);
       transform(g, {}, g.vertex(1));
@@ -167,12 +171,67 @@ describe('ASCII diagram', function() {
     });
     it('adds an edge from each branch of the split to the merge vertex', function() {
       var g = Graph.new_();
-      g.vertex(1).type = 'split';
       g.connect(1, 100);
       g.connect(1, 200);
       transform(g, {}, g.vertex(1));
 
       expect(keys(g.vertex(-1).sources())).toEqual([100, 200]);
+    });
+    it('handles nesting of splits', function() {
+      var g = Graph.new_();
+      //
+      // 1---+----------------+
+      //     |                |
+      //     11---+----+      12--+----+
+      //          |    |          |    |
+      //          111  112        121  122
+      //          |    |          |    |
+      //    -11---+----+     -12--+----+
+      //     |                |
+      // -1--+----------------+
+      g.connect(1, 11);
+      g.connect(1, 12);
+
+      g.connect(11, 111);
+      g.connect(11, 112);
+
+      g.connect(12, 121);
+      g.connect(12, 122);
+
+      transform(g, {}, g.vertex(1));
+
+      expect(keys(g.vertex(-11).sources())).toEqual([111, 112]);
+      expect(keys(g.vertex(-12).sources())).toEqual([121, 122]);
+      expect(keys(g.vertex(-1).sources())).toEqual([-11, -12]);
+    });
+    it('keeps linear sequences as-is', function() {
+      var g = Graph.new_();
+      g.connect(1, 2);
+      g.connect(2, 3);
+
+      transform(g, {}, g.vertex(1));
+
+      expect(g.edges().map(function(e) { return e.toString()})).toEqual(['1 -> 2', '2 -> 3']);
+    });
+    it('connects last vertex in a sequence to the merge vertex of the parent', function() {
+      var g = Graph.new_();
+      g.connect(1, 10);
+      g.connect(1, 20);
+      g.connect(10, 11);
+      g.connect(11, 12);
+      g.connect(12, 13);
+
+      transform(g, {}, g.vertex(1));
+
+      expect(keys(g.vertex(-1).sources())).toEqual([13,20]);
+      expect(g.edges().map(function(e) { return e.toString()})).toEqual([
+        '1 -> 10',
+        '1 -> 20',
+        '10 -> 11',
+        '11 -> 12',
+        '12 -> 13',
+        '13 -> -1',
+        '20 -> -1']);
     });
   });
 });
