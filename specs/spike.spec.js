@@ -139,4 +139,36 @@ describe('ASCII diagram', function() {
     expect(order(['a', {b1: 'B1', b2: 'B2' }, 'c'])).
         toEqual(['a'], ['+', 'B1', 'B2'], ['c']);
   });
+  function transform(g, visited, v) {
+    v.outgoing().map(function(e) { return e.to }).forEach(function(v) {
+      transform(g, visited, v);
+    });
+    if (v.type !== 'split')
+      return;
+
+    var merge = g.vertex(- Number(v));
+    v.outgoing().forEach(function(e) {
+      g.connect(e.to, merge);
+    });
+  }
+  describe('tree to dag transformation', function() {
+    it('adds a merge vertex for each split vertex', function() {
+      var g = Graph.new_();
+      g.vertex(1).type = 'split';
+      g.connect(1, 100);
+      g.connect(1, 200);
+      transform(g, {}, g.vertex(1));
+
+      expect(g.vertices().map(function(v) { return v.key })).toEqual([1,100,200,-1]);
+    });
+    it('adds an edge from each branch of the split to the merge vertex', function() {
+      var g = Graph.new_();
+      g.vertex(1).type = 'split';
+      g.connect(1, 100);
+      g.connect(1, 200);
+      transform(g, {}, g.vertex(1));
+
+      expect(g.vertex(-1).incoming().map(function(e) { return e.from.key })).toEqual([100, 200]);
+    });
+  });
 });
