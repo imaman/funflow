@@ -139,23 +139,23 @@ describe('ASCII diagram', function() {
     expect(order(['a', {b1: 'B1', b2: 'B2' }, 'c'])).
         toEqual(['a'], ['+', 'B1', 'B2'], ['c']);
   });
-  function transform(g, visited, v) {
+  function dagFromTree(g, visited, v) {
     var targets = v.targets();
     if (targets.length === 0)
       return v;
 
     if (targets.length === 1) {
-      return transform(g, visited, targets[0]);
+      return dagFromTree(g, visited, targets[0]);
     }
 
     var result = g.vertex(- Number(v));
     targets.forEach(function(t) {
-      transform(g, visited, t).connectTo(result);
+      dagFromTree(g, visited, t).connectTo(result);
     });
 
     return result;
   }
-  describe('tree to dag transformation', function() {
+  describe('tree to dag dagFromTreeation', function() {
     function keys(vertices) {
       return vertices.map(function(v) { return v.key });
     }
@@ -164,7 +164,7 @@ describe('ASCII diagram', function() {
       var g = Graph.new_();
       g.connect(1, 100);
       g.connect(1, 200);
-      transform(g, {}, g.vertex(1));
+      dagFromTree(g, {}, g.vertex(1));
 
       expect(g.vertices().map(function(v) { return v.key })).toEqual([1,100,200,-1]);
     });
@@ -172,7 +172,7 @@ describe('ASCII diagram', function() {
       var g = Graph.new_();
       g.connect(1, 100);
       g.connect(1, 200);
-      transform(g, {}, g.vertex(1));
+      dagFromTree(g, {}, g.vertex(1));
 
       expect(keys(g.vertex(-1).sources())).toEqual([100, 200]);
     });
@@ -197,7 +197,7 @@ describe('ASCII diagram', function() {
       g.connect(12, 121);
       g.connect(12, 122);
 
-      transform(g, {}, g.vertex(1));
+      dagFromTree(g, {}, g.vertex(1));
 
       expect(keys(g.vertex(-11).sources())).toEqual([111, 112]);
       expect(keys(g.vertex(-12).sources())).toEqual([121, 122]);
@@ -208,7 +208,7 @@ describe('ASCII diagram', function() {
       g.connect(1, 2);
       g.connect(2, 3);
 
-      transform(g, {}, g.vertex(1));
+      dagFromTree(g, {}, g.vertex(1));
 
       expect(g.edges().map(function(e) { return e.toString()})).toEqual(['1 -> 2', '2 -> 3']);
     });
@@ -220,7 +220,7 @@ describe('ASCII diagram', function() {
       g.connect(11, 12);
       g.connect(12, 13);
 
-      transform(g, {}, g.vertex(1));
+      dagFromTree(g, {}, g.vertex(1));
 
       expect(keys(g.vertex(-1).sources())).toEqual([13,20]);
       expect(g.edges().map(function(e) { return e.toString()})).toEqual([
@@ -231,6 +231,24 @@ describe('ASCII diagram', function() {
         '12 -> 13',
         '13 -> -1',
         '20 -> -1']);
+    });
+  });
+  function treeFromDsl(dsl) {
+    var g = Graph.new_();
+    dsl.reduce(function(prev, current) {
+      var result = g.vertex(current);
+      prev && prev.connectTo(result);
+      return result;
+    }, null);
+    return g;
+  }
+  describe('DSL translation into a tree', function() {
+    it('converts an array into a linear list', function() {
+      var input = [100, 200, 300];
+      var g = treeFromDsl(input);
+      expect(g.edges().map(function(e) { return e.toString() })).toEqual([
+        '100 -> 200',
+        '200 -> 300']);
     });
   });
 });
