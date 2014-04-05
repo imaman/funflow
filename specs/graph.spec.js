@@ -46,6 +46,22 @@ describe('graph', function() {
       g.connect(4, 2);
       expect(v.incoming().map(function(x) { return x.from.key })).toEqual([6, 4]);
     });
+    it('reports vertices at other end of outgoing edges', function() {
+      var g = Graph.new_();
+      g.connect(6, 2);
+      g.connect(6, 3);
+      expect(g.vertex(6).targets().map(function(v) { return v.key })).toEqual([2,3]);
+      expect(g.vertex(2).targets()).toEqual([]);
+      expect(g.vertex(3).targets()).toEqual([]);
+    });
+    it('reports vertices at other end of incoming edges', function() {
+      var g = Graph.new_();
+      g.connect(6, 2);
+      g.connect(4, 2);
+      expect(g.vertex(2).sources().map(function(v) { return v.key })).toEqual([6,4]);
+      expect(g.vertex(6).sources()).toEqual([]);
+      expect(g.vertex(4).sources()).toEqual([]);
+    });
     it('can connect by key', function() {
       var g = Graph.new_();
       var e = g.connect(6, 2);
