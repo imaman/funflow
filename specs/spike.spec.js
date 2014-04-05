@@ -149,7 +149,13 @@ describe('ASCII diagram', function() {
     }
 
     var result = g.vertex(- Number(v));
-    targets.forEach(function(t) {
+    v.outgoing().forEach(function(e) {
+      if (e.type === 'next') {
+        result.connectTo(e.to);
+        return;
+      }
+
+      var t = e.to;
       dagFromTree(g, visited, t).connectTo(result);
     });
 
@@ -231,6 +237,24 @@ describe('ASCII diagram', function() {
         '12 -> 13',
         '13 -> -1',
         '20 -> -1']);
+    });
+    it('handles a split in the middle of a sequence', function() {
+      var g = Graph.new_();
+      g.connect(1, 2);
+      g.connect(2, 21);
+      g.connect(2, 22);
+      g.connect(2, 3).type = 'next';
+
+      dagFromTree(g, {}, g.vertex(1));
+
+      expect(g.edges().map(function(e) { return e.toString()})).toEqual([
+        '1 -> 2',
+        '2 -> 21',
+        '2 -> 22',
+        '2 -> 3',
+        '21 -> -2',
+        '22 -> -2',
+        '-2 -> 3']);
     });
   });
   function treeFromDsl(dsl) {
