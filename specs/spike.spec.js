@@ -148,13 +148,12 @@ describe('ASCII diagram', function() {
       return transform(g, visited, targets[0]);
     }
 
-    var merge = g.vertex(- Number(v));
+    var result = g.vertex(- Number(v));
     targets.forEach(function(t) {
-      var bottom = transform(g, visited, t);
-      g.connect(bottom, merge);
+      transform(g, visited, t).connectTo(result);
     });
 
-    return merge;
+    return result;
   }
   describe('tree to dag transformation', function() {
     function keys(vertices) {
