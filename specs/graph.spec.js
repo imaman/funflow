@@ -30,6 +30,28 @@ describe('graph', function() {
       var e = g.connect(6, 3);
       expect(e.toString()).toEqual('6 -> 3');
     });
+    it('is stored in .edges()', function() {
+      var g = Graph.new_();
+      g.connect(6, 3);
+      g.connect(6, 2);
+      g.connect(4, 2);
+      expect(g.edges().map(function(e) { return e.toString() })).toEqual([
+        '6 -> 3',
+        '6 -> 2',
+        '4 -> 2']);
+    });
+    it('can be dropped', function() {
+      var g = Graph.new_();
+      g.connect(6, 3);
+      var e = g.connect(6, 2);
+      g.connect(4, 2);
+      e.drop();
+      expect(g.edges().map(function(e) { return e.toString() })).toEqual([
+        '6 -> 3',
+        '4 -> 2']);
+      expect(g.vertex(6).outgoing().length).toEqual(1);
+      expect(g.vertex(2).incoming().length).toEqual(1);
+    });
   });
   describe('vertex', function() {
     it('provides access to outgoing edges', function() {
