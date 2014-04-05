@@ -152,6 +152,7 @@ describe('ASCII diagram', function() {
     v.outgoing().forEach(function(e) {
       if (e.type === 'next') {
         result.connectTo(e.to);
+        e.drop();
         return;
       }
 
@@ -251,7 +252,6 @@ describe('ASCII diagram', function() {
         '1 -> 2',
         '2 -> 21',
         '2 -> 22',
-        '2 -> 3',
         '21 -> -2',
         '22 -> -2',
         '-2 -> 3']);
