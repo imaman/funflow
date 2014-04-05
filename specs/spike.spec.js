@@ -152,6 +152,10 @@ describe('ASCII diagram', function() {
     });
   }
   describe('tree to dag transformation', function() {
+    function keys(vertices) {
+      return vertices.map(function(v) { return v.key });
+    }
+
     it('adds a merge vertex for each split vertex', function() {
       var g = Graph.new_();
       g.vertex(1).type = 'split';
@@ -168,7 +172,7 @@ describe('ASCII diagram', function() {
       g.connect(1, 200);
       transform(g, {}, g.vertex(1));
 
-      expect(g.vertex(-1).incoming().map(function(e) { return e.from.key })).toEqual([100, 200]);
+      expect(keys(g.vertex(-1).sources())).toEqual([100, 200]);
     });
   });
 });
