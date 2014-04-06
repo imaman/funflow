@@ -259,18 +259,25 @@ describe('ASCII diagram', function() {
   });
   function treeFromDsl(dsl) {
     var g = Graph.new_();
-    if (util.isArray(dsl)) {
-      dsl.reduce(function(prev, current) {
-        var result = g.vertex(current);
-        prev && prev.connectTo(result);
-        return result;
-      }, null);
-    } else if (util.isPureObject(dsl)) {
-      var root = g.vertex('r');
-      Object.keys(dsl).forEach(function(k) {
-        root.connectTo(k);
-      });
+
+    function go(dsl) {
+      if (util.isArray(dsl)) {
+        dsl.reduce(function(prev, current) {
+          var result = go(current);
+          prev && prev.connectTo(result);
+          return result;
+        }, null);
+      } else if (util.isPureObject(dsl)) {
+        var root = g.vertex('r');
+        Object.keys(dsl).forEach(function(k) {
+          root.connectTo(k);
+        });
+        return root;
+      } else {
+        return g.vertex(dsl);
+      }
     }
+    go(dsl);
     return g;
   }
   describe('DSL translation into a tree', function() {
@@ -287,6 +294,15 @@ describe('ASCII diagram', function() {
       expect(g.edges().map(function(e) { return e.toString() })).toEqual([
         'r -> a',
         'r -> b',
+        'r -> c' ]);
+    });
+    it('handles nesting', function() {
+      var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
+      var g = treeFromDsl(input);
+      expect(g.edges().map(function(e) { return e.toString() })).toEqual([
+        'r -> b1',
+        'r -> b2',
+        'a -> r',
         'r -> c' ]);
     });
   });
