@@ -257,20 +257,28 @@ describe('ASCII diagram', function() {
         '-2 -> 3']);
     });
   });
-  function treeFromDsl(dsl) {
+  function treeFromDsl(dsl, prefix) {
+    prefix = prefix || '_temp_';
     var g = Graph.new_();
+    var n = 0;
 
     function go(dsl) {
       if (util.isArray(dsl)) {
-        dsl.reduce(function(prev, current) {
+        return dsl.reduceRight(function(soFar, current) {
           var result = go(current);
-          prev && prev.connectTo(result);
+          if (soFar) {
+            var e = result.connectTo(soFar);
+            e.type = 'next';
+          }
           return result;
         }, null);
       } else if (util.isPureObject(dsl)) {
-        var root = g.vertex('r');
+        var name = prefix + n;
+        n += 1;
+        var root = g.vertex(name);
         Object.keys(dsl).forEach(function(k) {
-          root.connectTo(k);
+          var v = go(dsl[k]);
+          root.connectTo(v);
         });
         return root;
       } else {
@@ -280,30 +288,55 @@ describe('ASCII diagram', function() {
     go(dsl);
     return g;
   }
+  function verify(actual, expected) {
+    actual = actual.map(function(x) { return x.toString() });
+    actual.sort();
+    expected.sort();
+    expect(actual).toEqual(expected);
+  }
   describe('DSL translation into a tree', function() {
     it('converts an array into a linear list', function() {
       var input = [100, 200, 300];
       var g = treeFromDsl(input);
-      expect(g.edges().map(function(e) { return e.toString() })).toEqual([
+      verify(g.edges(), [
         '100 -> 200',
         '200 -> 300']);
     });
     it('converts a pure-object into a multi-child node', function() {
       var input = {a: 'A', b: 'B', c: 'C' };
-      var g = treeFromDsl(input);
-      expect(g.edges().map(function(e) { return e.toString() })).toEqual([
-        'r -> a',
-        'r -> b',
-        'r -> c' ]);
+      var g = treeFromDsl(input, 't');
+      verify(g.edges(), [
+        't0 -> A',
+        't0 -> B',
+        't0 -> C' ]);
     });
     it('handles nesting', function() {
       var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
+      var g = treeFromDsl(input, 't');
+      verify(g.edges(), [
+        't0 -> B1',
+        't0 -> B2',
+        'a -> t0',
+        't0 -> c' ]);
+    });
+    it('map of arrays', function() {
+      var input = ['a', {b1: ['B11', 'B12'], b2: ['B21', 'B22']}, 'c'];
+      var g = treeFromDsl(input, 't');
+      verify(g.edges(), [
+        'B11 -> B12',
+        't0 -> B11',
+        'B21 -> B22',
+        't0 -> B21',
+        'a -> t0',
+        't0 -> c']);
+    });
+    it('tags edges in a sequence with "next"', function() {
+      var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
       var g = treeFromDsl(input);
-      expect(g.edges().map(function(e) { return e.toString() })).toEqual([
-        'r -> b1',
-        'r -> b2',
-        'a -> r',
-        'r -> c' ]);
+      expect(g.vertex('a').outgoing().map(function(e) { return e.type })).toEqual(['next']);
+      expect(g.vertex('B1').incoming().map(function(e) { return e.type })).toEqual([undefined]);
+      expect(g.vertex('B2').incoming().map(function(e) { return e.type })).toEqual([undefined]);
+      expect(g.vertex('c').incoming().map(function(e) { return e.type })).toEqual(['next']);
     });
   });
 });
