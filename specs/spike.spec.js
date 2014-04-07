@@ -2,6 +2,7 @@ require('util-is');
 var util = require('util');
 var Graph = require('../lib/graph');
 var Top = require('../lib/top').Top;
+var dagFromTree = require('../lib/visualization').dagFromTree;
 
 function intoDiagram(a) {
   var res = [];
@@ -139,30 +140,7 @@ describe('ASCII diagram', function() {
     expect(order(['a', {b1: 'B1', b2: 'B2' }, 'c'])).
         toEqual(['a'], ['+', 'B1', 'B2'], ['c']);
   });
-  function dagFromTree(g, visited, v) {
-    var targets = v.targets();
-    if (targets.length === 0)
-      return v;
-
-    if (targets.length === 1) {
-      return dagFromTree(g, visited, targets[0]);
-    }
-
-    var result = g.vertex(- Number(v));
-    v.outgoing().forEach(function(e) {
-      if (e.type === 'next') {
-        result.connectTo(e.to);
-        e.drop();
-        return;
-      }
-
-      var t = e.to;
-      dagFromTree(g, visited, t).connectTo(result);
-    });
-
-    return result;
-  }
-  describe('tree to dag dagFromTreeation', function() {
+  describe('tree to dag dag', function() {
     function keys(vertices) {
       return vertices.map(function(v) { return v.key });
     }
