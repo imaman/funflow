@@ -224,7 +224,26 @@ describe('tree/dag representation', function() {
     }
     return result;
   }
+  function order(v) {
+    var result = [];
+    while(v) {
+      result.push([v.toString()]);
+      v = v.targets()[0];
+    }
+    return result;
+  }
   describe('dag to ASCII diagram', function() {
+    describe('printing order', function() {
+      it('linear in a sequence', function() {
+        var g = Graph.new_();
+        g.connect('a', 'b');
+        g.connect('b', 'c');
+        expect(order(g.vertex('a'))).toEqual([
+          ['a'],
+          ['b'],
+          ['c']]);
+      });
+    });
     it('turns a sequence into a vertical line', function() {
       var g = Graph.new_();
       g.connect('a', 'b');
