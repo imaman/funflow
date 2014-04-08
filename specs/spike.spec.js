@@ -1,7 +1,6 @@
-require('util-is');
-var util = require('util');
 var Graph = require('../lib/graph');
 var dagFromTree = require('../lib/visualization').dagFromTree;
+var treeFromDsl = require('../lib/visualization').treeFromDsl;
 
 
 describe('tree/dag representation', function() {
@@ -100,37 +99,6 @@ describe('tree/dag representation', function() {
         '-2 -> 3']);
     });
   });
-  function treeFromDsl(dsl, prefix) {
-    prefix = prefix || '_temp_';
-    var g = Graph.new_();
-    var n = 0;
-
-    function go(dsl) {
-      if (util.isArray(dsl)) {
-        return dsl.reduceRight(function(soFar, current) {
-          var result = go(current);
-          if (soFar) {
-            var e = result.connectTo(soFar);
-            e.type = 'next';
-          }
-          return result;
-        }, null);
-      } else if (util.isPureObject(dsl)) {
-        var name = prefix + n;
-        n += 1;
-        var root = g.vertex(name);
-        Object.keys(dsl).forEach(function(k) {
-          var v = go(dsl[k]);
-          root.connectTo(v);
-        });
-        return root;
-      } else {
-        return g.vertex(dsl);
-      }
-    }
-    go(dsl);
-    return g;
-  }
   function verify(actual, expected) {
     actual = actual.map(function(x) { return x.toString() });
     actual.sort();
