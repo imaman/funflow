@@ -216,14 +216,6 @@ describe('tree/dag representation', function() {
       expect(g.vertex('c').incoming().map(function(e) { return e.type })).toEqual(['next']);
     });
   });
-  function diagramOf(v) {
-    var result = [];
-    while(v) {
-      result.push(v.toString());
-      v = v.targets()[0];
-    }
-    return result;
-  }
   function order(v) {
     var result = [];
     while(v) {
@@ -243,15 +235,6 @@ describe('tree/dag representation', function() {
           ['b'],
           ['c']]);
       });
-    });
-    it('turns a sequence into a vertical line', function() {
-      var g = Graph.new_();
-      g.connect('a', 'b');
-      g.connect('b', 'c');
-      expect(diagramOf(g.vertex('a'))).toEqual([
-        'a',
-        'b',
-        'c']);
     });
   });
 });
