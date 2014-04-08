@@ -105,7 +105,7 @@ describe('tree/dag representation', function() {
     expected.sort();
     expect(actual).toEqual(expected);
   }
-  describe('DSL translation into a tree', function() {
+  describe('DSL to tree', function() {
     it('converts an array into a linear list', function() {
       var input = [100, 200, 300];
       var g = treeFromDsl(input);
