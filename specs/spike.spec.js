@@ -217,16 +217,42 @@ describe('tree/dag representation', function() {
     });
   });
   function order(v) {
-    var result = [];
-    while(v) {
-      result.push([v.toString()]);
-      v = v.targets()[0];
+    var temp = [];
+    var q = [];
+    q.push({v: v, depth: 0});
+
+    while(q.length > 0) {
+      var current = q.shift();
+      temp.push(current);
+      current.v.targets().forEach(function(t) {
+        q.push({v: t, depth: current.depth + 1});
+      });
     }
-    return result;
+
+    function groupBy(array, map) {
+      var groups = {};
+      array.forEach(function(o) {
+        var group = JSON.stringify(map(o));
+        groups[group] = groups[group] || [];
+        groups[group].push(o);
+      });
+      return groups;
+    }
+
+    var groups = groupBy(temp, function(o) { return o.depth });
+    var result = Object.keys(groups).map(function(k) {
+      return {d: k, vs: groups[k].map(function(x) { return x.v })}
+    });
+    result.sort(function(x, y) {
+      var dx = Number(x.d);
+      var dy = Number(y.d);
+      return (dx === dy) ? 0 : (dx < dy) ? -1 : 1;
+    });
+    return result.map(function(x) { return x.vs.map(function(v) { return v.toString() }) });
   }
   describe('dag to ASCII diagram', function() {
     describe('printing order', function() {
-      it('linear in a sequence', function() {
+      it('is linear in a sequence', function() {
         var g = Graph.new_();
         g.connect('a', 'b');
         g.connect('b', 'c');
@@ -236,5 +262,16 @@ describe('tree/dag representation', function() {
           ['c']]);
       });
     });
+    it('is parallel for branches', function() {
+      var g = Graph.new_();
+      g.connect('a', 'a1');
+      g.connect('a', 'a2');
+      expect(order(g.vertex('a'))).toEqual([
+        ['a'],
+        ['a1', 'a2']]);
+    });
   });
 });
+
+
+
