@@ -220,9 +220,17 @@ describe('tree/dag representation', function() {
     var temp = [];
     var q = [];
     q.push({v: v, depth: 0});
+    var visitCountByVertex = {};
 
     while(q.length > 0) {
       var current = q.shift();
+      var visitCount = visitCountByVertex[current.v] || 0;
+      visitCount += 1;
+      visitCountByVertex[current.v] = visitCount;
+      if (visitCount < current.v.incoming().length) {
+        continue;
+      }
+
       temp.push(current);
       current.v.targets().forEach(function(t) {
         q.push({v: t, depth: current.depth + 1});
@@ -269,6 +277,34 @@ describe('tree/dag representation', function() {
       expect(order(g.vertex('a'))).toEqual([
         ['a'],
         ['a1', 'a2']]);
+    });
+    it('each vertex appears once', function() {
+      var g = Graph.new_();
+      g.connect('a', 'a1');
+      g.connect('a', 'a2');
+      g.connect('a1', 'b');
+      g.connect('a2', 'b');
+      g.connect('b', 'c');
+      expect(order(g.vertex('a'))).toEqual([
+        ['a'],
+        ['a1', 'a2'],
+        ['b'],
+        ['c']]);
+    });
+    it('a vertex appears only after all incoming edges have been traversed', function() {
+      var g = Graph.new_();
+      g.connect('a', 'a1');
+      g.connect('a', 'a2');
+      g.connect('a1', 'a1_1');
+      g.connect('a1_1', 'b');
+      g.connect('a2', 'b');
+      g.connect('b', 'c');
+      expect(order(g.vertex('a'))).toEqual([
+        ['a'],
+        ['a1', 'a2'],
+        ['a1_1'],
+        ['b'],
+        ['c']]);
     });
   });
 });
