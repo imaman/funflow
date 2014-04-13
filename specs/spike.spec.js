@@ -306,7 +306,7 @@ describe('tree/dag representation', function() {
           ['c']]);
       });
     });
-    describe('dfs', function() {
+    describe('width', function() {
       function preOrder(root, f) {
         function dfs(v) {
           var outgoing = v.outgoing();
@@ -335,16 +335,8 @@ describe('tree/dag representation', function() {
         return dfs(root);
       }
 
-      it('width', function() {
-        var g = Graph.new_();
-        g.connect('a', 'b');
-        g.connect('b', 'b1');
-        g.connect('b', 'b2');
-        g.connect('b', 'b3');
-        g.connect('b', 'c').type = 'next';
-        g.connect('c', 'd');
-
-        var w = preOrder(g.vertex('a'), function(kids, next) {
+      function width(v) {
+        return preOrder(v, function(kids, next) {
           if (kids.length === 0 && next === undefined)
             return 1;
 
@@ -354,8 +346,17 @@ describe('tree/dag representation', function() {
           var widthOfKids = kids.reduce(function(a,b) { return a + b }, 1);
           return Math.max(widthOfKids, next);
         });
+      }
+      it('adds 1 for each conc branch', function() {
+        var g = Graph.new_();
+        g.connect('a', 'b');
+        g.connect('b', 'b1');
+        g.connect('b', 'b2');
+        g.connect('b', 'b3');
+        g.connect('b', 'c').type = 'next';
+        g.connect('c', 'd');
 
-        expect(w).toEqual(4);
+        expect(width(g.vertex('a'))).toEqual(4);
       });
     });
     describe('printing depth', function() {
