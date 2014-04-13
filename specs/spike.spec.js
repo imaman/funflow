@@ -318,17 +318,13 @@ describe('tree/dag representation', function() {
           }
 
           var acc = [];
-          outgoing.forEach(function(e) {
-            if (e.type !== 'next')
-              acc.push(dfs(e.to));
-          });
-
           var next;
           outgoing.forEach(function(e) {
             if (e.type === 'next')
               next = dfs(e.to);
+            else
+              acc.push(dfs(e.to));
           });
-
           return f(acc, next);
         }
 
@@ -347,6 +343,14 @@ describe('tree/dag representation', function() {
           return Math.max(widthOfKids, next);
         });
       }
+      it('of a seq. is 1', function() {
+        var g = Graph.new_();
+        g.connect('a', 'b');
+        g.connect('b', 'c');
+        g.connect('c', 'd');
+
+        expect(width(g.vertex('a'))).toEqual(1);
+      });
       it('adds 1 for each conc branch', function() {
         var g = Graph.new_();
         g.connect('a', 'b');
@@ -357,6 +361,83 @@ describe('tree/dag representation', function() {
         g.connect('c', 'd');
 
         expect(width(g.vertex('a'))).toEqual(4);
+      });
+      it('allows conc branches to be of different lengths', function() {
+        var g = Graph.new_();
+        g.connect('a', 'b');
+        g.connect('b', 'b1');
+        g.connect('b', 'b2');
+        g.connect('b2', 'b2_1');
+        g.connect('b2_1', 'b2_2');
+        g.connect('b', 'b3');
+        g.connect('b', 'c').type = 'next';
+        g.connect('c', 'd');
+
+        expect(width(g.vertex('a'))).toEqual(4);
+      });
+      it('takes max. among several concurrent', function() {
+        var g = Graph.new_();
+        g.connect('a', 'b');
+        g.connect('b', 'b1');
+        g.connect('b', 'b2');
+        g.connect('b', 'b3');
+        g.connect('b', 'c').type = 'next';
+        g.connect('c', 'd');
+        g.connect('d', 'e');
+        g.connect('e', 'e1');
+        g.connect('e', 'e2');
+        g.connect('e', 'e3');
+        g.connect('e', 'e4');
+        g.connect('e', 'e5');
+        g.connect('e', 'f').type = 'next';
+        g.connect('f', 'g');
+
+        expect(width(g.vertex('a'))).toEqual(6);
+      });
+      it('acccumulates nesting of concurrent branches', function() {
+        var g = Graph.new_();
+        g.connect('a', 'b');
+        g.connect('b', 'b1');
+        g.connect('b1', 'b1_1');
+        g.connect('b1', 'b1_2');
+        g.connect('b1', 'b1_3');
+        g.connect('b1', 'b1_end').type = 'next';
+        g.connect('b', 'b2');
+        g.connect('b', 'b3');
+        g.connect('b', 'c').type = 'next';
+        g.connect('c', 'd');
+        g.connect('d', 'e');
+        g.connect('e', 'e1');
+        g.connect('e', 'e2');
+        g.connect('e', 'f').type = 'next';
+        g.connect('f', 'g');
+
+        expect(width(g.vertex('a'))).toEqual(7);
+      });
+      it('handles several nesting in parallel', function() {
+        var g = Graph.new_();
+        g.connect('a', 'b');
+        g.connect('b', 'b1');
+        g.connect('b1', 'b1_1');
+        g.connect('b1', 'b1_2');
+        g.connect('b1', 'b1_3');
+        g.connect('b1', 'b1_end').type = 'next';
+        g.connect('b', 'b2');
+        g.connect('b', 'b3');
+        g.connect('b3', 'b3_1');
+        g.connect('b3', 'b3_2');
+        g.connect('b3', 'b3_3');
+        g.connect('b3', 'b3_4');
+        g.connect('b3', 'b3_end').type = 'next';
+        g.connect('b', 'c').type = 'next';
+        g.connect('c', 'd');
+        g.connect('d', 'e');
+        g.connect('e', 'e1');
+        g.connect('e', 'e2');
+        g.connect('e', 'f').type = 'next';
+        g.connect('f', 'g');
+
+        expect(width(g.vertex('a'))).toEqual(11);
       });
     });
     describe('printing depth', function() {
