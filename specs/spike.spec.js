@@ -306,6 +306,58 @@ describe('tree/dag representation', function() {
           ['c']]);
       });
     });
+    describe('dfs', function() {
+      function preOrder(root, f) {
+        function dfs(v) {
+          var outgoing = v.outgoing();
+          if (outgoing.length === 0) {
+            return f([], undefined);
+          }
+          if (outgoing.length === 1) {
+            return f([], dfs(outgoing[0].to));
+          }
+
+          var acc = [];
+          outgoing.forEach(function(e) {
+            if (e.type !== 'next')
+              acc.push(dfs(e.to));
+          });
+
+          var next;
+          outgoing.forEach(function(e) {
+            if (e.type === 'next')
+              next = dfs(e.to);
+          });
+
+          return f(acc, next);
+        }
+
+        return dfs(root);
+      }
+
+      it('width', function() {
+        var g = Graph.new_();
+        g.connect('a', 'b');
+        g.connect('b', 'b1');
+        g.connect('b', 'b2');
+        g.connect('b', 'b3');
+        g.connect('b', 'c').type = 'next';
+        g.connect('c', 'd');
+
+        var w = preOrder(g.vertex('a'), function(kids, next) {
+          if (kids.length === 0 && next === undefined)
+            return 1;
+
+          if (kids.length === 0)
+            return next;
+
+          var widthOfKids = kids.reduce(function(a,b) { return a + b }, 1);
+          return Math.max(widthOfKids, next);
+        });
+
+        expect(w).toEqual(4);
+      });
+    });
     describe('printing depth', function() {
       function depth(v) {
         var result = {};
