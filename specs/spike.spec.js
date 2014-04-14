@@ -31,7 +31,7 @@ describe('tree representation', function() {
 
               line.push(es[0].v);
             }
-            lines.push(line.join(' ').replace(/[ ]+$/, ''));
+            lines.push(line.join('  ').replace(/[ ]+$/, ''));
           }
           return lines.join('\n');
         }
@@ -42,18 +42,18 @@ describe('tree representation', function() {
     function dump(v) {
       var lines = [];
       var screen = Screen.new_();
-      var ln = 0;
-      function preOrder(v, depth) {
+      function preOrder(v, row, col) {
         var arr = [];
-        var nextDepth = depth + 2;
-        screen.putAt(ln, depth, v);
-        ln += 1;
+        screen.putAt(row, col, v);
 
         v.targets().forEach(function(t) {
-          preOrder(t, nextDepth);
+          ++row;
+          row = preOrder(t, row, col + 1);
         });
+
+        return row;
       }
-      preOrder(v, 0);
+      preOrder(v, 0, 0);
       return screen.render();
     }
     it('is a string with horizontal indentation', function() {
@@ -101,6 +101,19 @@ describe('tree representation', function() {
         '      b7',
         '  c',
         '  d']);
+    });
+    xit('children of a "conc" node are indented horizontally', function() {
+      var g = Graph.new_();
+      g.connect('r0', 'a');
+      g.connect('r0', 'r1');
+      g.connect('r1', 'b1').from.type = 'conc';
+      g.connect('r1', 'b2');
+
+      expect(dump(g.vertex('r0')).split('\n')).toEqual([
+        'r0',
+        '  a',
+        '  r1',
+        '    b1 b2']);
     });
   });
 });
