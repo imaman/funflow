@@ -40,8 +40,24 @@ describe('screen', function() {
       ]);
     });
   });
+  describe('column alignment', function() {
+    it('chooses a width for each column based on widest string there in', function() {
+      var screen = Screen.new_();
+      screen.putAt(0, 1, 'AB');
+      screen.putAt(0, 2, 'CDEFGH');
+      screen.putAt(1, 1, 'M');
+      screen.putAt(1, 2, 'N');
+      screen.putAt(2, 0, 'VWXY');
+      screen.putAt(2, 3, 'Z');
+      expect(screen.render(1).split('\n')).toEqual([
+        '     AB CDEFGH',
+        '     M  N',
+        'VWXY           Z',
+      ]);
+    });
+  });
   describe('sub screening', function() {
-    it('allows nested screen to be created with relative offset', function() {
+    it('allows nested screen to be created with relative offsets', function() {
       var screen = Screen.new_();
       screen.putAt(0, 2, 'A');
       var sub = screen.nested(1, 3);
