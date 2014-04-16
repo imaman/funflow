@@ -20,7 +20,8 @@
     "jasmine-node": "~1.13.1",
     "util-is": "~0.1.0",
     "util": "~0.10.3",
-    "node.extend": "^1.0.10"
+    "node.extend": "^1.0.10",
+    "underscore": "^1.6.0"
   },
   "license": "MIT",
   "engines": {
