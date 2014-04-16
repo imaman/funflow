@@ -40,4 +40,20 @@ describe('screen', function() {
       ]);
     });
   });
+  describe('sub screening', function() {
+    it('allows nested screen to be created with relative offset', function() {
+      var screen = Screen.new_();
+      screen.putAt(0, 2, 'A');
+      var sub = screen.nested(1, 3);
+      sub.putAt(0, 0, 'B');
+      sub.putAt(1, 2, 'C');
+      screen.putAt(1, 1, 'D');
+
+      expect(screen.render(1).split('\n')).toEqual([
+        '  A',
+        ' D B',
+        '     C'
+      ]);
+    });
+  });
 });
