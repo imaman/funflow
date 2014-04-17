@@ -460,7 +460,7 @@ describe('tree/dag representation', function() {
     });
   });
   describe('diargam', function() {
-    it('connects the vertices', function() {
+    it('connects sequence vertices', function() {
       var g = treeFromDsl(['a', 'b', 'c', 'd'], 't');
       expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
         't0',
@@ -472,6 +472,14 @@ describe('tree/dag representation', function() {
         '|',
         'd',
         '|'
+      ].join('\n'));
+    });
+    it('connects split vertices', function() {
+      var g = treeFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
+      expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+        '+--+-+-+',
+        '   A B C',
+        '+--+-+-+'
       ].join('\n'));
     });
   });

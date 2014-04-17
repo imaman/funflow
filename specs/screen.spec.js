@@ -55,6 +55,21 @@ describe('screen', function() {
         'VWXY           Z',
       ]);
     });
+    it('allows a cell to specify custom filler value', function() {
+      var screen = Screen.new_();
+      screen.putAt(0, 1, 'AB');
+      screen.putAt(0, 2, 'CDEFGH');
+      screen.putAt(1, 0, 'L', '.');
+      screen.putAt(1, 1, 'M');
+      screen.putAt(1, 2, 'N', '-');
+      screen.putAt(2, 0, 'VWXY');
+      screen.putAt(2, 3, 'Z');
+      expect('\n' + screen.render(1)).toEqual(['',
+        '     AB CDEFGH',
+        'L....M  N------',
+        'VWXY           Z',
+      ].join('\n'));
+    });
   });
   describe('sub screening', function() {
     it('allows nested screen to be created with relative offsets', function() {
