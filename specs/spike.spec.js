@@ -1,5 +1,5 @@
 var Graph = require('../lib/graph');
-var dump = require('../lib/visualization').dump;
+var show = require('../lib/visualization').show;
 
 describe('tree representation', function() {
   describe('quick dump', function() {
@@ -10,7 +10,7 @@ describe('tree representation', function() {
       g.connect('r1', 'b1');
       g.connect('r1', 'b2');
 
-      expect(dump(g.vertex('r0')).split('\n')).toEqual([
+      expect(show(g.vertex('r0')).split('\n')).toEqual([
         'r0',
         '   a',
         '   r1',
@@ -33,7 +33,7 @@ describe('tree representation', function() {
       g.connect('r0', 'c');
       g.connect('r0', 'd');
 
-      expect(dump(g.vertex('r0')).split('\n')).toEqual([
+      expect(show(g.vertex('r0')).split('\n')).toEqual([
         'r0',
         '   a',
         '   r1',
@@ -56,7 +56,7 @@ describe('tree representation', function() {
       g.connect('r1', 'b1').from.type = 'conc';
       g.connect('r1', 'b2');
 
-      expect(dump(g.vertex('r0')).split('\n')).toEqual([
+      expect(show(g.vertex('r0')).split('\n')).toEqual([
         'r0',
         '   a',
         '   r1',
@@ -71,7 +71,7 @@ describe('tree representation', function() {
       g.connect('r2', 'b1').from.type = 'conc';
       g.connect('r2', 'b2');
 
-      expect(dump(g.vertex('r0')).split('\n')).toEqual([
+      expect(show(g.vertex('r0')).split('\n')).toEqual([
         'r0',
         '   a',
         '   r1',
@@ -84,7 +84,7 @@ describe('tree representation', function() {
       g.connect('r0', 'a').from.type = 'conc';
       g.connect('r0', 'b');
 
-      expect(dump(g.vertex('r0'))).toEqual([
+      expect(show(g.vertex('r0'))).toEqual([
         'r0',
         '   a b'
       ].join('\n'));
@@ -96,7 +96,7 @@ describe('tree representation', function() {
       g.connect('r1', 'b1');
       g.connect('r1', 'b2');
 
-      expect('\n' + dump(g.vertex('r0'))).toEqual(['',
+      expect('\n' + show(g.vertex('r0'))).toEqual(['',
         'r0',
         '   r1',
         '      b1',
@@ -110,7 +110,7 @@ describe('tree representation', function() {
 
       g.connect('r1', 'b1');
 
-      expect('\n' + dump(g.vertex('r0'))).toEqual(['',
+      expect('\n' + show(g.vertex('r0'))).toEqual(['',
         'r0',
         '   r1    b2',
         '      b1'
@@ -125,7 +125,7 @@ describe('tree representation', function() {
       g.connect('r1', 'c1').from.type = 'conc';
       g.connect('r1', 'c2');
 
-      expect('\n' + dump(g.vertex('r0'))).toEqual(['',
+      expect('\n' + show(g.vertex('r0'))).toEqual(['',
         'r0',
         '   a',
         '   r1',
@@ -145,7 +145,7 @@ describe('tree representation', function() {
       g.connect('r2', 'b4');
       g.connect('r2', 'b5');
 
-      expect(dump(g.vertex('r0'))).toEqual([
+      expect(show(g.vertex('r0'))).toEqual([
         'r0',
         '   r1    r2',
         '      b1    b3',
@@ -170,7 +170,7 @@ describe('tree representation', function() {
       g.connect('r3', 'b6');
       g.connect('r3', 'b7');
 
-      expect('\n' + dump(g.vertex('r0'))).toEqual(['',
+      expect('\n' + show(g.vertex('r0'))).toEqual(['',
         'r0',
         '   a',
         '   r1',
@@ -190,7 +190,7 @@ describe('tree representation', function() {
       g.connect('r1', 'c1').from.type = 'conc';
       g.connect('r1', 'c2');
 
-      expect('\n' + dump(g.vertex('r0'), {seqShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('r0'), {seqShift: 0})).toEqual(['',
         'r0',
         'a',
         'r1',
@@ -207,7 +207,7 @@ describe('tree representation', function() {
       g.connect('r1', 'c1').from.type = 'conc';
       g.connect('r1', 'c2');
 
-      expect('\n' + dump(g.vertex('r0'), {seqShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('r0'), {seqShift: 0})).toEqual(['',
         'r0',
         'a',
         'r1',
@@ -223,7 +223,7 @@ describe('tree representation', function() {
       g.connect('r1', 'b2');
       g.connect('r1', 'b3');
 
-      expect('\n' + dump(g.vertex('r0'), {seqShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('r0'), {seqShift: 0})).toEqual(['',
         'r0',
         '   r1 b1',
         '   b2',
@@ -238,7 +238,7 @@ describe('tree representation', function() {
       g.connect('r1', 'b1');
       g.connect('r2', 'b2');
 
-      expect('\n' + dump(g.vertex('r0'), {branchShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('r0'), {branchShift: 0})).toEqual(['',
         'r0 r1    r2',
         '      b1    b2'
       ].join('\n'));
@@ -255,7 +255,7 @@ describe('tree representation', function() {
       g.connect('r2', 'b1');
       g.connect('r3', 'b2');
 
-      expect('\n' + dump(g.vertex('r0'), {branchShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('r0'), {branchShift: 0})).toEqual(['',
         'r0',
         '   r1 r2    r3',
         '         b1    b2',
@@ -275,7 +275,7 @@ describe('tree representation', function() {
       g.connect('r2', 'b4');
       g.connect('r2', 'b5');
 
-      expect('\n' + dump(g.vertex('r0'), {seqShift: 0, branchShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('r0'), {seqShift: 0, branchShift: 0})).toEqual(['',
         'r0 r1 r2',
         '   b1 b3',
         '   b2 b4',
