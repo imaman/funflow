@@ -418,6 +418,63 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
   });
+  describe('integration', function() {
+    it('can render a tree constructed from DSL', function() {
+      var g = treeFromDsl(['a', {b1: 'B1', b2: 'B2'}, 'c'], 't');
+      expect('\n' + show(g.vertex('t0'), {seqShift: 0})).toEqual(['',
+        't0',
+        'a',
+        't1',
+        '   B1 B2',
+        'c'
+      ].join('\n'));
+    });
+    it('can render a tree a deeply nested DSL', function() {
+      var g = treeFromDsl([
+        'a',
+        {
+          b1: [
+            'B1',
+            {b11: 'B11', b12: ['B121', 'B122', 'B123']},
+            'B13'
+          ],
+          b2: {b21: 'B21', b22: 'B22'}
+        },
+        { b3: 'B3', b4: 'B5' }
+      ], 't');
+      expect('\n' + show(g.vertex('t0'), {seqShift: 0})).toEqual(['',
+        't0',
+        'a',
+        't1',
+        '   t2           t5',
+        '   B1              B21 B22',
+        '   t3',
+        '       B11 t4',
+        '           B121',
+        '           B122',
+        '           B123',
+        '   B13',
+        't6',
+        '   B3  B5'
+      ].join('\n'));
+    });
+  });
+  describe('diargam', function() {
+    it('connects the vertices', function() {
+      var g = treeFromDsl(['a', 'b', 'c', 'd'], 't');
+      expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+        't0',
+        'a',
+        '|',
+        'b',
+        '|',
+        'c',
+        '|',
+        'd',
+        '|'
+      ].join('\n'));
+    });
+  });
 });
 
 
