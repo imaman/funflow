@@ -13,9 +13,9 @@ describe('screen', function() {
       screen.putAt(0, 1, 'B');
       screen.putAt(1, 0, 'C');
       screen.putAt(1, 1, 'D');
-      expect(screen.render().split('\n')).toEqual([
-        'A B',
-        'C D'
+      expect(screen.render(0).split('\n')).toEqual([
+        'AB',
+        'CD'
       ]);
     });
     it('allows custom spacing', function() {
@@ -25,15 +25,15 @@ describe('screen', function() {
       screen.putAt(1, 0, 'C');
       screen.putAt(1, 1, 'D');
       expect(screen.render(1).split('\n')).toEqual([
-        'AB',
-        'CD'
+        'A B',
+        'C D'
       ]);
     });
     it('handles holes', function() {
       var screen = Screen.new_();
       screen.putAt(0, 2, 'A');
       screen.putAt(2, 1, 'B');
-      expect(screen.render(1).split('\n')).toEqual([
+      expect(screen.render(0, '.').split('\n')).toEqual([
         '  A',
         '',
         ' B'
@@ -65,7 +65,7 @@ describe('screen', function() {
       sub.putAt(1, 2, 'C');
       screen.putAt(1, 1, 'D');
 
-      expect(screen.render(1).split('\n')).toEqual([
+      expect(screen.render(0).split('\n')).toEqual([
         '  A',
         ' D B',
         '     C'

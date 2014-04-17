@@ -8,7 +8,7 @@ describe('tree representation', function() {
       var screen = Screen.new_();
       function preOrder(v, row, col) {
         var arr = [];
-        screen.putAt(row, col, v);
+        screen.putAt(row, col, v.key);
 
         v.targets().forEach(function(t) {
           ++row;
@@ -18,7 +18,7 @@ describe('tree representation', function() {
         return row;
       }
       preOrder(v, 0, 0);
-      return screen.render();
+      return screen.render(0);
     }
     it('is a string with horizontal indentation', function() {
       var g = Graph.new_();
