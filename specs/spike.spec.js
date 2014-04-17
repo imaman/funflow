@@ -9,18 +9,31 @@ describe('tree representation', function() {
         screen.putAt(0, 0, v.key);
 
         var row = 0;
+        var col = 0;
+        if (v.type !== 'conc') {
+          v.targets().forEach(function(t) {
+            ++row;
+            var dim = preOrder(t, screen.nested(row, 1));
+            row += dim.s;
+            col = Math.max(col, dim.p);
+          });
+
+          return { s: row, p: col };
+        }
+
         v.targets().forEach(function(t) {
-          ++row;
-          var dim = preOrder(t, screen.nested(row, 1));
-          row += dim.s;
+          ++col;
+          var dim = preOrder(t, screen.nested(1, col));
+          col += dim.p;
+          row = Math.max(row, dim.s);
         });
 
-        return { s: row };
+        return { s: row, p: col };
       }
 
       var screen = Screen.new_();
       preOrder(v, screen);
-      return screen.render(0);
+      return screen.render(1);
     }
     it('is a string with horizontal indentation', function() {
       var g = Graph.new_();
@@ -31,10 +44,10 @@ describe('tree representation', function() {
 
       expect(dump(g.vertex('r0')).split('\n')).toEqual([
         'r0',
-        '  a',
-        '  r1',
-        '    b1',
-        '    b2']);
+        '   a',
+        '   r1',
+        '      b1',
+        '      b2']);
     });
     it('nests as needed', function() {
       var g = Graph.new_();
@@ -54,21 +67,21 @@ describe('tree representation', function() {
 
       expect(dump(g.vertex('r0')).split('\n')).toEqual([
         'r0',
-        '  a',
-        '  r1',
-        '    b1',
-        '    b2',
-        '    r2',
-        '      b3',
-        '      r3',
-        '        b4',
-        '        b5',
-        '        b6',
-        '      b7',
-        '  c',
-        '  d']);
+        '   a',
+        '   r1',
+        '      b1',
+        '      b2',
+        '      r2',
+        '         b3',
+        '         r3',
+        '            b4',
+        '            b5',
+        '            b6',
+        '         b7',
+        '   c',
+        '   d']);
     });
-    xit('children of a "conc" node are indented horizontally', function() {
+    it('children of a "conc" node are indented horizontally', function() {
       var g = Graph.new_();
       g.connect('r0', 'a');
       g.connect('r0', 'r1');
@@ -77,9 +90,9 @@ describe('tree representation', function() {
 
       expect(dump(g.vertex('r0')).split('\n')).toEqual([
         'r0',
-        '  a',
-        '  r1',
-        '    b1 b2']);
+        '   a',
+        '   r1',
+        '      b1 b2']);
     });
   });
 });
