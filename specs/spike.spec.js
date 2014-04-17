@@ -5,19 +5,21 @@ describe('tree representation', function() {
   describe('quick dump', function() {
     function dump(v) {
       var lines = [];
-      var screen = Screen.new_();
-      function preOrder(v, row, col) {
+      function preOrder(v, screen) {
         var arr = [];
-        screen.putAt(row, col, v.key);
+        screen.putAt(0, 0, v.key);
 
+        var row = 0;
         v.targets().forEach(function(t) {
           ++row;
-          row = preOrder(t, row, col + 1);
+          row += preOrder(t, screen.nested(row, 1));
         });
 
         return row;
       }
-      preOrder(v, 0, 0);
+
+      var screen = Screen.new_();
+      preOrder(v, screen);
       return screen.render(0);
     }
     it('is a string with horizontal indentation', function() {
