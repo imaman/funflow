@@ -6,16 +6,16 @@ describe('tree representation', function() {
     function dump(v) {
       var lines = [];
       function preOrder(v, screen) {
-        var arr = [];
         screen.putAt(0, 0, v.key);
 
         var row = 0;
         v.targets().forEach(function(t) {
           ++row;
-          row += preOrder(t, screen.nested(row, 1));
+          var dim = preOrder(t, screen.nested(row, 1));
+          row += dim.s;
         });
 
-        return row;
+        return { s: row };
       }
 
       var screen = Screen.new_();
