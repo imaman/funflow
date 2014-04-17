@@ -71,5 +71,21 @@ describe('screen', function() {
         '     C'
       ]);
     });
+    it('uses relative offsets when creating deeply nested screens', function() {
+      var screen = Screen.new_();
+      var fromOneThree = screen.nested(1, 3);
+      var fromThreeFour = fromOneThree.nested(2, 1);
+      fromThreeFour.putAt(0, 0, 'A');
+      fromThreeFour.putAt(0, 1, 'B');
+      fromThreeFour.putAt(1, 0, 'C');
+
+      expect(screen.render(0).split('\n')).toEqual([
+        '',
+        '',
+        '',
+        '    AB',
+        '    C'
+      ]);
+    });
   });
 });
