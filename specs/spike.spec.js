@@ -1,44 +1,8 @@
 var Graph = require('../lib/graph');
-var Screen = require('../lib/screen').Screen;
-var extend = require('node.extend');
-var u_ = require('underscore');
+var dump = require('../lib/visualization').dump;
 
 describe('tree representation', function() {
   describe('quick dump', function() {
-    function dump(v, options) {
-      options = extend({seqShift: 1, branchShift: 1}, options);
-      function preOrder(v, screen) {
-        screen.putAt(0, 0, v.key);
-
-        var row = 1;
-        var col = 1;
-        if (v.type === 'conc') {
-          v.targets().forEach(function(t) {
-            var dim = preOrder(t, screen.nested(options.branchShift, col));
-            col += dim.p;
-            row = Math.max(row, dim.s);
-          });
-          if (v.targets().length) {
-            row += options.branchShift;
-          }
-        } else {
-          v.targets().forEach(function(t) {
-            var dim = preOrder(t, screen.nested(row, options.seqShift));
-            row += dim.s;
-            col = Math.max(col, dim.p);
-          });
-          if (v.targets().length) {
-            col += options.seqShift;
-          }
-        }
-
-        return { s: row, p: col };
-      }
-
-      var screen = Screen.new_();
-      preOrder(v, screen);
-      return screen.render(1);
-    }
     it('is a string with horizontal indentation', function() {
       var g = Graph.new_();
       g.connect('r0', 'a');
