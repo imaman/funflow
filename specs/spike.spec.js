@@ -165,7 +165,7 @@ describe('tree representation', function() {
         '   b'
       ].join('\n'));
     });
-    xit('two concurrent sequences', function() {
+    it('two concurrent sequences', function() {
       var g = Graph.new_();
       g.connect('r0', 'r1').from.type = 'conc';
       g.connect('r0', 'r2');
