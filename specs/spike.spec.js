@@ -299,5 +299,24 @@ describe('tree representation', function() {
         '   d'
       ].join('\n'));
     });
+    it('no-shifting of both sequences and branches', function() {
+      var g = Graph.new_();
+      g.connect('r0', 'r1').from.type = 'conc';
+      g.connect('r0', 'r2');
+
+      g.connect('r1', 'b1');
+      g.connect('r1', 'b2');
+
+      g.connect('r2', 'b3');
+      g.connect('r2', 'b4');
+      g.connect('r2', 'b5');
+
+      expect('\n' + dump(g.vertex('r0'), {seqShift: 0, branchShift: 0})).toEqual(['',
+        'r0 r1 r2',
+        '   b1 b3',
+        '   b2 b4',
+        '      b5'
+      ].join('\n'));
+    });
   });
 });
