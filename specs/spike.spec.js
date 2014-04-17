@@ -1,11 +1,12 @@
 var Graph = require('../lib/graph');
 var Screen = require('../lib/screen').Screen;
 var extend = require('node.extend');
+var u_ = require('underscore');
 
 describe('tree representation', function() {
   describe('quick dump', function() {
     function dump(v, options) {
-      options = extend({ seqShift: 1 }, options);
+      options = extend({seqShift: 1, branchShift: 1}, options);
       function preOrder(v, screen) {
         screen.putAt(0, 0, v.key);
 
@@ -13,12 +14,13 @@ describe('tree representation', function() {
         var col = 1;
         if (v.type === 'conc') {
           v.targets().forEach(function(t) {
-            var dim = preOrder(t, screen.nested(1, col));
+            var dim = preOrder(t, screen.nested(options.branchShift, col));
             col += dim.p;
             row = Math.max(row, dim.s);
           });
-          if (v.targets().length)
-            ++row;
+          if (v.targets().length) {
+            row += options.branchShift;
+          }
         } else {
           v.targets().forEach(function(t) {
             var dim = preOrder(t, screen.nested(row, options.seqShift));
@@ -262,6 +264,39 @@ describe('tree representation', function() {
         '   r1 b1',
         '   b2',
         '   b3'
+      ].join('\n'));
+    });
+    it('no-shift branch', function() {
+      var g = Graph.new_();
+      g.connect('r0', 'r1').from.type = 'conc';
+      g.connect('r0', 'r2');
+
+      g.connect('r1', 'b1');
+      g.connect('r2', 'b2');
+
+      expect('\n' + dump(g.vertex('r0'), {branchShift: 0})).toEqual(['',
+        'r0 r1    r2',
+        '      b1    b2'
+      ].join('\n'));
+    });
+    it('no-shift branch inside a sequence', function() {
+      var g = Graph.new_();
+      g.connect('r0', 'r1');
+      g.connect('r0', 'c');
+      g.connect('r0', 'd');
+
+      g.connect('r1', 'r2').from.type = 'conc';
+      g.connect('r1', 'r3');
+
+      g.connect('r2', 'b1');
+      g.connect('r3', 'b2');
+
+      expect('\n' + dump(g.vertex('r0'), {branchShift: 0})).toEqual(['',
+        'r0',
+        '   r1 r2    r3',
+        '         b1    b2',
+        '   c',
+        '   d'
       ].join('\n'));
     });
   });
