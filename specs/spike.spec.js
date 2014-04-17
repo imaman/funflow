@@ -16,6 +16,8 @@ describe('tree representation', function() {
             col += dim.p;
             row = Math.max(row, dim.s);
           });
+          if (v.targets().length)
+            ++row;
         } else {
           v.targets().forEach(function(t) {
             var dim = preOrder(t, screen.nested(row, 1));
@@ -144,6 +146,23 @@ describe('tree representation', function() {
         'r0',
         '   r1    b2',
         '      b1'
+      ].join('\n'));
+    });
+    it('concurrent branch inside a sequence', function() {
+      var g = Graph.new_();
+      g.connect('r0', 'a');
+      g.connect('r0', 'r1');
+      g.connect('r0', 'b');
+
+      g.connect('r1', 'c1').from.type = 'conc';
+      g.connect('r1', 'c2');
+
+      expect('\n' + dump(g.vertex('r0'))).toEqual(['',
+        'r0',
+        '   a',
+        '   r1',
+        '      c1 c2',
+        '   b'
       ].join('\n'));
     });
     xit('two concurrent sequences', function() {
