@@ -1,10 +1,11 @@
 var Graph = require('../lib/graph');
 var Screen = require('../lib/screen').Screen;
+var extend = require('node.extend');
 
 describe('tree representation', function() {
   describe('quick dump', function() {
-    function dump(v) {
-      var lines = [];
+    function dump(v, options) {
+      options = extend({ seqShift: 1 }, options);
       function preOrder(v, screen) {
         screen.putAt(0, 0, v.key);
 
@@ -20,12 +21,13 @@ describe('tree representation', function() {
             ++row;
         } else {
           v.targets().forEach(function(t) {
-            var dim = preOrder(t, screen.nested(row, 1));
+            var dim = preOrder(t, screen.nested(row, options.seqShift));
             row += dim.s;
             col = Math.max(col, dim.p);
           });
-          if (v.targets().length)
-            ++col;
+          if (v.targets().length) {
+            col += options.seqShift;
+          }
         }
 
         return { s: row, p: col };
@@ -211,6 +213,55 @@ describe('tree representation', function() {
         '            b3       b7',
         '            b4',
         '            b5'
+      ].join('\n'));
+    });
+    it('allows sequences to be laid out vertically', function() {
+      var g = Graph.new_();
+      g.connect('r0', 'a');
+      g.connect('r0', 'r1');
+      g.connect('r0', 'b');
+
+      g.connect('r1', 'c1').from.type = 'conc';
+      g.connect('r1', 'c2');
+
+      expect('\n' + dump(g.vertex('r0'), {seqShift: 0})).toEqual(['',
+        'r0',
+        'a',
+        'r1',
+        '   c1 c2',
+        'b'
+      ].join('\n'));
+    });
+    it('concurrent branch inside a no-shift sequence', function() {
+      var g = Graph.new_();
+      g.connect('r0', 'a');
+      g.connect('r0', 'r1');
+      g.connect('r0', 'b');
+
+      g.connect('r1', 'c1').from.type = 'conc';
+      g.connect('r1', 'c2');
+
+      expect('\n' + dump(g.vertex('r0'), {seqShift: 0})).toEqual(['',
+        'r0',
+        'a',
+        'r1',
+        '   c1 c2',
+        'b'
+      ].join('\n'));
+    });
+    it('no shift sequence inside a concurrent branch', function() {
+      var g = Graph.new_();
+      g.connect('r0', 'r1').from.type = 'conc';
+      g.connect('r0', 'b1');
+
+      g.connect('r1', 'b2');
+      g.connect('r1', 'b3');
+
+      expect('\n' + dump(g.vertex('r0'), {seqShift: 0})).toEqual(['',
+        'r0',
+        '   r1 b1',
+        '   b2',
+        '   b3'
       ].join('\n'));
     });
   });
