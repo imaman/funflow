@@ -363,67 +363,6 @@ describe('tree/dag representation', function() {
         expect(width(g.vertex('a'))).toEqual(11);
       });
     });
-    describe('printing depth', function() {
-      function depth(v) {
-        var result = {};
-        var countByVertex = {};
-        function dfs(v, baseDepth) {
-          var count = countByVertex[v] || 0;
-          count += 1;
-          countByVertex[v] = count;
-          if (count < v.incoming().length) {
-            return;
-          }
-
-          if (v.incoming().length > 1) {
-            baseDepth = v.sources().map(function(s) { return result[s] }).reduce(function(soFar, current) {
-              if (soFar === undefined)
-                return current;
-              return soFar < current ? soFar : current;
-            }, undefined) - 1;
-          }
-          result[v] = baseDepth;
-
-          var numTargets = v.targets().length;
-          if (numTargets === 0) {
-            return;
-          }
-          if (numTargets === 1) {
-            return dfs(v.targets()[0], baseDepth);
-          }
-          v.targets().forEach(function(t, index) {
-            dfs(t, baseDepth + index + 1);
-          });
-        }
-
-        dfs(v, 0);
-        return result;
-      }
-      it('is zero for a pure sequence', function() {
-        var g = Graph.new_();
-        g.connect('a', 'b');
-        g.connect('b', 'c');
-        expect(depth(g.vertex('a'))).toEqual({
-          a: 0,
-          b: 0,
-          c: 0});
-      });
-      it('is +1 for each conc branch', function() {
-        var g = Graph.new_();
-        g.connect('a', 'b');
-        g.connect('b', 'b1');
-        g.connect('b', 'b2');
-        g.connect('b1', 'c');
-        g.connect('b2', 'c');
-
-        expect(depth(g.vertex('a'))).toEqual({
-          a: 0,
-          b: 0,
-          b1: 1,
-          b2: 2,
-          c: 0});
-      });
-    });
   });
 });
 
