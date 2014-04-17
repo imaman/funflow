@@ -185,7 +185,7 @@ describe('tree representation', function() {
         '            b5'
       ].join('\n'));
     });
-    xit('two level concurrency with nested sequence', function() {
+    it('two level concurrency with nested sequence', function() {
       var g = Graph.new_();
       g.connect('r0', 'a');
       g.connect('r0', 'r1');
@@ -202,13 +202,13 @@ describe('tree representation', function() {
       g.connect('r3', 'b6');
       g.connect('r3', 'b7');
 
-      expect(dump(g.vertex('r0'))).toEqual([
+      expect('\n' + dump(g.vertex('r0'))).toEqual(['',
         'r0',
         '   a',
         '   r1',
-        '      r2         r3',
-        '         r4   b1    b6',
-        '            b3      b7',
+        '      r2          r3',
+        '         r4    b1    b6',
+        '            b3       b7',
         '            b4',
         '            b5'
       ].join('\n'));
