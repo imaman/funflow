@@ -1,23 +1,25 @@
 var Graph = require('../lib/graph');
-var dagFromTree = require('../lib/visualization').dagFromTree;
 var treeFromDsl = require('../lib/visualization').treeFromDsl;
-var width = require('../lib/visualization').width;
-var order = require('../lib/visualization').order;
+var u_ = require('underscore');
 
 describe('tree/dag representation', function() {
   function verify(actual, expected) {
     actual = actual.map(function(x) { return x.toString() });
     actual.sort();
     expected.sort();
+    u_.zip(actual, expected).forEach(function (pair) {
+      expect(pair[0]).toEqual(pair[1]);
+    });
     expect(actual).toEqual(expected);
   }
   describe('DSL to tree', function() {
     it('converts an array into a linear list', function() {
       var input = [100, 200, 300];
-      var g = treeFromDsl(input);
+      var g = treeFromDsl(input, 't');
       verify(g.edges(), [
-        '100 -> 200',
-        '200 -> 300']);
+        't0 -> 100',
+        't0 -> 200',
+        't0 -> 300']);
     });
     it('converts a pure-object into a multi-child node', function() {
       var input = {a: 'A', b: 'B', c: 'C' };
@@ -31,36 +33,49 @@ describe('tree/dag representation', function() {
       var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
       var g = treeFromDsl(input, 't');
       verify(g.edges(), [
-        'a -> t0',
-        't0 -> B1',
-        't0 -> B2',
+        't0 -> a',
+        't0 -> t1',
+        't1 -> B1',
+        't1 -> B2',
         't0 -> c' ]);
     });
     it('map of arrays', function() {
       var input = ['a', {b1: ['B11', 'B12'], b2: ['B21', 'B22']}, 'c'];
       var g = treeFromDsl(input, 't');
       verify(g.edges(), [
-        'a -> t0',
-        't0 -> B11',
-        't0 -> B21',
+        't0 -> a',
+        't0 -> t1',
         't0 -> c',
-        'B11 -> B12',
-        'B21 -> B22']);
+        't1 -> t2',
+        't2 -> B11',
+        't2 -> B12',
+        't1 -> t3',
+        't3 -> B21',
+        't3 -> B22']);
     });
     it('map of arrays of different lengths', function() {
       var input = ['a', {b1: ['B11', 'B12', 'B13'], b2: ['B21', 'B22', 'B23', 'B24'], b3: ['B31']}, 'c'];
       var g = treeFromDsl(input, 't');
       verify(g.edges(), [
-        'a -> t0',
-        't0 -> B11',
-        't0 -> B21',
-        't0 -> B31',
+        't0 -> a',
+        't0 -> t1',
         't0 -> c',
-        'B11 -> B12',
-        'B12 -> B13',
-        'B21 -> B22',
-        'B22 -> B23',
-        'B23 -> B24']);
+
+        't1 -> t2',
+        't1 -> t3',
+        't1 -> t4',
+
+        't2 -> B11',
+        't2 -> B12',
+        't2 -> B13',
+
+        't3 -> B21',
+        't3 -> B22',
+        't3 -> B23',
+        't3 -> B24',
+
+        't4 -> B31'
+      ]);
     });
     it('map of arrays of maps', function() {
       var input = ['a', {
@@ -76,50 +91,49 @@ describe('tree/dag representation', function() {
         'c',
         'd'];
       var g = treeFromDsl(input, 't');
-      verify(g.edges().filter(function(e) { return e.type === 'next' }), [
-        'a -> t0',
-        't0 -> c',
-        'c -> d',
-        't2 -> t1',
-        't5 -> t4',
-        't4 -> t3']);
-
       verify(g.edges(), [
-        'a -> t0',
-
-        't0 -> t2',
-        't0 -> t5',
+        't0 -> a',
+        't0 -> t1',
         't0 -> c',
+        't0 -> d',
 
-        't2 -> B111',
-        't2 -> B112',
-        't2 -> t1',
+        't1 -> t2',
+        't1 -> t5',
 
-        't5 -> B211',
-        't5 -> B212',
-        't5 -> t4',
+        't2 -> t3',
+        't2 -> t4',
 
-        't1 -> B121',
-        't1 -> B122',
-        't1 -> B123',
+        't5 -> t6',
+        't5 -> t7',
+        't5 -> t8',
 
-        't4 -> B221',
-        't4 -> B222',
-        't4 -> B223',
-        't4 -> t3',
+        't3 -> B111',
+        't3 -> B112',
 
-        't3 -> B231',
-        't3 -> B232',
+        't4 -> B121',
+        't4 -> B122',
+        't4 -> B123',
 
-        'c -> d']);
+        't6 -> B211',
+        't6 -> B212',
+
+        't7 -> B221',
+        't7 -> B222',
+        't7 -> B223',
+
+        't8 -> B231',
+        't8 -> B232'
+      ]);
     });
-    it('tags edges in a sequence with "next"', function() {
+    it('tags split vertices with "conc"', function() {
       var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
-      var g = treeFromDsl(input);
-      expect(g.vertex('a').outgoing().map(function(e) { return e.type })).toEqual(['next']);
-      expect(g.vertex('B1').incoming().map(function(e) { return e.type })).toEqual([undefined]);
-      expect(g.vertex('B2').incoming().map(function(e) { return e.type })).toEqual([undefined]);
-      expect(g.vertex('c').incoming().map(function(e) { return e.type })).toEqual(['next']);
+      var g = treeFromDsl(input, 't');
+      expect(g.vertex('t0').type).toBe(undefined);
+      expect(g.vertex('a').type).toBe(undefined);
+      expect(g.vertex('t1').type).toEqual('conc');
+      expect(g.vertex('B1').type).toBe(undefined);
+      expect(g.vertex('B2').type).toBe(undefined);
+      expect(g.vertex('c').type).toBe(undefined);
     });
   });
 });
