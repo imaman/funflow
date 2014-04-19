@@ -486,17 +486,19 @@ describe('tree/dag representation', function() {
         '+--+-+-+'
       ].join('\n'));
     });
-    xit('extends vertical connector all the way down', function() {
+    it('extends vertical connector all the way down', function() {
       var g = treeFromDsl({a: 'A', b: ['B1', 'B2', 'B3']}, 't');
       expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
         '|',
         '+--+-+',
         '   | |',
-        '   A B1',
+        '   A |',
+        '   | B1',
         '   | |',
         '   | B2',
         '   | |',
         '   | B3',
+        '   | |',
         '   | |',
         '+--+-+'
       ].join('\n'));
@@ -516,11 +518,11 @@ describe('tree/dag representation', function() {
         '   |  |  |',
         '   B1 B2 |',
         '   |  |  +--+--+',
-        '            |  |',
-        '            B4 B5',
-        '            |  |',
-        '            |  |',
-        '         +--+--+',
+        '   |  |     |  |',
+        '   |  |     B4 B5',
+        '   |  |     |  |',
+        '   |  |     |  |',
+        '   |  |  +--+--+',
         '   |  |  |',
         '+--+--+--+',
         '|',
@@ -528,9 +530,9 @@ describe('tree/dag representation', function() {
         '   |  |',
         '   C1 |',
         '   |  C3',
-        '      |',
-        '      C4',
-        '      |',
+        '   |  |',
+        '   |  C4',
+        '   |  |',
         '   |  |',
         '+--+--+',
         'd',

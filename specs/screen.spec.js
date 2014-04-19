@@ -33,7 +33,7 @@ describe('screen', function() {
       var screen = Screen.new_();
       screen.putAt(0, 2, 'A');
       screen.putAt(2, 1, 'B');
-      expect(screen.render(0, '.').split('\n')).toEqual([
+      expect(screen.render(0).split('\n')).toEqual([
         '  A',
         '',
         ' B'
