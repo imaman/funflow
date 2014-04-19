@@ -463,7 +463,7 @@ describe('tree/dag representation', function() {
     it('connects sequence vertices', function() {
       var g = treeFromDsl(['a', 'b', 'c', 'd'], 't');
       expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
-        't0',
+        '|',
         'a',
         '|',
         'b',
@@ -477,9 +477,49 @@ describe('tree/dag representation', function() {
     it('connects split vertices', function() {
       var g = treeFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
       expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+        '|',
         '+--+-+-+',
+        '   | | |',
         '   A B C',
+        '   | | |',
+        '   | | |',
         '+--+-+-+'
+      ].join('\n'));
+    });
+    it('connects depply nested graph', function() {
+      var g = treeFromDsl([
+        'a',
+        {b1: 'B1', b2: 'B2', b3: {b4: 'B4', b5: 'B5'}},
+        {c1: 'C1', c2: ['C3', 'C4']},
+        'd'], 't');
+      expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+        '|',
+        'a',
+        '|',
+        '|',
+        '+--+--+--+',
+        '   |  |  |',
+        '   B1 B2 |',
+        '   |  |  +--+--+',
+        '            |  |',
+        '            B4 B5',
+        '            |  |',
+        '            |  |',
+        '         +--+--+',
+        '   |  |  |',
+        '+--+--+--+',
+        '|',
+        '+--+--+',
+        '   |  |',
+        '   C1 |',
+        '   |  C3',
+        '      |',
+        '      C4',
+        '      |',
+        '   |  |',
+        '+--+--+',
+        'd',
+        '|'
       ].join('\n'));
     });
   });
