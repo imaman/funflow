@@ -486,6 +486,21 @@ describe('tree/dag representation', function() {
         '+--+-+-+'
       ].join('\n'));
     });
+    xit('extends vertical connector all the way down', function() {
+      var g = treeFromDsl({a: 'A', b: ['B1', 'B2', 'B3']}, 't');
+      expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+        '|',
+        '+--+-+',
+        '   | |',
+        '   A B1',
+        '   | |',
+        '   | B2',
+        '   | |',
+        '   | B3',
+        '   | |',
+        '+--+-+'
+      ].join('\n'));
+    });
     it('connects depply nested graph', function() {
       var g = treeFromDsl([
         'a',
