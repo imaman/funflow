@@ -488,21 +488,25 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('extends vertical connector all the way down', function() {
-      var g = rootFromDsl({a: 'A', b: ['B']});
+      var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         '+-+-+',
         '  | |',
         '  A |',
-        '  | B',
+        '  | B1',
+        '  | |',
+        '  | B2',
+        '  | |',
+        '  | B3',
         '  | |',
         '  | |',
         '+-+-+'
       ].join('\n'));
     });
-    it('add a down-arrow after at the fourth line', function() {
+    it('can add a down-arrow after three bars', function() {
       var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
-      expect('\n' + show(g, {connect: true})).toEqual(['',
+      expect('\n' + show(g, {connect: true, downArrows: true})).toEqual(['',
         '|',
         '+-+-+',
         '  | |',
@@ -517,7 +521,7 @@ describe('tree/dag representation', function() {
         '+-+-+'
       ].join('\n'));
     });
-    it('connects depply nested graph', function() {
+    it('connects deeply nested graph', function() {
       var g = rootFromDsl([
         'a',
         {b1: 'B1', b2: 'B2', b3: {b4: 'B4', b5: 'B5'}},
@@ -534,7 +538,7 @@ describe('tree/dag representation', function() {
         '  |  |  +-+--+',
         '  |  |    |  |',
         '  |  |    B4 B5',
-        '  v  v    |  |',
+        '  |  |    |  |',
         '  |  |    |  |',
         '  |  |  +-+--+',
         '  |  |  |',
@@ -546,7 +550,7 @@ describe('tree/dag representation', function() {
         '  |  C3',
         '  |  |',
         '  |  C4',
-        '  v  |',
+        '  |  |',
         '  |  |',
         '+-+--+',
         'd',
