@@ -578,6 +578,7 @@ describe('tree/dag representation', function() {
             var w = 1;
             this.entries.filter(function(current) { return current.c === 0}).forEach(function(current) {
               w = Math.max(w, current.v.length);
+              expect(w).not.toEqual(7);
             });
             expect(w).toEqual(3);
           }
