@@ -574,6 +574,7 @@ describe('tree/dag representation', function() {
         function  render(spacing, matrixTransformer) {
           var max = this.computeMax_();
           var widths = this.computeWidths_(max, spacing);
+          expect(widths[0]).toEqual('   ');
 
           var self = this;
           var lines = u_.range(0, max.r + 1).reduce(function(acc, r) {
