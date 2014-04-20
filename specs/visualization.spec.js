@@ -462,7 +462,7 @@ describe('tree/dag representation', function() {
   describe('diargam', function() {
     it('connects sequence vertices', function() {
       var g = treeFromDsl(['a', 'b', 'c', 'd'], 't');
-      expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('t0'), {connect: true})).toEqual(['',
         '|',
         'a',
         '|',
@@ -476,7 +476,7 @@ describe('tree/dag representation', function() {
     });
     it('connects split vertices', function() {
       var g = treeFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
-      expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('t0'), {connect: true})).toEqual(['',
         '|',
         '+--+-+-+',
         '   | | |',
@@ -488,7 +488,7 @@ describe('tree/dag representation', function() {
     });
     it('extends vertical connector all the way down', function() {
       var g = treeFromDsl({a: 'A', b: ['B1', 'B2', 'B3']}, 't');
-      expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('t0'), {connect: true})).toEqual(['',
         '|',
         '+--+-+',
         '   | |',
@@ -509,7 +509,7 @@ describe('tree/dag representation', function() {
         {b1: 'B1', b2: 'B2', b3: {b4: 'B4', b5: 'B5'}},
         {c1: 'C1', c2: ['C3', 'C4']},
         'd'], 't');
-      expect('\n' + show(g.vertex('t0'), {connect: true, seqShift: 0})).toEqual(['',
+      expect('\n' + show(g.vertex('t0'), {connect: true})).toEqual(['',
         '|',
         'a',
         '|',
