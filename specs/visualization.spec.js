@@ -580,7 +580,6 @@ describe('tree/dag representation', function() {
               w = Math.max(w, current.v.length);
               expect(w).not.toEqual(7);
             });
-            expect(w).toEqual(3);
           }
 
           var max = this.computeMax_();
