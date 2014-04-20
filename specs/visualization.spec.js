@@ -572,8 +572,22 @@ describe('tree/dag representation', function() {
         var screen = Screen.new_();
         preOrder(v, screen);
         function render(spacing, matrixTransformer) {
+          function computeWidths_(max, spacing) {
+            var widths = u_.range(0, max.c + 1).map(u_.constant(1));
+
+            this.entries.forEach(function(current) {
+              var c = current.c;
+              widths[c] = Math.max(widths[c], current.v.length);
+            });
+            widths = widths.map(function(current) {
+              var width = (spacing === undefined) ? 2 : current + spacing;
+              return u_.range(width).map(u_.constant(' ')).join('');
+            });
+            return widths;
+          }
+
           var max = this.computeMax_();
-          var widths = this.computeWidths_(max, spacing);
+          var widths = computeWidths_.bind(this)(max, spacing);
           expect(widths[0]).toEqual('   ');
         }
 
