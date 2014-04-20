@@ -487,6 +487,18 @@ describe('tree/dag representation', function() {
         '+-+-+-+'
       ].join('\n'));
     });
+    it('can add left/right arrows', function() {
+      var g = rootFromDsl({a: 'A', b: 'B', c: 'C'});
+      expect('\n' + show(g, {splitArrows: true, connect: true})).toEqual(['',
+        '|',
+        '+->-+-+-+',
+        '    | | |',
+        '    A B C',
+        '    | | |',
+        '    | | |',
+        '+-<-+-+-+',
+      ].join('\n'));
+    });
     it('extends vertical connector all the way down', function() {
       var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
       expect('\n' + show(g, {connect: true})).toEqual(['',
