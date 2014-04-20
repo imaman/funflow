@@ -580,16 +580,10 @@ describe('tree/dag representation', function() {
               widths[c] = Math.max(widths[c], current.v.length);
             });
             expect(widths[0]).toEqual(3);
-            widths = widths.map(function(current) {
-              var width = (spacing === undefined) ? 2 : current + spacing;
-              return u_.range(width).map(u_.constant(' ')).join('');
-            });
-            return widths;
           }
 
           var max = this.computeMax_();
           var widths = computeWidths_.bind(this)(max, spacing);
-          expect(widths[0]).toEqual('   ');
         }
 
         return render.bind(screen)(1, connectVeritcally);
