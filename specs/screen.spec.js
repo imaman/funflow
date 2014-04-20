@@ -70,6 +70,13 @@ describe('screen', function() {
         'VWXY           Z',
       ].join('\n'));
     });
+    it('takes only the most recent entry', function() {
+      var screen = Screen.new_();
+      screen.putAt(0, 0, 'string_to_be_overwritten');
+      screen.putAt(0, 0, 'a');
+      screen.putAt(0, 1, 'b');
+      expect(screen.render(1)).toEqual('a b');
+    });
   });
   describe('sub screening', function() {
     it('allows nested screen to be created with relative offsets', function() {

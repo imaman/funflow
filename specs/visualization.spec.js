@@ -475,14 +475,6 @@ describe('tree/dag representation', function() {
         '|'
       ].join('\n'));
     });
-    it('squeeze', function() {
-      var Screen = require('../lib/screen').Screen;
-      var screen = Screen.new_();
-      screen.putAt(0, 0, 'string_to_be_overwritten');
-      screen.putAt(0, 0, 'a');
-      screen.putAt(0, 1, 'b');
-      expect(screen.render(1)).toEqual('a b');
-    });
     it('connects split vertices', function() {
       var g = rootFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
       expect('\n' + show(g, {connect: true})).toEqual(['',
