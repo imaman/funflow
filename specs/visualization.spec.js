@@ -1,5 +1,6 @@
 var Graph = require('../lib/graph');
 var treeFromDsl = require('../lib/visualization').treeFromDsl;
+var rootFromDsl = require('../lib/visualization').rootFromDsl;
 var show = require('../lib/visualization').show;
 var u_ = require('underscore');
 
@@ -420,8 +421,8 @@ describe('tree/dag representation', function() {
   });
   describe('integration', function() {
     it('can render a tree constructed from DSL', function() {
-      var g = treeFromDsl(['a', {b1: 'B1', b2: 'B2'}, 'c'], 't');
-      expect('\n' + show(g.vertex('t0'), {seqShift: 0})).toEqual(['',
+      var g = rootFromDsl(['a', {b1: 'B1', b2: 'B2'}, 'c'], 't');
+      expect('\n' + show(g, {seqShift: 0})).toEqual(['',
         't0',
         'a',
         't1',
