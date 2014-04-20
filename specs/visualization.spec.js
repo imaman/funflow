@@ -431,7 +431,7 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('can render a tree a deeply nested DSL', function() {
-      var g = treeFromDsl([
+      var g = rootFromDsl([
         'a',
         {
           b1: [
@@ -443,7 +443,7 @@ describe('tree/dag representation', function() {
         },
         { b3: 'B3', b4: 'B5' }
       ], 't');
-      expect('\n' + show(g.vertex('t0'), {seqShift: 0})).toEqual(['',
+      expect('\n' + show(g, {seqShift: 0})).toEqual(['',
         't0',
         'a',
         't1',
@@ -462,8 +462,8 @@ describe('tree/dag representation', function() {
   });
   describe('diargam', function() {
     it('connects sequence vertices', function() {
-      var g = treeFromDsl(['a', 'b', 'c', 'd'], 't');
-      expect('\n' + show(g.vertex('t0'), {connect: true})).toEqual(['',
+      var g = rootFromDsl(['a', 'b', 'c', 'd']);
+      expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         'a',
         '|',
@@ -476,8 +476,8 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('connects split vertices', function() {
-      var g = treeFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
-      expect('\n' + show(g.vertex('t0'), {connect: true})).toEqual(['',
+      var g = rootFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
+      expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         '+--+-+-+',
         '   | | |',
@@ -488,8 +488,8 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('extends vertical connector all the way down', function() {
-      var g = treeFromDsl({a: 'A', b: ['B1', 'B2', 'B3']}, 't');
-      expect('\n' + show(g.vertex('t0'), {connect: true})).toEqual(['',
+      var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']}, 't');
+      expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         '+--+-+',
         '   | |',
@@ -505,12 +505,12 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('connects depply nested graph', function() {
-      var g = treeFromDsl([
+      var g = rootFromDsl([
         'a',
         {b1: 'B1', b2: 'B2', b3: {b4: 'B4', b5: 'B5'}},
         {c1: 'C1', c2: ['C3', 'C4']},
         'd'], 't');
-      expect('\n' + show(g.vertex('t0'), {connect: true})).toEqual(['',
+      expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         'a',
         '|',
