@@ -476,7 +476,7 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('connects split vertices', function() {
-      var g = rootFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
+      var g = rootFromDsl({a: 'A', b: 'B', c: 'C'});
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         '+-+-+-+',
@@ -488,7 +488,7 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('extends vertical connector all the way down', function() {
-      var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']}, 't');
+      var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         '+-+-+',
@@ -509,7 +509,7 @@ describe('tree/dag representation', function() {
         'a',
         {b1: 'B1', b2: 'B2', b3: {b4: 'B4', b5: 'B5'}},
         {c1: 'C1', c2: ['C3', 'C4']},
-        'd'], 't');
+        'd']);
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         'a',
