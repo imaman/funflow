@@ -476,6 +476,104 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('squeeze', function() {
+      var Screen = require('../lib/screen').Screen;
+      var extend = require('node.extend');
+      function show(v, options) {
+        options = extend({seqShift: 1, branchShift: 1, connect: false},
+            options);
+        if (options.connect) {
+          options.branchShift = 3;
+          options.seqShift = 0;
+        }
+
+        function showSplit(v, screen, options, preOrder) {
+          var row = 1;
+          var col = 1;
+          var cols = [];
+
+          screen.putAt(0, 0, v.key);
+
+          if (options.connect) {
+            screen.putAt(0, 0, '|');
+            screen.putAt(1, 0, '+', '-');
+          }
+
+          v.targets().forEach(function(t) {
+            cols.push(col);
+            var dim = preOrder(t, screen.nested(options.branchShift, col));
+            col += dim.p;
+            row = Math.max(row, options.branchShift + dim.s);
+          });
+
+          if (options.connect) {
+            cols.forEach(function(c, index) {
+              screen.putAt(1, c, '+', index === (cols.length - 1) ? undefined : '-');
+            });
+            cols.forEach(function(c) {
+              screen.putAt(2, c, '|');
+            });
+            cols.forEach(function(c, index) {
+              screen.putAt(row, c, '|');
+              screen.putAt(row + 1, 0, '+', '-');
+              screen.putAt(row + 1, c, '+', index === (cols.length - 1) ? undefined : '-');
+            });
+            row += 2;
+          }
+          return {s: row, p: col};
+        }
+
+        function showSequence(v, screen, options, preOrder) {
+          var row = 1;
+          var col = 1;
+          screen.putAt(0, 0, v.key);
+          if (options.connect)
+            screen.putAt(0, 0, '|');
+          v.targets().forEach(function(t) {
+            var dim = preOrder(t, screen.nested(row, options.seqShift));
+            row += dim.s;
+            col = Math.max(col, dim.p);
+          });
+          col += options.seqShift;
+          return {s: row, p: col};
+        }
+
+        function showTerminal(v, screen, options, preOrder) {
+          var row = 1;
+          screen.putAt(0, 0, v.key);
+          if (options.connect) {
+            screen.putAt(1, 0 ,'|');
+            row += 1;
+          }
+          return {s: row, p: 1};
+        }
+        function preOrder(v, screen) {
+
+          if (v.type === 'conc') {
+            return showSplit(v, screen, options, preOrder);
+          } else if (v.targets().length > 0) {
+            return showSequence(v, screen, options, preOrder);
+          } else {
+            return showTerminal(v, screen, options, preOrder);
+          }
+        }
+
+        function connectVeritcally(lines, numRows, numCols) {
+          u_.range(0, numCols).forEach(function(c) {
+            u_.range(1, numRows).forEach(function(r) {
+              var curr = lines[r][c];
+              var prev = lines[r-1][c];
+              if (prev.trim() === '|' && curr.trim().length === 0) {
+                lines[r][c] = ('|' + curr.substring(1));
+              }
+            });
+          });
+        }
+
+        var screen = Screen.new_();
+        preOrder(v, screen);
+        return screen.render(1, connectVeritcally);
+      }
+
       var g = rootFromDsl({a: 'A', b: 'B'});
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
