@@ -475,6 +475,18 @@ describe('tree/dag representation', function() {
         '|'
       ].join('\n'));
     });
+    it('squeeze', function() {
+      var g = rootFromDsl({a: 'A', b: 'B'});
+      expect('\n' + show(g, {connect: true})).toEqual(['',
+        '|',
+        '+--+-+',
+        '   | |',
+        '   A B',
+        '   | |',
+        '   | |',
+        '+--+-+'
+      ].join('\n'));
+    });
     it('connects split vertices', function() {
       var g = rootFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
       expect('\n' + show(g, {connect: true})).toEqual(['',
