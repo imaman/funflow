@@ -575,8 +575,8 @@ describe('tree/dag representation', function() {
           function computeWidths_(max, spacing) {
             var widths = u_.range(0, max.c + 1).map(u_.constant(1));
 
-            var current = this.entries.filter(function(current) { return current.c === 0 && current.r === 0})[0];
-            expect(current.v).not.toEqual('_temp_0');
+            var chosen = this.entries.filter(function(current) { return current.c === 0 && current.r === 0});
+            expect(chosen.length).toEqual(1);
           }
 
           var max = this.computeMax_();
