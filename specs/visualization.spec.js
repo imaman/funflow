@@ -571,41 +571,17 @@ describe('tree/dag representation', function() {
 
         var screen = Screen.new_();
         preOrder(v, screen);
-        function  render(spacing, matrixTransformer) {
+        function render(spacing, matrixTransformer) {
           var max = this.computeMax_();
           var widths = this.computeWidths_(max, spacing);
           expect(widths[0]).toEqual('   ');
-
-          var self = this;
-          var lines = u_.range(0, max.r + 1).reduce(function(acc, r) {
-            var line = u_.range(0, max.c + 1).map(function(c) {
-              var entry = self.findEntry_(r, c);
-              return self.computeCell_(entry, c, spacing, widths);
-            });
-            acc.push(line);
-            return acc;
-          }, []);
-
-          matrixTransformer && matrixTransformer(lines, max.r + 1, max.c + 1);
-
-          return lines.map(function(line) {
-            return line.join('').replace(/[ ]+$/, '');
-          }).join('\n');
         }
 
         return render.bind(screen)(1, connectVeritcally);
       }
 
       var g = rootFromDsl({a: 'A', b: 'B'});
-      expect('\n' + show(g, {connect: true})).toEqual(['',
-        '|',
-        '+--+-+',
-        '   | |',
-        '   A B',
-        '   | |',
-        '   | |',
-        '+--+-+'
-      ].join('\n'));
+      show(g, {connect: true});
     });
     it('connects split vertices', function() {
       var g = rootFromDsl({a: 'A', b: 'B', c: 'C'}, 't');
