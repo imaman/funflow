@@ -579,6 +579,7 @@ describe('tree/dag representation', function() {
               var c = current.c;
               widths[c] = Math.max(widths[c], current.v.length);
             });
+            expect(widths[0]).toEqual(3);
             widths = widths.map(function(current) {
               var width = (spacing === undefined) ? 2 : current + spacing;
               return u_.range(width).map(u_.constant(' ')).join('');
