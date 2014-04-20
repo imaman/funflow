@@ -488,6 +488,19 @@ describe('tree/dag representation', function() {
       ].join('\n'));
     });
     it('extends vertical connector all the way down', function() {
+      var g = rootFromDsl({a: 'A', b: ['B']});
+      expect('\n' + show(g, {connect: true})).toEqual(['',
+        '|',
+        '+-+-+',
+        '  | |',
+        '  A |',
+        '  | B',
+        '  | |',
+        '  | |',
+        '+-+-+'
+      ].join('\n'));
+    });
+    it('add a down-arrow after at the fourth line', function() {
       var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
@@ -497,7 +510,7 @@ describe('tree/dag representation', function() {
         '  | B1',
         '  | |',
         '  | B2',
-        '  | |',
+        '  v |',
         '  | B3',
         '  | |',
         '  | |',
@@ -521,7 +534,7 @@ describe('tree/dag representation', function() {
         '  |  |  +-+--+',
         '  |  |    |  |',
         '  |  |    B4 B5',
-        '  |  |    |  |',
+        '  v  v    |  |',
         '  |  |    |  |',
         '  |  |  +-+--+',
         '  |  |  |',
@@ -533,7 +546,7 @@ describe('tree/dag representation', function() {
         '  |  C3',
         '  |  |',
         '  |  C4',
-        '  |  |',
+        '  v  |',
         '  |  |',
         '+-+--+',
         'd',
