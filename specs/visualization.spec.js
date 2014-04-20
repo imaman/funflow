@@ -575,7 +575,15 @@ describe('tree/dag representation', function() {
           function computeWidths_(max, spacing) {
             var widths = u_.range(0, max.c + 1).map(u_.constant(1));
 
-            var chosen = this.entries.filter(function(current) { return current.c === 0 && current.r === 0});
+            var reduced = {};
+            this.entries.forEach(function(current) {
+              var id = current.c + current.r * (max.c + 1);
+              reduced[id] = current;
+            });
+            var uniq = Object.keys(reduced).map(function(id) {
+              return reduced[id];
+            });
+            var chosen = uniq.filter(function(current) { return current.c === 0 && current.r === 0});
             expect(chosen.length).toEqual(1);
           }
 
