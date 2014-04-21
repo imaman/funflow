@@ -132,6 +132,20 @@ describe('funflow compilation', function() {
       });
       expect(args).toEqual([null, 'aXb']);
     });
+    it('supports arbitrarily long sequences', function() {
+      var flow = compile(rootFromDsl([
+        function a(x, next) { next(null, x + 'a') },
+        function b(x, next) { next(null, x + 'b') },
+        function c(x, next) { next(null, x + 'c') },
+        function d(x, next) { next(null, x + 'd') },
+        function e(x, next) { next(null, x + 'e') }
+      ]));
+      var args;
+      flow(null, '', function() {
+        args = u_.toArray(arguments);
+      });
+      expect(args).toEqual([null, 'abcde']);
+    });
   });
   function compile(v) {
     var compiled = v.targets().map(compile);
