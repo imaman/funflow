@@ -135,6 +135,10 @@ describe('DSL', function() {
       expect(g.vertex('B2').type).toBe(undefined);
       expect(g.vertex('c').type).toBe(undefined);
     });
+    it('tags split edges with the corresponding attribute name', function() {
+      var root = rootFromDsl({b1: 'B1', b2: 'B2'});
+      expect(root.outgoing().map(function(e) { return e.name })).toEqual(['b1', 'b2']);
+    });
   });
   describe('with real functions', function() {
     it('generates a unique key for a function vertex', function() {
