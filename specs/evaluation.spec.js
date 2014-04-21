@@ -136,10 +136,6 @@ describe('funflow compilation', function() {
   function compile(v) {
     var compiled = v.targets().map(compile);
     if (compiled.length > 0) {
-      var current = compiled[0];
-      if (compiled.length === 1) {
-        return current;
-      }
       return function() {
         var args = u_.toArray(arguments);
         var next = args.pop();
