@@ -188,15 +188,23 @@ describe('funflow compilation', function() {
       }));
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
-      expect(args).toEqual([null, {key: 'AB'}]);
+      expect(args).toEqual([null, {key: ['AB']}]);
     });
+/*    it('supports multiple outputs', function() {
+      var flow = compile(rootFromDsl({
+        key: function f(v1, v2, next) { next(null, v1 + v2, v1 * v2) }
+      }));
+      var args;
+      flow(null, 20, 4, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, {key: [16, 'XY'}]);
+    });*/
     it('passes inputs to the function at the branch', function() {
       var flow = compile(rootFromDsl({
         key: function ab(v1, v2, next) { next(null, v1 + v2) }
       }));
       var args;
       flow(null, 'X', 'Y', function() { args = u_.toArray(arguments) });
-      expect(args).toEqual([null, {key: 'XY'}]);
+      expect(args).toEqual([null, {key: ['XY']}]);
     });
     it('handles a two-way split', function() {
       var flow = compile(rootFromDsl({
@@ -205,7 +213,7 @@ describe('funflow compilation', function() {
       }));
       var args;
       flow(null, 5, 8, function() { args = u_.toArray(arguments) });
-      expect(args).toEqual([null, {sum: 13, product: 40}]);
+      expect(args).toEqual([null, {sum: [13], product: [40]}]);
     });
   });
   function compile(v) {
@@ -219,7 +227,7 @@ describe('funflow compilation', function() {
         var left = edges.length;
         var obj = {};
         function temp(k, e, v) {
-          obj[k] = v;
+          obj[k] = [v];
           --left;
           if (left === 0)
             next(null, obj);
