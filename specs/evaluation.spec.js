@@ -136,9 +136,9 @@ describe('funflow compilation', function() {
   function compile(v) {
     var compiled = v.targets().map(compile);
     if (compiled.length > 0) {
-      var lhs = compiled[0];
+      var current = compiled[0];
       if (compiled.length === 1) {
-        return lhs;
+        return current;
       }
       var rhs = compiled[1];
       return function() {
@@ -152,7 +152,7 @@ describe('funflow compilation', function() {
         }
 
         args[args.length - 1] = temp;
-        lhs.apply(null, args);
+        current.apply(null, args);
       }
     }
     return function() {
