@@ -144,8 +144,7 @@ describe('funflow compilation', function() {
         var args = u_.toArray(arguments);
         var next = args.pop();
 
-        var a = [compiled[0], compiled[1]];
-        var reduced = a.reduceRight(function(soFar, x) {
+        var reduced = compiled.reduceRight(function(soFar, x) {
           return function() {
             var args = u_.toArray(arguments);
             args.push(soFar);
