@@ -61,6 +61,18 @@ describe('funflow compilation', function() {
       });
       expect(args).toEqual(['SOME_ERROR']);
     });
+    it('passes an exception thrown by the function to the error argument of the trap function', function() {
+      var error = new Error('THROWN_ERROR');
+      var root = rootFromDsl(
+        function f(next) { throw error }
+      );
+      var flow = compile(root);
+      var args;
+      flow(null, function() {
+        args = u_.toArray(arguments);
+      });
+      expect(args).toEqual([error]);
+    });
     it('yells if no "next" argument was passed-in', function() {
       var root = rootFromDsl(
         function f(next) {}
@@ -98,8 +110,13 @@ describe('funflow compilation', function() {
       if (numExpected !== numPassed)
         throw new Error(v.payload.name + '() expects ' + numExpected + ' arguments but ' + numPassed + ' were passed');
       var e = args[0];
-      if (e) return u_.last(args)(e);
-      v.payload.apply(null, args.slice(1));
+      var trap = u_.last(args);
+      if (e) return trap(e);
+      try {
+        v.payload.apply(null, args.slice(1));
+      } catch (exception) {
+        trap(exception);
+      }
     }
   }
 });
