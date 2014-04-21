@@ -75,6 +75,14 @@ describe('funflow compilation', function() {
       var flow = compile(root);
       expect(function() { flow() }).toThrow('No error argument was passed in');
     });
+    it('yells on number-of-argument mismatch', function() {
+      var root = rootFromDsl(
+        function trenaryFunction(a1, a2, a3, next) {}
+      );
+      var flow = compile(root);
+      function trap() {}
+      expect(function() { flow(null, 'a', 'b', trap) }).toThrow('trenaryFunction() expects 3 arguments but 2 were passed');
+    });
   });
   function compile(v) {
     return function() {
@@ -83,6 +91,12 @@ describe('funflow compilation', function() {
         throw new Error('No error argument was passed in');
       if (args.length === 1)
         throw new Error('No next() argument was passed in');
+
+      var numPassed = args.length - 2;
+      var func = v.payload;
+      var numExpected = func.length - 1;
+      if (numExpected !== numPassed)
+        throw new Error(v.payload.name + '() expects ' + numExpected + ' arguments but ' + numPassed + ' were passed');
       var e = args[0];
       if (e) return u_.last(args)(e);
       v.payload.apply(null, args.slice(1));
