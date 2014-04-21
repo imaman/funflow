@@ -215,6 +215,17 @@ describe('funflow compilation', function() {
       flow(null, 5, 8, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {sum: [13], product: [40]}]);
     });
+    it('ivnokes the trap function exactly once', function() {
+      var flow = compile(rootFromDsl({
+        f0: function f0(next) { next(null) },
+        f1: function f1(next) { next(null) },
+        f2: function f2(next) { next(null) },
+        f3: function f3(next) { next(null) }
+      }));
+      var count = 0;
+      flow(null, function() { ++count });
+      expect(count).toEqual(1);
+    });
     it('propagates a thrown error to the trap function', function() {
       var error = new Error('THROWN_ERROR');
       var flow = compile(rootFromDsl({
@@ -235,6 +246,29 @@ describe('funflow compilation', function() {
       flow(null, 5, 8, function() { args = u_.toArray(arguments) });
       expect(args).toEqual(['SOME_PROBLEM']);
     });
+    it('it reports a failure only once, even if multiple brnahces fail', function() {
+      var flow = compile(rootFromDsl({
+        f0: function f0(v1, v2, next) { next(null, v1 + v2) },
+        f1: function f1(v1, v2, next) { next('some_problem') },
+        f2: function f2(v1, v2, next) { next('some_problem') },
+        f3: function f3(v1, v2, next) { next(null, v1 * v2) },
+      }));
+      var count = 0;
+      var args;
+      flow(null, 0, 0, function() { ++count; args = u_.toArray(arguments) });
+      expect(count).toEqual(1);
+    });
+    it('propagates an outside failure directly to the trap function', function() {
+      var flow = compile(rootFromDsl({
+        f0: function f0(next) { next(null) },
+        f1: function f1(next) { next(null) }
+      }));
+      var args;
+      var error = new Error('some_problem');
+      flow(error, function() { args = u_.toArray(arguments) });
+      expect(args.length).toEqual(1);
+      expect(args[0]).toBe(error);
+    });
   });
   function compile(v) {
     var compiled = v.targets().map(compile);
@@ -247,7 +281,13 @@ describe('funflow compilation', function() {
         var left = edges.length;
         var obj = {};
         function temp(k, e) {
-          if (e) return next(e);
+          if (left === 0)
+            return;
+
+          if (e) {
+            left = 0;
+            return next(e);
+          }
           obj[k] = u_.toArray(arguments).slice(2);
           --left;
           if (left === 0)
