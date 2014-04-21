@@ -198,6 +198,15 @@ describe('funflow compilation', function() {
       flow(null, 'X', 'Y', function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {key: 'XY'}]);
     });
+    it('handles a two-way split', function() {
+      var flow = compile(rootFromDsl({
+        sum: function plus(v1, v2, next) { next(null, v1 + v2) },
+        product: function star(v1, v2, next) { next(null, v1 * v2) }
+      }));
+      var args;
+      flow(null, 5, 8, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, {sum: 13, product: 40}]);
+    });
   });
   function compile(v) {
     var compiled = v.targets().map(compile);
@@ -207,13 +216,18 @@ describe('funflow compilation', function() {
         var args = u_.toArray(arguments);
         var next = args.pop();
 
-        function temp(e, v) {
-          var obj = {};
-          obj[edges[0].name] = v;
-          next(null, obj);
+        var left = edges.length;
+        var obj = {};
+        function temp(k, e, v) {
+          obj[k] = v;
+          --left;
+          if (left === 0)
+            next(null, obj);
         }
-        args.push(temp);
-        compiled[0].apply(null, args);
+        compiled.forEach(function(current, index) {
+          var bounded = temp.bind(null, edges[index].name);
+          current.apply(null, args.concat(bounded));
+        });
       }
     }
     if (compiled.length > 0) {
