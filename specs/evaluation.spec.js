@@ -190,17 +190,30 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {key: 'AB'}]);
     });
+    it('passes inputs to the function at the branch', function() {
+      var flow = compile(rootFromDsl({
+        key: function ab(v1, v2, next) { next(null, v1 + v2) }
+      }));
+      var args;
+      flow(null, 'X', 'Y', function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, {key: 'XY'}]);
+    });
   });
   function compile(v) {
     var compiled = v.targets().map(compile);
     if (v.type === 'conc') {
       var edges = v.outgoing();
-      return function(e, next) {
-        compiled[0](null, function(e, v) {
+      return function() {
+        var args = u_.toArray(arguments);
+        var next = args.pop();
+
+        function temp(e, v) {
           var obj = {};
           obj[edges[0].name] = v;
           next(null, obj);
-        })
+        }
+        args.push(temp);
+        compiled[0].apply(null, args);
       }
     }
     if (compiled.length > 0) {
