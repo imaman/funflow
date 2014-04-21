@@ -95,7 +95,7 @@ describe('funflow compilation', function() {
     });
   });
   describe('of a sequence', function() {
-    it('passes outside input to the first function', function() {
+    it('passes outside inputs to the first function', function() {
       var root = rootFromDsl([
         function plus(v1, v2, next) { next(null, v1 + v2) }
       ]);
@@ -139,9 +139,7 @@ describe('funflow compilation', function() {
         function e(x, next) { next(null, x + 'e') }
       ]));
       var args;
-      flow(null, '', function() {
-        args = u_.toArray(arguments);
-      });
+      flow(null, '', function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 'abcde']);
     });
     it('does not run subsequent functions after a failure', function() {
@@ -181,6 +179,16 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
       expect(args[0]).toBe(error);
+    });
+  });
+  describe('of a split', function() {
+    it('passes output to the trap function, tagged by the property name', function() {
+      var flow = compile(rootFromDsl({
+        ab: function f(next) { next('A_B') }
+      }));
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, {ab: 'A_B'}]);
     });
   });
   function compile(v) {
