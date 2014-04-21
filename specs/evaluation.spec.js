@@ -63,15 +63,13 @@ describe('funflow compilation', function() {
     });
     it('passes an exception thrown by the function to the error argument of the trap function', function() {
       var error = new Error('THROWN_ERROR');
-      var root = rootFromDsl(
+      var flow = compile(rootFromDsl(
         function f(next) { throw error }
-      );
-      var flow = compile(root);
+      ));
       var args;
-      flow(null, function() {
-        args = u_.toArray(arguments);
-      });
-      expect(args).toEqual([error]);
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args.length).toEqual(1);
+      expect(args[0]).toBe(error);
     });
     it('yells if no "next" argument was passed-in', function() {
       var root = rootFromDsl(
@@ -145,6 +143,44 @@ describe('funflow compilation', function() {
         args = u_.toArray(arguments);
       });
       expect(args).toEqual([null, 'abcde']);
+    });
+    it('does not run subsequent functions after a failure', function() {
+      called = '';
+      var flow = compile(rootFromDsl([
+        function a(next) { called += 'a'; next(null) },
+        function b(next) { called += 'b'; next('some_error') },
+        function c(next) { called += 'c'; next(null) },
+        function d(next) { called += 'd'; next(null) },
+        function e(next) { called += 'e'; next(null) },
+      ]));
+      flow(null, function() {});
+      expect(called).toEqual('ab');
+    });
+    it('does not run subsequent functions after a thrown error', function() {
+      called = '';
+      var flow = compile(rootFromDsl([
+        function a(next) { called += 'a'; next(null) },
+        function b(next) { called += 'b'; new Error('some_error') },
+        function c(next) { called += 'c'; next(null) },
+        function d(next) { called += 'd'; next(null) },
+        function e(next) { called += 'e'; next(null) },
+      ]));
+      flow(null, function() {});
+      expect(called).toEqual('ab');
+    });
+    it('propagates a thrown error all the way to the trap function', function() {
+      var error = new Error('THROWN_ERROR');
+      var flow = compile(rootFromDsl([
+        function a(next) { next(null) },
+        function b(next) { next(error) },
+        function c(next) { next(null) },
+        function d(next) { next(null) },
+        function e(next) { next(null) },
+      ]));
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args.length).toEqual(1);
+      expect(args[0]).toBe(error);
     });
   });
   function compile(v) {
