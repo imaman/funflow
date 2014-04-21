@@ -215,6 +215,17 @@ describe('funflow compilation', function() {
       flow(null, 5, 8, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {sum: [13], product: [40]}]);
     });
+    it('propagates a thrown error to the trap function', function() {
+      var error = new Error('THROWN_ERROR');
+      var flow = compile(rootFromDsl({
+        sum: function plus(v1, v2, next) { next(null, v1 + v2) },
+        product: function star(v1, v2, next) { throw error }
+      }));
+      var args;
+      flow(null, 5, 8, function() { args = u_.toArray(arguments) });
+      expect(args.length).toEqual(1);
+      expect(args[0]).toBe(error);
+    });
   });
   function compile(v) {
     var compiled = v.targets().map(compile);
@@ -227,8 +238,7 @@ describe('funflow compilation', function() {
         var left = edges.length;
         var obj = {};
         function temp(k, e) {
-          var args = u_.toArray(arguments).slice(2);
-          obj[k] = args;
+          obj[k] = u_.toArray(arguments).slice(2);
           --left;
           if (left === 0)
             next(null, obj);
