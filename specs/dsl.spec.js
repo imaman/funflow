@@ -1,4 +1,4 @@
-var treeFromDsl = require('../lib/visualization').treeFromDsl;
+var treeFromDsl = require('../lib/dsl').treeFromDsl;
 var u_ = require('underscore');
 
 describe('DSL', function() {

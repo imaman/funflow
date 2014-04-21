@@ -1,5 +1,5 @@
 var Graph = require('../lib/graph');
-var rootFromDsl = require('../lib/visualization').rootFromDsl;
+var rootFromDsl = require('../lib/dsl').rootFromDsl;
 var show = require('../lib/visualization').show;
 
 describe('visualization', function() {
