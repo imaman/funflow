@@ -194,9 +194,12 @@ describe('funflow compilation', function() {
   function compile(v) {
     var compiled = v.targets().map(compile);
     if (v.type === 'conc') {
+      var edges = v.outgoing();
       return function(e, next) {
         compiled[0](null, function(e, v) {
-          next(null, {key: v});
+          var obj = {};
+          obj[edges[0].name] = v;
+          next(null, obj);
         })
       }
     }
