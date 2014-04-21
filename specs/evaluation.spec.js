@@ -238,6 +238,7 @@ describe('funflow compilation', function() {
         var left = edges.length;
         var obj = {};
         function temp(k, e) {
+          if (e) return next(e);
           obj[k] = u_.toArray(arguments).slice(2);
           --left;
           if (left === 0)
