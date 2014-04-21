@@ -96,7 +96,23 @@ describe('funflow compilation', function() {
       expect(function() { flow(null, 'a', 'b', trap) }).toThrow('trenaryFunction() expects 3 arguments but 2 were passed');
     });
   });
+  describe('of a sequence', function() {
+    it('passes outside input to the first function', function() {
+      var root = rootFromDsl([
+        function plus(v1, v2, next) { next(null, v1 + v2) }
+      ]);
+      var flow = compile(root);
+      var args;
+      flow(null, 'a', 'b', function() {
+        args = u_.toArray(arguments);
+      });
+      expect(args).toEqual([null, 'ab']);
+    });
+  });
   function compile(v) {
+    if (v.targets().length > 0) {
+      return compile(v.targets()[0]);
+    }
     return function() {
       var args = u_.toArray(arguments);
       if (args.length === 0)
