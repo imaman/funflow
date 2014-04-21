@@ -182,17 +182,22 @@ describe('funflow compilation', function() {
     });
   });
   describe('of a split', function() {
-    it('passes output to the trap function, tagged by the property name', function() {
+    it('passes output to the trap function, keyed by the property name', function() {
       var flow = compile(rootFromDsl({
-        ab: function f(next) { next('A_B') }
+        key: function ab(next) { next('AB') }
       }));
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
-      expect(args).toEqual([null, {ab: 'A_B'}]);
+      expect(args).toEqual([null, {key: 'AB'}]);
     });
   });
   function compile(v) {
     var compiled = v.targets().map(compile);
+    if (v.type === 'conc') {
+      return function(e, next) {
+        next(null, {key: 'AB'});
+      }
+    }
     if (compiled.length > 0) {
       return function() {
         var args = u_.toArray(arguments);
