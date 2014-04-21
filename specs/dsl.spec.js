@@ -1,4 +1,5 @@
 var treeFromDsl = require('../lib/dsl').treeFromDsl;
+var rootFromDsl = require('../lib/dsl').rootFromDsl;
 var u_ = require('underscore');
 
 describe('DSL', function() {
@@ -133,6 +134,22 @@ describe('DSL', function() {
       expect(g.vertex('B1').type).toBe(undefined);
       expect(g.vertex('B2').type).toBe(undefined);
       expect(g.vertex('c').type).toBe(undefined);
+    });
+  });
+  describe('with real functions', function() {
+    it('generates a unique key for a function vertex', function() {
+      var g = treeFromDsl([function a1() {}, function a2() {}], 't');
+      verify(g.edges(), [
+        't0 -> t1',
+        't0 -> t2'
+      ]);
+    });
+    it('stores the function in .payload', function() {
+      function f1() {}
+      function f2() {}
+      var root = rootFromDsl([f1, f2], 't');
+      expect(root.targets()[0].payload).toBe(f1);
+      expect(root.targets()[1].payload).toBe(f2);
     });
   });
 });
