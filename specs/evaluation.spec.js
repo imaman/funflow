@@ -144,11 +144,14 @@ describe('funflow compilation', function() {
         var args = u_.toArray(arguments);
         var next = args.pop();
 
-        var temp = function() {
-          var args = u_.toArray(arguments);
-          args.push(next);
-          return compiled[1].apply(null, args);
-        }
+        var a = [compiled[1]];
+        var temp = a.reduce(function(soFar, x) {
+          return function() {
+            var args = u_.toArray(arguments);
+            args.push(soFar);
+            return a[0].apply(null, args);
+          }
+        }, next);
 
         args.push(temp);
         current.apply(null, args);
