@@ -5,7 +5,7 @@ var u_ = require('underscore');
 
 describe('funflow compilation', function() {
   function compile(v) {
-    return function(e, a1, a2, next) { next(null, 10) };
+    return function(e, a1, a2, next) { v.payload(a1, a2, next) };
   }
   it('transforms a single function into a fully-async one', function() {
     var root = rootFromDsl(
