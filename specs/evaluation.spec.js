@@ -4,9 +4,6 @@ var show = require('../lib/visualization').show;
 var u_ = require('underscore');
 
 describe('funflow compilation', function() {
-  function compile(v) {
-    return function(e, a1, a2, next) { v.payload(a1, a2, next) };
-  }
   describe('of a function', function() {
     it('turns an (arg, ..., next) function into an (e, arg, ..., next) callback', function() {
       var root = rootFromDsl(
@@ -19,7 +16,78 @@ describe('funflow compilation', function() {
       });
       expect(args).toEqual([null, 10]);
     });
+    it('supports incoming var. args', function() {
+      var root = rootFromDsl(
+        function sum(w, x, y, z, next) { next(null, w + x + y + z) }
+      );
+      var flow = compile(root);
+      var args;
+      flow(null, 'a', 'b', 'c', 'd', function(e, v) {
+        args = [e, v];
+      });
+      expect(args).toEqual([null, 'abcd']);
+    });
+    it('supports outgoing var. args', function() {
+      var root = rootFromDsl(
+        function sumDiffProd(x1, x2, next) { next(null, x1 + x2, x1 - x2, x1 * x2) }
+      );
+      var flow = compile(root);
+      var args;
+      flow(null, 20, 4, function() {
+        args = u_.toArray(arguments);
+      });
+      expect(args).toEqual([null, 24, 16, 80]);
+    });
+    it('does not call the function if the outside caller passed in an error value', function() {
+      var called = false;
+      var root = rootFromDsl(
+        function f(next) { called = true }
+      );
+      var flow = compile(root);
+      var args;
+      flow('SOME_ERROR', function() {
+        args = u_.toArray(arguments);
+      });
+      expect(called).toBe(false);
+    });
+    it('passes an error value from the outside caller directly to the trap function', function() {
+      var root = rootFromDsl(
+        function f(next) {}
+      );
+      var flow = compile(root);
+      var args;
+      flow('SOME_ERROR', function() {
+        args = u_.toArray(arguments);
+      });
+      expect(args).toEqual(['SOME_ERROR']);
+    });
+    it('yells if no "next" argument was passed-in', function() {
+      var root = rootFromDsl(
+        function f(next) {}
+      );
+      var flow = compile(root);
+      expect(function() { flow(null) }).toThrow('No next() argument was passed in');
+    });
+    it('yells if no "error" argument was passed-in', function() {
+      var root = rootFromDsl(
+        function f(next) {}
+      );
+      var flow = compile(root);
+      expect(function() { flow() }).toThrow('No error argument was passed in');
+    });
   });
+  function compile(v) {
+    return function() {
+      var args = u_.toArray(arguments);
+      if (args.length === 0)
+        throw new Error('No error argument was passed in');
+      if (args.length === 1)
+        throw new Error('No next() argument was passed in');
+      var e = args[0];
+      if (e) return u_.last(args)(e);
+      v.payload.apply(null, args.slice(1));
+    }
+  }
 });
 
 
