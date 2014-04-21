@@ -140,7 +140,6 @@ describe('funflow compilation', function() {
       if (compiled.length === 1) {
         return current;
       }
-      var rhs = compiled[1];
       return function() {
         var args = u_.toArray(arguments);
         var next = args.pop();
@@ -148,7 +147,7 @@ describe('funflow compilation', function() {
         var temp = function() {
           var args = u_.toArray(arguments);
           args.push(next);
-          return rhs.apply(null, args);
+          return compiled[1].apply(null, args);
         }
 
         args.push(temp);
