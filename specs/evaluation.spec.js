@@ -120,21 +120,37 @@ describe('funflow compilation', function() {
       });
       expect(args).toEqual([null, 'ab']);
     });
+    it('supports incoming args', function() {
+      var root = rootFromDsl([
+        function ab(x, next) { next(null, 'a', x, 'b') },
+        function plus(v1, v2, v3, next) { next(null, v1 + v2 + v3) }
+      ]);
+      var flow = compile(root);
+      var args;
+      flow(null, 'X', function() {
+        args = u_.toArray(arguments);
+      });
+      expect(args).toEqual([null, 'aXb']);
+    });
   });
   function compile(v) {
-    if (v.targets().length > 0) {
-      if (v.targets().length === 1) {
-        return compile(v.targets()[0]);
+    var targets = v.targets();
+    if (targets.length > 0) {
+      var lhs = compile(targets[0]);
+      if (targets.length === 1) {
+        return lhs;
       }
-      var lhs = compile(v.targets()[0]);
-      var rhs = compile(v.targets()[1]);
-      return function(e, next) {
-        var temp = function(e, x, y) {
-          return rhs(e, x, y, next);
-        }
-
+      var rhs = compile(targets[1]);
+      return function() {
         var args = u_.toArray(arguments);
         var next = u_.last(args);
+
+        var temp = function() {
+          var args = u_.toArray(arguments);
+          args.push(next);
+          return rhs.apply(null, args);
+        }
+
         args[args.length - 1] = temp;
         lhs.apply(null, args);
       }
