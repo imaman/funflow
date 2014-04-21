@@ -149,7 +149,7 @@ describe('funflow compilation', function() {
           return function() {
             var args = u_.toArray(arguments);
             args.push(soFar);
-            return a[0].apply(null, args);
+            return x.apply(null, args);
           }
         }, next);
 
