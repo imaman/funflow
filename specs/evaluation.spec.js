@@ -226,6 +226,15 @@ describe('funflow compilation', function() {
       expect(args.length).toEqual(1);
       expect(args[0]).toBe(error);
     });
+    it('propagates a failure to the trap function', function() {
+      var flow = compile(rootFromDsl({
+        sum: function plus(v1, v2, next) { next(null, v1 + v2) },
+        product: function star(v1, v2, next) { next('SOME_PROBLEM') }
+      }));
+      var args;
+      flow(null, 5, 8, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual(['SOME_PROBLEM']);
+    });
   });
   function compile(v) {
     var compiled = v.targets().map(compile);
