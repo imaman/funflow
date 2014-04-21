@@ -190,14 +190,14 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {key: ['AB']}]);
     });
-/*    it('supports multiple outputs', function() {
+    it('supports multiple outputs', function() {
       var flow = compile(rootFromDsl({
         key: function f(v1, v2, next) { next(null, v1 + v2, v1 * v2) }
       }));
       var args;
       flow(null, 20, 4, function() { args = u_.toArray(arguments) });
-      expect(args).toEqual([null, {key: [16, 'XY'}]);
-    });*/
+      expect(args).toEqual([null, {key: [24, 80]}]);
+    });
     it('passes inputs to the function at the branch', function() {
       var flow = compile(rootFromDsl({
         key: function ab(v1, v2, next) { next(null, v1 + v2) }
@@ -226,8 +226,9 @@ describe('funflow compilation', function() {
 
         var left = edges.length;
         var obj = {};
-        function temp(k, e, v) {
-          obj[k] = [v];
+        function temp(k, e) {
+          var args = u_.toArray(arguments).slice(2);
+          obj[k] = args;
           --left;
           if (left === 0)
             next(null, obj);
