@@ -195,7 +195,9 @@ describe('funflow compilation', function() {
     var compiled = v.targets().map(compile);
     if (v.type === 'conc') {
       return function(e, next) {
-        next(null, {key: 'AB'});
+        compiled[0](null, function(e, v) {
+          next(null, {key: 'AB'});
+        })
       }
     }
     if (compiled.length > 0) {
