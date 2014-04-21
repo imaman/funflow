@@ -325,6 +325,24 @@ describe('visualization', function() {
       ].join('\n'));
     });
   });
+  describe('of real functions', function() {
+    it('uses the function name for its visual representation', function() {
+      var g = rootFromDsl([function f1() {}, function f2() {}], 't');
+      expect('\n' + show(g)).toEqual(['',
+        't0',
+        '   f1',
+        '   f2'
+      ].join('\n'));
+    });
+    it('uses a unique name if the function is unnamed', function() {
+      var g = rootFromDsl([function () {}, function () {}], 't');
+      expect('\n' + show(g)).toEqual(['',
+        't0',
+        '   t1',
+        '   t2'
+      ].join('\n'));
+    });
+  });
   describe('diargam', function() {
     it('connects sequence vertices', function() {
       var g = rootFromDsl(['a', 'b', 'c', 'd']);
