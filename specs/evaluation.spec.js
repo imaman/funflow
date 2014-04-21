@@ -134,13 +134,13 @@ describe('funflow compilation', function() {
     });
   });
   function compile(v) {
-    var targets = v.targets();
-    if (targets.length > 0) {
-      var lhs = compile(targets[0]);
-      if (targets.length === 1) {
+    var compiled = v.targets().map(compile);
+    if (compiled.length > 0) {
+      var lhs = compiled[0];
+      if (compiled.length === 1) {
         return lhs;
       }
-      var rhs = compile(targets[1]);
+      var rhs = compiled[1];
       return function() {
         var args = u_.toArray(arguments);
         var next = u_.last(args);
