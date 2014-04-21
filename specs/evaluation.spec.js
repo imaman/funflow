@@ -184,7 +184,7 @@ describe('funflow compilation', function() {
   describe('of a split', function() {
     it('passes output to the trap function, keyed by the property name', function() {
       var flow = compile(rootFromDsl({
-        key: function ab(next) { next('AB') }
+        key: function ab(next) { next(null, 'AB') }
       }));
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
@@ -196,7 +196,7 @@ describe('funflow compilation', function() {
     if (v.type === 'conc') {
       return function(e, next) {
         compiled[0](null, function(e, v) {
-          next(null, {key: 'AB'});
+          next(null, {key: v});
         })
       }
     }
