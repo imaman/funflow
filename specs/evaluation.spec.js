@@ -278,24 +278,28 @@ describe('funflow compilation', function() {
         var args = u_.toArray(arguments);
         var next = args.pop();
 
-        var left = edges.length;
-        var obj = {};
-        function temp(k, e) {
-          if (left === 0)
+        var countdown = edges.length;
+        var result = {};
+        function merge(k, e) {
+          if (countdown === 0)
             return;
 
           if (e) {
-            left = 0;
+            countdown = 0;
             return next(e);
           }
-          obj[k] = u_.toArray(arguments).slice(2);
-          --left;
-          if (left === 0)
-            next(null, obj);
+          result[k] = u_.toArray(arguments).slice(2);
+          --countdown;
+          if (countdown === 0)
+            next(null, result);
         }
-        compiled.forEach(function(current, index) {
-          var bounded = temp.bind(null, edges[index].name);
-          current.apply(null, args.concat(bounded));
+        var zipped = u_.zip(edges.map(function(e) { return e.name }), compiled);
+        zipped.forEach(function(current) {
+          var key = current[0];
+          var func = current[1];
+
+          var bounded = merge.bind(null, key);
+          func.apply(null, args.concat(bounded));
         });
       }
     }
