@@ -137,7 +137,7 @@ describe('DSL', function() {
     });
     it('tags split edges with the corresponding attribute name', function() {
       var root = rootFromDsl({b1: 'B1', b2: 'B2'});
-      expect(root.outgoing().map(function(e) { return e.name })).toEqual(['b1', 'b2']);
+      expect(root.branchNames()).toEqual(['b1', 'b2']);
     });
   });
   describe('with real functions', function() {
