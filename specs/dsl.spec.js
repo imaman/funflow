@@ -4,7 +4,19 @@ var u_ = require('underscore');
 
 describe('DSL', function() {
   function verify(actual, expected) {
-    actual = actual.map(function(x) { return x.toString() });
+    if (actual.kids) {
+      var acc = [];
+      function dfs(n) {
+        n.kids().forEach(function(t) {
+          acc.push(n + ' -> ' + t);
+          dfs(t);
+        });
+      }
+      dfs(actual);
+      actual = acc;
+    } else {
+      actual = actual.map(function(x) { return x.toString() });
+    }
     actual.sort();
     expected.sort();
     u_.zip(actual, expected).forEach(function (pair) {
@@ -90,8 +102,8 @@ describe('DSL', function() {
         ]},
         'c',
         'd'];
-      var g = treeFromDsl(input, 't');
-      verify(g.edges(), [
+      var g = rootFromDsl(input, 't');
+      verify(g, [
         't0 -> a',
         't0 -> t1',
         't0 -> c',
