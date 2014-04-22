@@ -169,8 +169,8 @@ describe('DSL', function() {
       function f1() {}
       function f2() {}
       var root = rootFromDsl([f1, f2], 't');
-      expect(root.kids()[0].payload).toBe(f1);
-      expect(root.kids()[1].payload).toBe(f2);
+      expect(root.kids()[0].payload()).toBe(f1);
+      expect(root.kids()[1].payload()).toBe(f2);
     });
   });
 });
