@@ -1,4 +1,3 @@
-var treeFromDsl = require('../lib/dsl').treeFromDsl;
 var rootFromDsl = require('../lib/dsl').rootFromDsl;
 var u_ = require('underscore');
 
@@ -27,24 +26,24 @@ describe('DSL', function() {
   describe('to tree', function() {
     it('converts an array into a linear list', function() {
       var input = [100, 200, 300];
-      var g = treeFromDsl(input, 't');
-      verify(g.edges(), [
+      var g = rootFromDsl(input, 't');
+      verify(g, [
         't0 -> 100',
         't0 -> 200',
         't0 -> 300']);
     });
     it('converts a pure-object into a multi-child node', function() {
       var input = {a: 'A', b: 'B', c: 'C' };
-      var g = treeFromDsl(input, 't');
-      verify(g.edges(), [
+      var g = rootFromDsl(input, 't');
+      verify(g, [
         't0 -> A',
         't0 -> B',
         't0 -> C' ]);
     });
     it('handles nesting', function() {
       var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
-      var g = treeFromDsl(input, 't');
-      verify(g.edges(), [
+      var g = rootFromDsl(input, 't');
+      verify(g, [
         't0 -> a',
         't0 -> t1',
         't1 -> B1',
@@ -53,8 +52,8 @@ describe('DSL', function() {
     });
     it('map of arrays', function() {
       var input = ['a', {b1: ['B11', 'B12'], b2: ['B21', 'B22']}, 'c'];
-      var g = treeFromDsl(input, 't');
-      verify(g.edges(), [
+      var g = rootFromDsl(input, 't');
+      verify(g, [
         't0 -> a',
         't0 -> t1',
         't0 -> c',
@@ -67,8 +66,8 @@ describe('DSL', function() {
     });
     it('map of arrays of different lengths', function() {
       var input = ['a', {b1: ['B11', 'B12', 'B13'], b2: ['B21', 'B22', 'B23', 'B24'], b3: ['B31']}, 'c'];
-      var g = treeFromDsl(input, 't');
-      verify(g.edges(), [
+      var g = rootFromDsl(input, 't');
+      verify(g, [
         't0 -> a',
         't0 -> t1',
         't0 -> c',
@@ -139,13 +138,21 @@ describe('DSL', function() {
     });
     it('tags split vertices with "conc"', function() {
       var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
-      var g = treeFromDsl(input, 't');
-      expect(g.vertex('t0').type).toBe(undefined);
-      expect(g.vertex('a').type).toBe(undefined);
-      expect(g.vertex('t1').type).toEqual('conc');
-      expect(g.vertex('B1').type).toBe(undefined);
-      expect(g.vertex('B2').type).toBe(undefined);
-      expect(g.vertex('c').type).toBe(undefined);
+      var g = rootFromDsl(input, 't');
+      var acc = {};
+      function dfs(n) {
+        acc[n] = n;
+        n.kids().forEach(function(k) {
+          dfs(k);
+        });
+      }
+      dfs(g);
+      expect(acc['t0'].type).toBe(undefined);
+      expect(acc['a'].type).toBe(undefined);
+      expect(acc['t1'].type).toEqual('conc');
+      expect(acc['B1'].type).toBe(undefined);
+      expect(acc['B2'].type).toBe(undefined);
+      expect(acc['c'].type).toBe(undefined);
     });
     it('tags split edges with the corresponding attribute name', function() {
       var root = rootFromDsl({b1: 'B1', b2: 'B2'});
@@ -154,8 +161,8 @@ describe('DSL', function() {
   });
   describe('with real functions', function() {
     it('generates a unique key for a function vertex', function() {
-      var g = treeFromDsl([function a1() {}, function a2() {}], 't');
-      verify(g.edges(), [
+      var g = rootFromDsl([function a1() {}, function a2() {}], 't');
+      verify(g, [
         't0 -> t1',
         't0 -> t2'
       ]);
