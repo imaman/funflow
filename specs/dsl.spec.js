@@ -146,7 +146,8 @@ describe('DSL', function() {
       dfs(g);
       expect(acc['t0'].type).toBe(undefined);
       expect(acc['a'].type).toBe(undefined);
-      expect(acc['t1'].type).toEqual('conc');
+      expect(acc['t1'].isFork()).toBe(true);
+      expect(acc['t1'].isSequence()).toBe(false);
       expect(acc['B1'].type).toBe(undefined);
       expect(acc['B2'].type).toBe(undefined);
       expect(acc['c'].type).toBe(undefined);
