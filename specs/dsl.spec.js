@@ -133,25 +133,6 @@ describe('DSL', function() {
         't8 -> B232'
       ]);
     });
-    it('tags split vertices with "conc"', function() {
-      var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
-      var g = rootFromDsl(input, 't');
-      var acc = {};
-      function dfs(n) {
-        acc[n] = n;
-        n.forEach(function(k) {
-          dfs(k);
-        });
-      }
-      dfs(g);
-      expect(acc['t0'].type).toBe(undefined);
-      expect(acc['a'].type).toBe(undefined);
-      expect(acc['t1'].isFork()).toBe(true);
-      expect(acc['t1'].isSequence()).toBe(false);
-      expect(acc['B1'].type).toBe(undefined);
-      expect(acc['B2'].type).toBe(undefined);
-      expect(acc['c'].type).toBe(undefined);
-    });
     it('tags split edges with the corresponding attribute name', function() {
       var root = rootFromDsl({b1: 'B1', b2: 'B2'});
       expect(root.map(function(x) { return x.slot() })).toEqual(['b1', 'b2']);
