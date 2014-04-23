@@ -5,7 +5,7 @@ describe('DSL', function() {
   function verify(actual, expected) {
     var acc = [];
     function dfs(n) {
-      n.kids().forEach(function(t) {
+      n.forEach(function(t) {
         acc.push(n + ' -> ' + t);
         dfs(t);
       });
@@ -139,7 +139,7 @@ describe('DSL', function() {
       var acc = {};
       function dfs(n) {
         acc[n] = n;
-        n.kids().forEach(function(k) {
+        n.forEach(function(k) {
           dfs(k);
         });
       }
@@ -169,8 +169,9 @@ describe('DSL', function() {
       function f1() {}
       function f2() {}
       var root = rootFromDsl([f1, f2], 't');
-      expect(root.kids()[0].payload()).toBe(f1);
-      expect(root.kids()[1].payload()).toBe(f2);
+      var temp = root.map(function(x) { return x.payload() });
+      expect(temp[0]).toBe(f1);
+      expect(temp[1]).toBe(f2);
     });
   });
 });
