@@ -77,7 +77,7 @@ describe('visualization', function() {
         '|'
       ].join('\n'));
     });
-    it('connects split vertices', function() {
+    it('connects fork vertices', function() {
       var g = rootFromDsl({a: 'A', b: 'B', c: 'C'});
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
@@ -91,7 +91,7 @@ describe('visualization', function() {
     });
     it('can add left/right arrows', function() {
       var g = rootFromDsl({a: 'A', b: 'B', c: 'C'});
-      expect('\n' + show(g, {splitArrows: true, connect: true})).toEqual(['',
+      expect('\n' + show(g, {forkArrows: true, connect: true})).toEqual(['',
         '|',
         '+->-+-+-+',
         '    | | |',
