@@ -174,4 +174,45 @@ describe('DSL', function() {
       expect(temp[1]).toBe(f2);
     });
   });
+  describe('visitation', function() {
+    it('dispatches .fork() in a fork', function() {
+      var fork = rootFromDsl({a: function a1() {}});
+      var captured;
+      var others = 0;
+      fork.accept({
+        fork: function(n) { captured = n },
+        sequence: function(n) { ++others },
+        terminal: function(n) { ++others }
+      });
+
+      expect(others).toEqual(0);
+      expect(captured).toBe(fork);
+    });
+    it('dispatches .sequence() in a sequence', function() {
+      var seq = rootFromDsl([function a1() {}]);
+      var captured;
+      var others = 0;
+      seq.accept({
+        fork: function(n) { ++others },
+        sequence: function(n) { captured = n },
+        terminal: function(n) { ++others }
+      });
+
+      expect(others).toEqual(0);
+      expect(captured).toBe(seq);
+    });
+    it('dispatches .terminal() in a terminal', function() {
+      var terminal = rootFromDsl(function a1() {});
+      var captured;
+      var others = 0;
+      terminal.accept({
+        fork: function(n) { ++others },
+        sequence: function(n) { ++others },
+        terminal: function(n) { captured = n }
+      });
+
+      expect(others).toEqual(0);
+      expect(captured).toBe(terminal);
+    });
+  });
 });
