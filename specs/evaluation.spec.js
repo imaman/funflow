@@ -4,6 +4,20 @@ var u_ = require('underscore');
 var compile = require('../lib/evaluation').compile;
 
 describe('funflow compilation', function() {
+  describe('of a literal', function() {
+    it('evaulautes to itself', function() {
+      var flow = compile(rootFromDsl('SOME_LITERAL'));
+      var args;
+      flow(null, function() { args = u_.toArray(arguments); });
+      expect(args).toEqual([null, 'SOME_LITERAL']);
+    });
+    it('is skipped if an external error is present', function() {
+      var flow = compile(rootFromDsl('some_literal'));
+      var args;
+      flow('EXTERNAL_ERROR', function() { args = u_.toArray(arguments); });
+      expect(args).toEqual(['EXTERNAL_ERROR']);
+    });
+  });
   describe('of a function', function() {
     it('turns an (arg, ..., next) function into an (e, arg, ..., next) callback', function() {
       var root = rootFromDsl(
@@ -12,7 +26,7 @@ describe('funflow compilation', function() {
       var flow = compile(root);
       var args;
       flow(null, 3, 7, function(e, v) {
-        args = [e, v];
+        args = u_.toArray(arguments);
       });
       expect(args).toEqual([null, 10]);
     });
@@ -22,9 +36,7 @@ describe('funflow compilation', function() {
       );
       var flow = compile(root);
       var args;
-      flow(null, 'a', 'b', 'c', 'd', function(e, v) {
-        args = [e, v];
-      });
+      flow(null, 'a', 'b', 'c', 'd', function(e, v) { args = u_.toArray(arguments); });
       expect(args).toEqual([null, 'abcd']);
     });
     it('supports outgoing var. args', function() {
