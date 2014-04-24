@@ -1,6 +1,7 @@
 var rootFromDsl = require('../lib/dsl').rootFromDsl;
 var comp = require('../lib/dsl').comp;
 var single = require('../lib/dsl').single;
+var fork = require('../lib/dsl').fork;
 var u_ = require('underscore');
 var compile = require('../lib/evaluation').compile;
 
@@ -283,6 +284,88 @@ describe('funflow compilation', function() {
       flow(error, function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
       expect(args[0]).toBe(error);
+    });
+    describe('with custom merge', function() {
+      it('passes the result object to the merge function', function() {
+        var flow = compile(rootFromDsl(fork({
+          plusOne: single(function (v, next) { next(null, v + 1) }),
+          plusTwo: single(function (v, next) { next(null, v + 2) })
+        }, function(result, next) {
+          if (result.plusOne && result.plusTwo) {
+            next(null, result.plusOne + ',' + result.plusTwo);
+          }
+        })));
+        var args;
+        flow(null, 100, function() { args = u_.toArray(arguments) });
+        expect(args).toEqual([null, '101,102']);
+        if (args[0]) throw args[0];
+      });
+      it('invokes the merge function once for each branch', function() {
+        var count = 0;
+        var flow = compile(rootFromDsl(fork({
+          a: single(function (next) { next(null) }),
+          b: single(function (next) { next(null) }),
+          c: single(function (next) { next(null) }),
+        }, function(result, next) {
+          ++count;
+          if (Object.keys(result).length === 3) {
+            next(null, count);
+          }
+        })));
+        var args;
+        flow(null, function() { args = u_.toArray(arguments) });
+        expect(args).toEqual([null, 3]);
+        if (args[0]) throw args[0];
+      });
+      it('invokes the merge function with partial results', function() {
+        var flow = compile(rootFromDsl(fork({
+          a: single(function (next) { next(null, 'A') }),
+          b: single(function (next) {}),
+          c: single(function (next) { next(null, 'C') }),
+        }, function(result, next) {
+          if (result.a && result.c)
+            next(null, result.a + '_' + result.c);
+        })));
+        var args;
+        flow(null, function() { args = u_.toArray(arguments) });
+        expect(args).toEqual([null, 'A_C']);
+        if (args[0]) throw args[0];
+      });
+      it('invokes the merge function with partial results', function() {
+        var acc = [];
+        var flow = compile(rootFromDsl(fork({
+          A: single(function (next) { next(null, 'a') }),
+          B: single(function (next) { next(null, 'b') }),
+          C: single(function (next) { next(null, 'c') }),
+        }, function(result, next) {
+          var keys = Object.keys(result);
+          keys.sort();
+          acc.push(keys.join(''));
+          if (acc.length === 3) {
+            acc.sort();
+            next(null, acc);
+          }
+        })));
+        var args;
+        flow(null, function() { args = u_.toArray(arguments) });
+        expect(args).toEqual([null, ['A', 'AB', 'ABC']]);
+        if (args[0]) throw args[0];
+      });
+      it('propagates errors from the merge function', function() {
+        var acc = [];
+        var flow = compile(rootFromDsl(fork({
+          a: single(function (next) { next(null) }),
+          b: single(function (next) { next(null) }),
+          c: single(function (next) { next(null) }),
+        }, function(result, next) {
+          if (Object.keys(result).length === 2) {
+            next('WE HAVE A PROBLEM');
+          }
+        })));
+        var args;
+        flow(null, function() { args = u_.toArray(arguments) });
+        expect(args).toEqual(['WE HAVE A PROBLEM']);
+      });
     });
   });
   describe('of a computation', function() {
