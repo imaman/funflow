@@ -317,6 +317,23 @@ describe('funflow compilation', function() {
         expect(args).toEqual([null, 3]);
         if (args[0]) throw args[0];
       });
+      it('does not re-invoke the merge after it called next()', function() {
+        var count = 0;
+        var flow = compile(rootFromDsl(fork({
+          a: single(function (next) { next(null, 'A') }),
+          b: single(function (next) { next(null, 'B') }),
+          c: single(function (next) { next(null, 'C') }),
+        }, function(result, next) {
+          ++count;
+          if (Object.keys(result).length === 2)
+            next(null, 'count=' + count);
+        })));
+        var args;
+        flow(null, function() { args = u_.toArray(arguments) });
+        expect(count).toEqual(2);
+        expect(args).toEqual([null, 'count=2']);
+        if (args[0]) throw args[0];
+      });
       it('invokes the merge function with partial results', function() {
         var flow = compile(rootFromDsl(fork({
           a: single(function (next) { next(null, 'A') }),
