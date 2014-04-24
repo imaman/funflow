@@ -1,5 +1,6 @@
 var Graph = require('../lib/graph');
 var rootFromDsl = require('../lib/dsl').rootFromDsl;
+var rescue = require('../lib/dsl').rescue;
 var show = require('../lib/visualization').show;
 
 describe('visualization', function() {
@@ -35,6 +36,14 @@ describe('visualization', function() {
         't1',
         '|',
         't2',
+        '|'
+      ].join('\n'));
+    });
+    it('uses the inner function name for rescue functions', function() {
+      var g = rootFromDsl([rescue(function INNER(){})], 't');
+      expect('\n' + show(g, {connect: true})).toEqual(['',
+        '|',
+        'INNER',
         '|'
       ].join('\n'));
     });
