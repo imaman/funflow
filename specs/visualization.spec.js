@@ -1,6 +1,6 @@
 var Graph = require('../lib/graph');
 var rootFromDsl = require('../lib/dsl').rootFromDsl;
-var rescue = require('../lib/dsl').rescue;
+var comp = require('../lib/dsl').comp;
 var show = require('../lib/visualization').show;
 
 describe('visualization', function() {
@@ -39,8 +39,8 @@ describe('visualization', function() {
         '|'
       ].join('\n'));
     });
-    it('uses the inner function name for rescue functions', function() {
-      var g = rootFromDsl([rescue(function INNER(){})], 't');
+    it('uses the inner function name for comp functions', function() {
+      var g = rootFromDsl([comp(function INNER(){})], 't');
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         'INNER',
@@ -48,7 +48,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('defaults to a unique ID if the inner function name is unnamed', function() {
-      var g = rootFromDsl([rescue(function (){})], 't');
+      var g = rootFromDsl([comp(function (){})], 't');
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         't1',

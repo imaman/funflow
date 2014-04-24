@@ -1,5 +1,5 @@
 var rootFromDsl = require('../lib/dsl').rootFromDsl;
-var rescue = require('../lib/dsl').rescue;
+var comp = require('../lib/dsl').comp;
 var u_ = require('underscore');
 var compile = require('../lib/evaluation').compile;
 
@@ -270,10 +270,10 @@ describe('funflow compilation', function() {
       expect(args[0]).toBe(error);
     });
   });
-  describe('of a rescue function', function() {
+  describe('of a comp function', function() {
     it('takes an err argument', function() {
       var flow = compile(rootFromDsl(
-        rescue(function f(e, v, next) { next(null, {e: e, v: v}) })
+        comp(function f(e, v, next) { next(null, {e: e, v: v}) })
       ));
       var args;
       flow(null, 100, function() { args = u_.toArray(arguments) });
@@ -285,28 +285,28 @@ describe('funflow compilation', function() {
         function f1(v, next) { next(null, v + '1') },
         function f2(v, next) { next('F2 FAILED') },
         function f3(v, next) { next(null, v + '2') },
-        rescue(function f(e, next) { next(null, e + ', AND RESCUED')})
+        comp(function f(e, next) { next(null, e + ', AND RESCUED')})
       ]));
       var args;
       flow(null, '', function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 'F2 FAILED, AND RESCUED']);
     });
-    it('an exception thrown from a rescue function is propagated to the trap function', function() {
+    it('an exception thrown from a comp function is propagated to the trap function', function() {
       var err = new Error();
       var flow = compile(rootFromDsl([
         function f0(next) { next('f0 failed') },
-        rescue(function f(e, next) { throw err })
+        comp(function f(e, next) { throw err })
       ]));
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
       expect(args[0]).toBe(err);
     });
-    it('a rescue function in a branch does not rescue other branches', function() {
+    it('a comp function in a branch does not rescue other branches', function() {
       var err = new Error();
       var flow = compile(rootFromDsl({
           a: function f0(next) { next('PROBLEM') },
-          b: rescue(function f(e, next) { next('ok') })
+          b: comp(function f(e, next) { next('ok') })
       }));
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
