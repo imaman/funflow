@@ -47,6 +47,14 @@ describe('visualization', function() {
         '|'
       ].join('\n'));
     });
+    it('defaults to a unique ID if the inner function name is unnamed', function() {
+      var g = rootFromDsl([rescue(function (){})], 't');
+      expect('\n' + show(g, {connect: true})).toEqual(['',
+        '|',
+        't1',
+        '|'
+      ].join('\n'));
+    });
     it('connects fork vertices', function() {
       var g = rootFromDsl({a: 'A', b: 'B', c: 'C'});
       expect('\n' + show(g, {connect: true})).toEqual(['',
