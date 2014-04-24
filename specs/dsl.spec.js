@@ -192,8 +192,7 @@ describe('DSL', function() {
       terminal.accept({
         fork: function(n) { ++others },
         sequence: function(n) { ++others },
-        terminal: function(n) { ++others },
-        rescue: function(n) { captured = n }
+        computation: function(n) { captured = n }
       });
 
       expect(others).toEqual(0);
