@@ -270,7 +270,7 @@ describe('funflow compilation', function() {
       expect(args[0]).toBe(error);
     });
   });
-  describe('of a comp function', function() {
+  describe('of a computation', function() {
     it('takes an err argument', function() {
       var flow = compile(rootFromDsl(
         comp(function f(e, v, next) { next(null, {e: e, v: v}) })
@@ -291,7 +291,7 @@ describe('funflow compilation', function() {
       flow(null, '', function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 'F2 FAILED, AND RESCUED']);
     });
-    it('an exception thrown from a comp function is propagated to the trap function', function() {
+    it('an exception thrown from a computation is propagated to the trap function', function() {
       var err = new Error();
       var flow = compile(rootFromDsl([
         function f0(next) { next('f0 failed') },
