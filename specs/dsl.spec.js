@@ -147,12 +147,15 @@ describe('DSL', function() {
       ]);
     });
     it('stores the function in .payload', function() {
-      function f1() {}
-      function f2() {}
+      var acc = '';
+      function f1() { acc += 'f1' }
+      function f2() { acc += 'f2' }
       var root = rootFromDsl([f1, f2], 't');
       var temp = root.map(function(x) { return x.payload() });
-      expect(temp[0]).toBe(f1);
-      expect(temp[1]).toBe(f2);
+      temp[0](null);
+      expect(acc).toEqual('f1');
+      temp[1](null);
+      expect(acc).toEqual('f1f2');
     });
   });
   describe('visitation', function() {
@@ -189,7 +192,8 @@ describe('DSL', function() {
       terminal.accept({
         fork: function(n) { ++others },
         sequence: function(n) { ++others },
-        terminal: function(n) { captured = n }
+        terminal: function(n) { ++others },
+        rescue: function(n) { captured = n }
       });
 
       expect(others).toEqual(0);
