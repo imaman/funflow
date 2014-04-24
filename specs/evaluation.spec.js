@@ -1,5 +1,6 @@
 var rootFromDsl = require('../lib/dsl').rootFromDsl;
 var comp = require('../lib/dsl').comp;
+var single = require('../lib/dsl').single;
 var u_ = require('underscore');
 var compile = require('../lib/evaluation').compile;
 
@@ -31,35 +32,28 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 10]);
     });
     it('supports incoming var. args', function() {
-      var root = rootFromDsl(
+      var flow = compile(rootFromDsl(
         function sum(w, x, y, z, next) { next(null, w + x + y + z) }
-      );
-      var flow = compile(root);
+      ));
       var args;
-      flow(null, 'a', 'b', 'c', 'd', function(e, v) { args = u_.toArray(arguments); });
+      flow(null, 'a', 'b', 'c', 'd', function() { args = u_.toArray(arguments); });
       expect(args).toEqual([null, 'abcd']);
     });
     it('supports outgoing var. args', function() {
-      var root = rootFromDsl(
+      var flow = compile(rootFromDsl(
         function sumDiffProd(x1, x2, next) { next(null, x1 + x2, x1 - x2, x1 * x2) }
-      );
-      var flow = compile(root);
+      ));
       var args;
-      flow(null, 20, 4, function() {
-        args = u_.toArray(arguments);
-      });
+      flow(null, 20, 4, function() { args = u_.toArray(arguments); });
       expect(args).toEqual([null, 24, 16, 80]);
     });
     it('does not call the function if the outside caller passed in an error value', function() {
       var called = false;
-      var root = rootFromDsl(
+      var flow = compile(rootFromDsl(
         function f(next) { called = true }
-      );
-      var flow = compile(root);
+      ));
       var args;
-      flow('SOME_ERROR', function() {
-        args = u_.toArray(arguments);
-      });
+      flow('SOME_ERROR', function() { args = u_.toArray(arguments); });
       expect(called).toBe(false);
     });
     it('passes an error value from the outside caller directly to the trap function', function() {
@@ -193,7 +187,7 @@ describe('funflow compilation', function() {
       expect(args[0]).toBe(error);
     });
   });
-  describe('of a split', function() {
+  describe('of a fork', function() {
     it('passes output to the trap function, keyed by the property name', function() {
       var flow = compile(rootFromDsl({
         key: function ab(next) { next(null, 'AB') }
@@ -210,6 +204,15 @@ describe('funflow compilation', function() {
       flow(null, 20, 4, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {key: [24, 80]}]);
     });
+    it('does not output an array when the function is marked as single output', function() {
+      var flow = compile(rootFromDsl({
+        key: single(function f(v, next) { next(null, '*' + v + '*' )})
+      }));
+      var args;
+      flow(null, 'A', function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, {key: '*A*'}]);
+      if (args[0]) throw args[0];
+    });
     it('passes inputs to the function at the branch', function() {
       var flow = compile(rootFromDsl({
         key: function ab(v1, v2, next) { next(null, v1 + v2) }
@@ -218,7 +221,7 @@ describe('funflow compilation', function() {
       flow(null, 'X', 'Y', function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {key: ['XY']}]);
     });
-    it('handles a two-way split', function() {
+    it('handles a two-way fork', function() {
       var flow = compile(rootFromDsl({
         sum: function plus(v1, v2, next) { next(null, v1 + v2) },
         product: function star(v1, v2, next) { next(null, v1 * v2) }
@@ -324,6 +327,24 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual(['PROBLEM']);
     });
+  });
+  it('can be evaluated multiple times', function() {
+    var flow = compile(rootFromDsl([
+      function f1(a, next) { next(null, a, 10) },
+      {
+        sum: function sum(a, b, next) { next(null, a + b) },
+        prod: function sum(a, b, next) { next(null, a * b) }
+      },
+      function f2(acc, next) {
+        next(null, acc.sum[0] + ',' + acc.prod[0]);
+      }
+    ]));
+    var args;
+    flow(null, 5, function() { args = u_.toArray(arguments) });
+    expect(args).toEqual([null, '15,50']);
+
+    flow(null, 7, function() { args = u_.toArray(arguments) });
+    expect(args).toEqual([null, '17,70']);
   });
 });
 
