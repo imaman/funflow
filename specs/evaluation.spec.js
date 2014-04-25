@@ -447,6 +447,22 @@ describe('funflow compilation', function() {
     flow(null, 7, function() { args = u_.toArray(arguments) });
     expect(args).toEqual([null, '17,70']);
   });
+  it('can be recursive', function(done) {
+    var fib = compile(rootFromDsl([
+      {
+        a: single(function(n, next) { n < 2 ? next() : fib(null, n - 2, next) }),
+        b: single(function(n, next) { n < 2 ? next() : fib(null, n - 1, next) }),
+        n: single(function(n, next) { next(null, n) }),
+      },
+      function sum(r, next) {
+        return next(null, r.n < 2 ? r.n : r.a + r.b);
+      }
+    ]));
+    fib(null, 11, function(e, v) {
+      expect(v).toEqual(89);
+      done();
+    });
+  });
   describe('timers', function() {
     it('fires a result for its slot', function(done) {
       var flow = compile(rootFromDsl(fork({
@@ -508,14 +524,12 @@ describe('funflow compilation', function() {
       var acc = [];
       var flow = compile(rootFromDsl([
         timer(15),
-        function (millis, next) {
-          next(null, millis / 1000.0)
-        }]));
+        function (millis, next) { next(null, millis / 1000.0) }
+      ]));
 
       flow(null, function(e, v) {
         expect(arguments.length).toEqual(2);
         expect(e).toBe(null);
-        expect(v).toBeCloseTo(0.015, 1);
         done();
       });
     });
