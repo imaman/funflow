@@ -497,7 +497,7 @@ describe('funflow compilation', function() {
     test(null, done);
   });
   it('handles long sequences', function(done) {
-    var flow = prepare(u_.times(27953, function() { return 'A' }));
+    var flow = prepare(u_.times(3000, function() { return 'A' }));
     var args;
     flow(null, function() { args = u_.toArray(arguments) });
     if (args[0]) throw args[0];
@@ -581,6 +581,12 @@ describe('funflow compilation', function() {
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 16]);
+    });
+    xit('handles forks', function() {
+      var flow = prepare({ a: 1, b: 2, d: 4});
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
     });
   });
 });
