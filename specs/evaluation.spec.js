@@ -567,6 +567,14 @@ describe('funflow compilation', function() {
       });
     });
   });
+  describe('prepare', function() {
+    it('handles sequences', function() {
+      var flow = prepare([1, 2, 4, 8, 16]);
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, 16]);
+    });
+  });
 });
 
 
