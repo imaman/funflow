@@ -1,12 +1,12 @@
 var Graph = require('../lib/graph');
-var rootFromDsl = require('../lib/dsl').rootFromDsl;
+var treeFromDsl = require('../lib/dsl').treeFromDsl;
 var comp = require('../lib/dsl').comp;
 var show = require('../lib/visualization').show;
 
 describe('visualization', function() {
   describe('diargam', function() {
     it('connects sequence vertices', function() {
-      var g = rootFromDsl(['a', 'b', 'c', 'd']);
+      var g = treeFromDsl(['a', 'b', 'c', 'd']);
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         'a',
@@ -20,7 +20,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('uses function name when present', function() {
-      var g = rootFromDsl([function f1(){}, function f2(){}]);
+      var g = treeFromDsl([function f1(){}, function f2(){}]);
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         'f1',
@@ -30,7 +30,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('defaults to a unique ID for unnamed functions', function() {
-      var g = rootFromDsl([function (){}, function (){}], 't');
+      var g = treeFromDsl([function (){}, function (){}], 't');
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         't1',
@@ -40,7 +40,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('uses the inner function name for comp functions', function() {
-      var g = rootFromDsl([comp(function INNER(){})], 't');
+      var g = treeFromDsl([comp(function INNER(){})], 't');
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         'INNER',
@@ -48,7 +48,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('defaults to a unique ID if the inner function name is unnamed', function() {
-      var g = rootFromDsl([comp(function (){})], 't');
+      var g = treeFromDsl([comp(function (){})], 't');
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         't1',
@@ -56,7 +56,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('connects fork vertices', function() {
-      var g = rootFromDsl({a: 'A', b: 'B', c: 'C'});
+      var g = treeFromDsl({a: 'A', b: 'B', c: 'C'});
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         '+-+-+-+',
@@ -68,7 +68,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('can add left/right arrows', function() {
-      var g = rootFromDsl({a: 'A', b: 'B', c: 'C'});
+      var g = treeFromDsl({a: 'A', b: 'B', c: 'C'});
       expect('\n' + show(g, {forkArrows: true, connect: true})).toEqual(['',
         '|',
         '+->-+-+-+',
@@ -80,7 +80,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('extends vertical connector all the way down', function() {
-      var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
+      var g = treeFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
       expect('\n' + show(g, {connect: true})).toEqual(['',
         '|',
         '+-+-+',
@@ -97,7 +97,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('can add a down-arrow after three bars', function() {
-      var g = rootFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
+      var g = treeFromDsl({a: 'A', b: ['B1', 'B2', 'B3']});
       expect('\n' + show(g, {connect: true, downArrows: true})).toEqual(['',
         '|',
         '+-+-+',
@@ -114,7 +114,7 @@ describe('visualization', function() {
       ].join('\n'));
     });
     it('connects deeply nested graph', function() {
-      var g = rootFromDsl([
+      var g = treeFromDsl([
         'a',
         {b1: 'B1', b2: 'B2', b3: {b4: 'B4', b5: 'B5'}},
         {c1: 'C1', c2: ['C3', 'C4']},

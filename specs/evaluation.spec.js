@@ -77,21 +77,21 @@ describe('funflow compilation', function() {
       expect(args[0]).toBe(error);
     });
     xit('yells if no "next" argument was passed-in', function() {
-      var root = rootFromDsl(
+      var root = treeFromDsl(
         function f(next) {}
       );
       var flow = compile(root);
       expect(function() { flow(null) }).toThrow('No next() argument was passed in');
     });
     xit('yells if no "error" argument was passed-in', function() {
-      var root = rootFromDsl(
+      var root = treeFromDsl(
         function f(next) {}
       );
       var flow = compile(root);
       expect(function() { flow() }).toThrow('No error argument was passed in');
     });
     xit('yells on number-of-argument mismatch', function() {
-      var root = rootFromDsl(
+      var root = treeFromDsl(
         function trenaryFunction(a1, a2, a3, next) {}
       );
       var flow = compile(root);

@@ -1,4 +1,4 @@
-var rootFromDsl = require('../lib/dsl').rootFromDsl;
+var treeFromDsl = require('../lib/dsl').treeFromDsl;
 var u_ = require('underscore');
 
 describe('DSL', function() {
@@ -23,7 +23,7 @@ describe('DSL', function() {
   describe('to tree', function() {
     it('converts an array into a linear list', function() {
       var input = [100, 200, 300];
-      var g = rootFromDsl(input, 't');
+      var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> 100',
         't0 -> 200',
@@ -31,7 +31,7 @@ describe('DSL', function() {
     });
     it('converts a pure-object into a multi-child node', function() {
       var input = {a: 'A', b: 'B', c: 'C' };
-      var g = rootFromDsl(input, 't');
+      var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> A',
         't0 -> B',
@@ -39,7 +39,7 @@ describe('DSL', function() {
     });
     it('handles nesting', function() {
       var input = ['a', {b1: 'B1', b2: 'B2'}, 'c'];
-      var g = rootFromDsl(input, 't');
+      var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> a',
         't0 -> t1',
@@ -49,7 +49,7 @@ describe('DSL', function() {
     });
     it('map of arrays', function() {
       var input = ['a', {b1: ['B11', 'B12'], b2: ['B21', 'B22']}, 'c'];
-      var g = rootFromDsl(input, 't');
+      var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> a',
         't0 -> t1',
@@ -63,7 +63,7 @@ describe('DSL', function() {
     });
     it('map of arrays of different lengths', function() {
       var input = ['a', {b1: ['B11', 'B12', 'B13'], b2: ['B21', 'B22', 'B23', 'B24'], b3: ['B31']}, 'c'];
-      var g = rootFromDsl(input, 't');
+      var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> a',
         't0 -> t1',
@@ -98,7 +98,7 @@ describe('DSL', function() {
         ]},
         'c',
         'd'];
-      var g = rootFromDsl(input, 't');
+      var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> a',
         't0 -> t1',
@@ -134,13 +134,13 @@ describe('DSL', function() {
       ]);
     });
     it('tags split edges with the corresponding attribute name', function() {
-      var root = rootFromDsl({b1: 'B1', b2: 'B2'});
+      var root = treeFromDsl({b1: 'B1', b2: 'B2'});
       expect(root.map(function(x) { return x.slot() })).toEqual(['b1', 'b2']);
     });
   });
   describe('with real functions', function() {
     it('generates a unique key for a function vertex', function() {
-      var g = rootFromDsl([function a1() {}, function a2() {}], 't');
+      var g = treeFromDsl([function a1() {}, function a2() {}], 't');
       verify(g, [
         't0 -> t1',
         't0 -> t2'
@@ -150,7 +150,7 @@ describe('DSL', function() {
       var acc = '';
       function f1() { acc += 'f1' }
       function f2() { acc += 'f2' }
-      var root = rootFromDsl([f1, f2], 't');
+      var root = treeFromDsl([f1, f2], 't');
       var temp = root.map(function(x) { return x.payload() });
       temp[0](null);
       expect(acc).toEqual('f1');
@@ -160,7 +160,7 @@ describe('DSL', function() {
   });
   describe('visitation', function() {
     it('dispatches .fork() in a fork', function() {
-      var fork = rootFromDsl({a: function a1() {}});
+      var fork = treeFromDsl({a: function a1() {}});
       var captured;
       var others = 0;
       fork.accept({
@@ -173,7 +173,7 @@ describe('DSL', function() {
       expect(captured).toBe(fork);
     });
     it('dispatches .sequence() in a sequence', function() {
-      var seq = rootFromDsl([function a1() {}]);
+      var seq = treeFromDsl([function a1() {}]);
       var captured;
       var others = 0;
       seq.accept({
@@ -186,7 +186,7 @@ describe('DSL', function() {
       expect(captured).toBe(seq);
     });
     it('dispatches .terminal() in a terminal', function() {
-      var terminal = rootFromDsl(function a1() {});
+      var terminal = treeFromDsl(function a1() {});
       var captured;
       var others = 0;
       terminal.accept({
