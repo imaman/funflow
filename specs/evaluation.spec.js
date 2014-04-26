@@ -9,7 +9,7 @@ var prepare = require('../lib/evaluation').prepare;
 describe('funflow compilation', function() {
   describe('of a literal', function() {
     it('evaulautes to itself', function() {
-      var flow = newFlow('SOME_LITERAL');
+      var flow = prepare('SOME_LITERAL');
       var args;
       flow(null, function() { args = u_.toArray(arguments); });
       expect(args).toEqual([null, 'SOME_LITERAL']);
