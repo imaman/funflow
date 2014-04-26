@@ -429,6 +429,29 @@ describe('funflow compilation', function() {
       expect(args).toEqual(['PROBLEM']);
     });
   });
+  it('continues to the subsequent computation when next() is invoked with no args', function() {
+    var count = 0;
+    var flow = compile(rootFromDsl([
+      function(a, next) { ++count; next() },
+      function(next) { ++count; next(null, count) }
+    ]));
+    var args;
+    flow(null, 5, function() { args = u_.toArray(arguments) });
+    expect(args).toEqual([null, 2]);
+  });
+  it('can evaluate a sequence where all computations take no arguments and produce no results', function() {
+    var count = 0;
+    var flow = compile(rootFromDsl([
+      function(next) { ++count; next() },
+      function(next) { ++count; next() },
+      function(next) { ++count; next() }
+    ]));
+    var args;
+    flow(null, function() { args = u_.toArray(arguments) });
+    if (args[0]) throw args[0];
+    expect(args).toEqual([null]);
+    expect(count).toEqual(3);
+  });
   it('can be evaluated multiple times', function() {
     var flow = compile(rootFromDsl([
       function f1(a, next) { next(null, a, 10) },
@@ -462,6 +485,22 @@ describe('funflow compilation', function() {
       expect(v).toEqual(89);
       done();
     });
+  });
+  it('example: async unit test', function(done) {
+    var pith = compile(rootFromDsl([
+      function cube(a, b, next) { next(null, a*a, b*b) },
+      function add(aa, bb, next) { next(null, aa + bb) },
+      function square(cc, next) { next(null, Math.sqrt(cc)) }
+    ]));
+    var test = compile(rootFromDsl([
+      function gen3_4(next) { pith(null, 3, 4, next) },
+      function check5(v, next) { expect(v).toEqual(5); next() },
+      function gen6_8(next) { pith(null, 6, 8, next) },
+      function check10(v, next) { expect(v).toEqual(10); next() },
+      function gen12_5(next) { pith(null, 12, 5, next) },
+      function check13(v, next) { expect(v).toEqual(13); next() }
+    ]));
+    test(null, done);
   });
   describe('timers', function() {
     it('fires a result for its slot', function(done) {
