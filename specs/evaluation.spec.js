@@ -496,6 +496,14 @@ describe('funflow compilation', function() {
     ]);
     test(null, done);
   });
+  xit('handles long sequences', function(done) {
+    var flow = newFlow(u_.times(953, function() { return 'A' }));
+    var args;
+    flow(null, function() { args = u_.toArray(arguments) });
+    if (args[0]) throw args[0];
+    expect(args).toEqual([null, 'A']);
+    done();
+  });
   describe('timers', function() {
     it('fires a result for its slot', function(done) {
       var flow = newFlow(fork({
