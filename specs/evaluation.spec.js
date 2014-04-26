@@ -496,8 +496,8 @@ describe('funflow compilation', function() {
     ]);
     test(null, done);
   });
-  xit('handles long sequences', function(done) {
-    var flow = newFlow(u_.times(953, function() { return 'A' }));
+  it('handles long sequences', function(done) {
+    var flow = prepare(u_.times(27953, function() { return 'A' }));
     var args;
     flow(null, function() { args = u_.toArray(arguments) });
     if (args[0]) throw args[0];
