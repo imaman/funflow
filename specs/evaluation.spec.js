@@ -4,7 +4,7 @@ var single = require('../lib/dsl').single;
 var fork = require('../lib/dsl').fork;
 var timer = require('../lib/dsl').timer;
 var newFlow = require('../lib/evaluation').newFlow;
-var prepare = require('../lib/evaluation').prepare;
+var prepare = require('../lib/evaluation2').prepare;
 
 describe('funflow compilation', function() {
   describe('of a literal', function() {
