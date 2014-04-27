@@ -4,9 +4,13 @@ var u_ = require('underscore');
 describe('DSL', function() {
   function verify(actual, expected) {
     var acc = [];
+    function toS(n) {
+      return n.displayName ? n.displayName() : n.toString()
+    }
     function dfs(n) {
       n.forEach(function(t) {
-        acc.push(n + ' -> ' + t);
+
+        acc.push(toS(n) + ' -> ' + toS(t));
         dfs(t);
       });
     }
@@ -42,9 +46,9 @@ describe('DSL', function() {
       var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> a',
-        't0 -> t1',
-        't1 -> B1',
-        't1 -> B2',
+        't0 -> t2',
+        't2 -> B1',
+        't2 -> B2',
         't0 -> c' ]);
     });
     it('map of arrays', function() {
@@ -52,37 +56,34 @@ describe('DSL', function() {
       var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> a',
-        't0 -> t1',
         't0 -> c',
-        't1 -> t2',
-        't2 -> B11',
-        't2 -> B12',
-        't1 -> t3',
-        't3 -> B21',
-        't3 -> B22']);
+        't0 -> t2',
+        't2 -> t3',
+        't2 -> t6',
+        't3 -> B11',
+        't3 -> B12',
+        't6 -> B21',
+        't6 -> B22'
+      ]);
     });
     it('map of arrays of different lengths', function() {
       var input = ['a', {b1: ['B11', 'B12', 'B13'], b2: ['B21', 'B22', 'B23', 'B24'], b3: ['B31']}, 'c'];
       var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> a',
-        't0 -> t1',
         't0 -> c',
-
-        't1 -> t2',
-        't1 -> t3',
-        't1 -> t4',
-
-        't2 -> B11',
-        't2 -> B12',
-        't2 -> B13',
-
-        't3 -> B21',
-        't3 -> B22',
-        't3 -> B23',
-        't3 -> B24',
-
-        't4 -> B31'
+        't0 -> t2',
+        't12 -> B31',
+        't2 -> t12',
+        't2 -> t3',
+        't2 -> t7',
+        't3 -> B11',
+        't3 -> B12',
+        't3 -> B13',
+        't7 -> B21',
+        't7 -> B22',
+        't7 -> B23',
+        't7 -> B24'
       ]);
     });
     it('map of arrays of maps', function() {
@@ -101,36 +102,28 @@ describe('DSL', function() {
       var g = treeFromDsl(input, 't');
       verify(g, [
         't0 -> a',
-        't0 -> t1',
         't0 -> c',
         't0 -> d',
-
-        't1 -> t2',
-        't1 -> t5',
-
+        't0 -> t2',
+        't11 -> t12',
+        't11 -> t15',
+        't11 -> t19',
+        't12 -> B211',
+        't12 -> B212',
+        't15 -> B221',
+        't15 -> B222',
+        't15 -> B223',
+        't19 -> B231',
+        't19 -> B232',
+        't2 -> t11',
         't2 -> t3',
-        't2 -> t4',
-
-        't5 -> t6',
-        't5 -> t7',
-        't5 -> t8',
-
-        't3 -> B111',
-        't3 -> B112',
-
-        't4 -> B121',
-        't4 -> B122',
-        't4 -> B123',
-
-        't6 -> B211',
-        't6 -> B212',
-
-        't7 -> B221',
-        't7 -> B222',
-        't7 -> B223',
-
-        't8 -> B231',
-        't8 -> B232'
+        't3 -> t4',
+        't3 -> t7',
+        't4 -> B111',
+        't4 -> B112',
+        't7 -> B121',
+        't7 -> B122',
+        't7 -> B123'
       ]);
     });
     it('tags split edges with the corresponding attribute name', function() {
@@ -142,8 +135,8 @@ describe('DSL', function() {
     it('generates a unique key for a function vertex', function() {
       var g = treeFromDsl([function a1() {}, function a2() {}], 't');
       verify(g, [
-        't0 -> t1',
-        't0 -> t2'
+        't0 -> a1',
+        't0 -> a2'
       ]);
     });
     it('stores the function in .payload', function() {
