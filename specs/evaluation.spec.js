@@ -496,13 +496,6 @@ describe('funflow compilation', function() {
     ]);
     test(null, done);
   });
-  xit('handles long sequences', function() {
-    var flow = prepare(u_.times(3000, function() { return 'A' }));
-   var args;
-    flow(null, function() { args = u_.toArray(arguments) });
-    if (args[0]) throw args[0];
-    expect(args).toEqual([null, 'A']);
-  });
   describe('timers', function() {
     it('fires a result for its slot', function(done) {
       var flow = newFlow(fork({
@@ -579,6 +572,7 @@ describe('funflow compilation', function() {
       var flow = prepare(function(next) { next(null, 8) });
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
       expect(args).toEqual([null, 8]);
     });
     it('handles sequences', function() {
@@ -587,11 +581,18 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 32]);
     });
-    it('handles a sequence of identical literals', function() {
-      var flow = prepare([100, 101]);
+    it('handles long sequences', function() {
+      var arr = u_.times(570, function() { return 'A' });
+      arr.push(function(v, next) {
+        console.log('trace=\n' + new Error().stack);
+        next(null, v.toLowerCase());
+      });
+
+      var flow = prepare(arr);
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
-      expect(args).toEqual([null, 101]);
+      if (args[0]) throw args[0];
+      expect(args).toEqual([null, 'a']);
     });
     it('handles a sequence of identical literals', function() {
       var flow = prepare([100, 100]);
