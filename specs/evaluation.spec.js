@@ -184,7 +184,7 @@ describe('funflow compilation', function() {
   });
   describe('of a fork', function() {
     it('passes output to the trap function, keyed by the property name', function() {
-      var flow = newFlow({
+      var flow = prepare({
         key: function ab(next) { next(null, 'AB') }
       });
       var args;
