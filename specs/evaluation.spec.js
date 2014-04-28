@@ -15,7 +15,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 'SOME_LITERAL']);
     });
     it('is skipped if an external error is present', function() {
-      var flow = newFlow('some_literal');
+      var flow = prepare('some_literal');
       var args;
       flow('EXTERNAL_ERROR', function() { args = u_.toArray(arguments); });
       expect(args).toEqual(['EXTERNAL_ERROR']);
@@ -23,16 +23,15 @@ describe('funflow compilation', function() {
   });
   describe('of a function', function() {
     it('turns an (arg, ..., next) function into an (e, arg, ..., next) callback', function() {
-      var flow = newFlow(function sum(x, y, next) { next(null, x + y) }
+      var flow = prepare(function sum(x, y, next) { next(null, x + y) }
       );
       var args;
-      flow(null, 3, 7, function(e, v) {
-        args = u_.toArray(arguments);
-      });
+      flow(null, 3, 7, function(e, v) { args = u_.toArray(arguments); });
+      if (args[0]) throw args[0];
       expect(args).toEqual([null, 10]);
     });
     it('supports incoming var. args', function() {
-      var flow = newFlow(
+      var flow = prepare(
         function sum(w, x, y, z, next) { next(null, w + x + y + z) }
       );
       var args;
@@ -40,7 +39,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 'abcd']);
     });
     it('supports outgoing var. args', function() {
-      var flow = newFlow(
+      var flow = prepare(
         function sumDiffProd(x1, x2, next) { next(null, x1 + x2, x1 - x2, x1 * x2) }
       );
       var args;
@@ -49,7 +48,7 @@ describe('funflow compilation', function() {
     });
     it('does not call the function if the outside caller passed in an error value', function() {
       var called = false;
-      var flow = newFlow(
+      var flow = prepare(
         function f(next) { called = true }
       );
       var args;
@@ -57,7 +56,7 @@ describe('funflow compilation', function() {
       expect(called).toBe(false);
     });
     it('passes an error value from the outside caller directly to the trap function', function() {
-      var flow = newFlow(
+      var flow = prepare(
         function f(next) {}
       );
       var args;
@@ -68,7 +67,7 @@ describe('funflow compilation', function() {
     });
     it('passes an exception thrown by the function to the error argument of the trap function', function() {
       var error = new Error('THROWN_ERROR');
-      var flow = newFlow(
+      var flow = prepare(
         function f(next) { throw error }
       );
       var args;
@@ -101,7 +100,7 @@ describe('funflow compilation', function() {
   });
   describe('of a sequence', function() {
     it('passes outside inputs to the first function', function() {
-      var flow = newFlow([
+      var flow = prepare([
         function plus(v1, v2, next) { next(null, v1 + v2) }
       ]);
       var args;
@@ -111,7 +110,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 'ab']);
     });
     it('passes outputs of first function to inputs of second one', function() {
-      var flow = newFlow([
+      var flow = prepare([
         function ab(next) { next(null, 'a', 'b') },
         function plus(v1, v2, next) { next(null, v1 + v2) }
       ]);
@@ -122,7 +121,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 'ab']);
     });
     it('supports incoming args', function() {
-      var flow = newFlow([
+      var flow = prepare([
         function ab(x, next) { next(null, 'a', x, 'b') },
         function plus(v1, v2, v3, next) { next(null, v1 + v2 + v3) }
       ]);
@@ -133,7 +132,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 'aXb']);
     });
     it('supports arbitrarily long sequences', function() {
-      var flow = newFlow([
+      var flow = prepare([
         function a(x, next) { next(null, x + 'a') },
         function b(x, next) { next(null, x + 'b') },
         function c(x, next) { next(null, x + 'c') },
@@ -146,7 +145,7 @@ describe('funflow compilation', function() {
     });
     it('does not run subsequent functions after a failure', function() {
       called = '';
-      var flow = newFlow([
+      var flow = prepare([
         function a(next) { called += 'a'; next(null) },
         function b(next) { called += 'b'; next('some_error') },
         function c(next) { called += 'c'; next(null) },
@@ -158,7 +157,7 @@ describe('funflow compilation', function() {
     });
     it('does not run subsequent functions after a thrown error', function() {
       called = '';
-      var flow = newFlow([
+      var flow = prepare([
         function a(next) { called += 'a'; next(null) },
         function b(next) { called += 'b'; new Error('some_error') },
         function c(next) { called += 'c'; next(null) },
@@ -170,7 +169,7 @@ describe('funflow compilation', function() {
     });
     it('propagates a thrown error all the way to the trap function', function() {
       var error = new Error('THROWN_ERROR');
-      var flow = newFlow([
+      var flow = prepare([
         function a(next) { next(null) },
         function b(next) { next(error) },
         function c(next) { next(null) },
@@ -568,7 +567,7 @@ describe('funflow compilation', function() {
     });
   });
   describe('prepare', function() {
-    xit('handles function literal', function() {
+    it('handles function literal', function() {
       var flow = prepare(function(next) { next(null, 8) });
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
@@ -635,6 +634,16 @@ describe('funflow compilation', function() {
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 100]);
+    });
+    it('passes the external input to the first computation', function() {
+      var flow = prepare([
+        function(v, next) { next(null, v + 'A') },
+        function(v, next) { next(null, v + 'B') }
+      ]);
+      var args;
+      flow(null, 'ab', function() { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
+      expect(args).toEqual([null, 'abAB']);
     });
     xit('handles forks', function() {
       var flow = prepare({ a: 1, b: 2, d: 4});
