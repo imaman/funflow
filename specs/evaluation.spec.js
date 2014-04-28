@@ -248,7 +248,7 @@ describe('funflow compilation', function() {
       expect(args[0]).toBe(error);
     });
     it('propagates a failure to the trap function', function() {
-      var flow = newFlow({
+      var flow = prepare({
         sum: function plus(v1, v2, next) { next(null, v1 + v2) },
         product: function star(v1, v2, next) { next('SOME_PROBLEM') }
       });
