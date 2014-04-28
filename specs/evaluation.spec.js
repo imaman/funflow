@@ -238,7 +238,7 @@ describe('funflow compilation', function() {
     });
     it('propagates a thrown error to the trap function', function() {
       var error = new Error('THROWN_ERROR');
-      var flow = newFlow({
+      var flow = prepare({
         sum: function plus(v1, v2, next) { next(null, v1 + v2) },
         product: function star(v1, v2, next) { throw error }
       });
