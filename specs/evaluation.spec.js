@@ -581,8 +581,45 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 32]);
     });
-    xit('handles long sequences', function() {
-      var arr = u_.times(570, function() { return 'A' });
+    it('three literal example', function() {
+      var flow = prepare(['A', 'B', 'C']);
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, 'C']);
+    });
+    it('passes the output to the subsequent function', function() {
+      var flow = prepare(['A',
+        function(v, next) { next(null, v + 'B') },
+        function(v, next) { next(null, v + 'C') }]);
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, 'ABC']);
+    });
+    it('evaluates async functions', function(done) {
+      var flow = prepare(['A',
+        function(v, next) { process.nextTick(function() {next(null, v + 'B') })}
+      ]);
+      var args;
+      flow(null, function(e, v) {
+        expect(e).toBe(null);
+        expect(v).toEqual('AB');
+        done();
+      });
+    });
+    it('passes on the output of an async function', function(done) {
+      var flow = prepare(['A',
+        function(v, next) { process.nextTick(function() {next(null, v + 'B') })},
+        function(v, next) { next(null, v + 'C') }
+      ]);
+      var args;
+      flow(null, function(e, v) {
+        expect(e).toBe(null);
+        expect(v).toEqual('ABC');
+        done();
+      });
+    });
+    it('handles long sequences', function() {
+      var arr = u_.times(1570, function() { return 'A' });
       arr.push(function(v, next) {
         next(null, v.toLowerCase());
       });
