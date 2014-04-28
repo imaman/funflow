@@ -257,7 +257,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual(['SOME_PROBLEM']);
     });
     it('it reports a failure only once, even if multiple brnahces fail', function() {
-      var flow = newFlow({
+      var flow = prepare({
         f0: function f0(v1, v2, next) { next(null, v1 + v2) },
         f1: function f1(v1, v2, next) { next('some_problem') },
         f2: function f2(v1, v2, next) { next('some_problem') },
@@ -269,7 +269,7 @@ describe('funflow compilation', function() {
       expect(count).toEqual(1);
     });
     it('propagates an outside failure directly to the trap function', function() {
-      var flow = newFlow({
+      var flow = prepare({
         f0: function f0(next) { next(null) },
         f1: function f1(next) { next(null) }
       });
