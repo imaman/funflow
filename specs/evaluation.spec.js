@@ -192,7 +192,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {key: ['AB']}]);
     });
     it('supports multiple outputs', function() {
-      var flow = newFlow({
+      var flow = prepare({
         key: function f(v1, v2, next) { next(null, v1 + v2, v1 * v2) }
       });
       var args;
@@ -200,7 +200,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {key: [24, 80]}]);
     });
     it('does not output an array when the function is marked as single output', function() {
-      var flow = newFlow({
+      var flow = prepare({
         key: single(function f(v, next) { next(null, '*' + v + '*' )})
       });
       var args;
