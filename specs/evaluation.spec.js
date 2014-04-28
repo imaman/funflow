@@ -209,7 +209,7 @@ describe('funflow compilation', function() {
       if (args[0]) throw args[0];
     });
     it('passes inputs to the function at the branch', function() {
-      var flow = newFlow({
+      var flow = prepare({
         key: function ab(v1, v2, next) { next(null, v1 + v2) }
       });
       var args;
@@ -217,7 +217,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {key: ['XY']}]);
     });
     it('handles a two-way fork', function() {
-      var flow = newFlow({
+      var flow = prepare({
         sum: function plus(v1, v2, next) { next(null, v1 + v2) },
         product: function star(v1, v2, next) { next(null, v1 * v2) }
       });
@@ -226,7 +226,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {sum: [13], product: [40]}]);
     });
     it('ivnokes the trap function exactly once', function() {
-      var flow = newFlow({
+      var flow = prepare({
         f0: function f0(next) { next(null) },
         f1: function f1(next) { next(null) },
         f2: function f2(next) { next(null) },
