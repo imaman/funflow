@@ -435,7 +435,7 @@ describe('funflow compilation', function() {
   });
   it('can evaluate a sequence where all computations take no arguments and produce no results', function() {
     var count = 0;
-    var flow = newFlow([
+    var flow = prepare([
       function(next) { ++count; next() },
       function(next) { ++count; next() },
       function(next) { ++count; next() }
