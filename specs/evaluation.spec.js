@@ -145,7 +145,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 'abcde']);
     });
     it('does not run subsequent functions after a failure', function() {
-      called = '';
+      var called = '';
       var flow = prepare([
         function a(next) { called += 'a'; next(null) },
         function b(next) { called += 'b'; next('some_error') },
@@ -157,10 +157,10 @@ describe('funflow compilation', function() {
       expect(called).toEqual('ab');
     });
     it('does not run subsequent functions after a thrown error', function() {
-      called = '';
+      var called = '';
       var flow = prepare([
         function a(next) { called += 'a'; next(null) },
-        function b(next) { called += 'b'; new Error('some_error') },
+        function b(next) { called += 'b'; throw new Error('some_error') },
         function c(next) { called += 'c'; next(null) },
         function d(next) { called += 'd'; next(null) },
         function e(next) { called += 'e'; next(null) },
@@ -447,7 +447,7 @@ describe('funflow compilation', function() {
     expect(count).toEqual(3);
   });
   it('can be evaluated multiple times', function() {
-    var flow = newFlow([
+    var flow = prepare([
       function f1(a, next) { next(null, a, 10) },
       {
         sum: function sum(a, b, next) { next(null, a + b) },
