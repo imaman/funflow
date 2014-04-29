@@ -413,9 +413,9 @@ describe('funflow compilation', function() {
     });
     it('a comp function in a branch does not rescue other branches', function() {
       var err = new Error();
-      var flow = newFlow({
+      var flow = prepare({
           a: function f0(next) { next('PROBLEM') },
-          b: comp(function f(e, next) { next('ok') })
+          b: comp(function f(e, next) { next(null, 'ok') })
       });
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
