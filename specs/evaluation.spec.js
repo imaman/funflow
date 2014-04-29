@@ -5,6 +5,7 @@ var fork = require('../lib/dsl').fork;
 var timer = require('../lib/dsl').timer;
 var newFlow = require('../lib/evaluation').newFlow;
 var prepare = require('../lib/evaluation2').prepare;
+var compile = require('../lib/evaluation2').compile;
 
 describe('funflow compilation', function() {
   describe('of a literal', function() {
@@ -424,12 +425,12 @@ describe('funflow compilation', function() {
   });
   it('continues to the subsequent computation when next() is invoked with no args', function() {
     var count = 0;
-    var flow = newFlow([
+    var flow = compile([
       function(a, next) { ++count; next() },
       function(next) { ++count; next(null, count) }
     ]);
     var args;
-    flow(null, 5, function() { args = u_.toArray(arguments) });
+    flow.run(null, 5, function() { args = u_.toArray(arguments) });
     expect(args).toEqual([null, 2]);
   });
   it('can evaluate a sequence where all computations take no arguments and produce no results', function() {
