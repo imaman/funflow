@@ -113,5 +113,13 @@ describe('graph', function() {
       var v = g.connect(12, 6).from;
       expect(v.toString()).toEqual('12');
     });
+    it('assigns a unique integer ID a vertex if no key is given', function() {
+      var g = Graph.new_();
+      var v0 = g.vertex();
+      var v1 = g.vertex();
+
+      expect(g.vertex(0)).toBe(v0);
+      expect(g.vertex(1)).toBe(v1);
+    });
   });
 });
