@@ -329,7 +329,7 @@ describe('funflow compilation', function() {
         if (args[0]) throw args[0];
       });
       it('invokes the merge function with partial results', function() {
-        var flow = newFlow(fork({
+        var flow = prepare(fork({
           a: single(function (next) { next(null, 'A') }),
           b: single(function (next) {}),
           c: single(function (next) { next(null, 'C') }),
@@ -344,7 +344,7 @@ describe('funflow compilation', function() {
       });
       it('invokes the merge function with partial results', function() {
         var acc = [];
-        var flow = newFlow(fork({
+        var flow = prepare(fork({
           A: single(function (next) { next(null, 'a') }),
           B: single(function (next) { next(null, 'b') }),
           C: single(function (next) { next(null, 'c') }),
@@ -359,12 +359,12 @@ describe('funflow compilation', function() {
         }));
         var args;
         flow(null, function() { args = u_.toArray(arguments) });
-        expect(args).toEqual([null, ['A', 'AB', 'ABC']]);
+        expect(args).toEqual([null, ['ABC', 'BC', 'C']]);
         if (args[0]) throw args[0];
       });
       it('propagates errors from the merge function', function() {
         var acc = [];
-        var flow = newFlow(fork({
+        var flow = prepare(fork({
           a: single(function (next) { next(null) }),
           b: single(function (next) { next(null) }),
           c: single(function (next) { next(null) }),
@@ -381,7 +381,7 @@ describe('funflow compilation', function() {
   });
   describe('of a computation', function() {
     it('takes an err argument', function() {
-      var flow = newFlow(
+      var flow = prepare(
         comp(function f(e, v, next) { next(null, {e: e, v: v}) })
       );
       var args;
@@ -389,7 +389,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {e: null, v: 100}]);
     });
     it('receives whichever err that was produced earlier', function() {
-      var flow = newFlow([
+      var flow = prepare([
         function f0(v, next) { next(null, v + '0') },
         function f1(v, next) { next(null, v + '1') },
         function f2(v, next) { next('F2 FAILED') },
