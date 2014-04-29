@@ -281,7 +281,7 @@ describe('funflow compilation', function() {
     });
     describe('with custom merge', function() {
       it('passes the result object to the merge function', function() {
-        var flow = newFlow(fork({
+        var flow = prepare(fork({
           plusOne: single(function (v, next) { next(null, v + 1) }),
           plusTwo: single(function (v, next) { next(null, v + 2) })
         }, function(result, next) {
@@ -296,7 +296,7 @@ describe('funflow compilation', function() {
       });
       it('invokes the merge function once for each branch', function() {
         var count = 0;
-        var flow = newFlow(fork({
+        var flow = prepare(fork({
           a: single(function (next) { next(null) }),
           b: single(function (next) { next(null) }),
           c: single(function (next) { next(null) }),
