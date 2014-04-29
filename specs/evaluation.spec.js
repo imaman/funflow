@@ -465,7 +465,7 @@ describe('funflow compilation', function() {
     expect(args).toEqual([null, '17,70']);
   });
   it('can be recursive', function(done) {
-    var fib = newFlow([
+    var fib = prepare([
       {
         a: single(function(n, next) { n < 2 ? next() : fib(null, n - 2, next) }),
         b: single(function(n, next) { n < 2 ? next() : fib(null, n - 1, next) }),
@@ -481,12 +481,12 @@ describe('funflow compilation', function() {
     });
   });
   it('example: async unit test', function(done) {
-    var pith = newFlow([
+    var pith = prepare([
       function cube(a, b, next) { next(null, a*a, b*b) },
       function add(aa, bb, next) { next(null, aa + bb) },
       function square(cc, next) { next(null, Math.sqrt(cc)) }
     ]);
-    var test = newFlow([
+    var test = prepare([
       function gen3_4(next) { pith(null, 3, 4, next) },
       function check5(v, next) { expect(v).toEqual(5); next() },
       function gen6_8(next) { pith(null, 6, 8, next) },
@@ -498,7 +498,7 @@ describe('funflow compilation', function() {
   });
   describe('timers', function() {
     it('fires a result for its slot', function(done) {
-      var flow = newFlow(fork({
+      var flow = prepare(fork({
         a: single(function(v, next) { next(null, v + 'A') }),
         b: function(v, next) {},
         elapsed: timer(1),
