@@ -402,7 +402,7 @@ describe('funflow compilation', function() {
     });
     it('an exception thrown from a computation is propagated to the trap function', function() {
       var err = new Error();
-      var flow = newFlow([
+      var flow = prepare([
         function f0(next) { next('f0 failed') },
         comp(function f(e, next) { throw err })
       ]);
