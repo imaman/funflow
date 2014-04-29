@@ -555,7 +555,7 @@ describe('funflow compilation', function() {
     });
     it('can be used inside a seq', function(done) {
       var acc = [];
-      var flow = newFlow([
+      var flow = prepare([
         timer(15),
         function (millis, next) { next(null, millis / 1000.0) }
       ]);
