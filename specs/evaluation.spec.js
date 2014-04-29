@@ -519,7 +519,7 @@ describe('funflow compilation', function() {
     });
     it('fires several times, each time reporting the elapsed time', function(done) {
       var acc = [];
-      var flow = newFlow(fork({
+      var flow = prepare(fork({
         elapsed: timer(1)
       }, function(result, next) {
         acc.push(result.elapsed);
@@ -531,16 +531,22 @@ describe('funflow compilation', function() {
         // a 1-ms frequency for 20 ms, should (conservatively) fire at least
         // three times.
         expect(acc.length).toBeGreaterThan(3);
+
+        var n = 0;
         acc.reduce(function(prev, curr) {
-          expect(curr).toBeGreaterThan(prev);
+          if (curr > prev)
+            ++n;
           return curr;
         }, -1);
+        // As time is ever-increasing at least three of these values should
+        // be greater than the previous values.
+        expect(n).toBeGreaterThan(3);
         done();
       });
     });
     it('fires an excpetion after the specified timeout duration', function(done) {
       var acc = [];
-      var flow = newFlow(fork({
+      var flow = prepare(fork({
         elapsed: timer(1, 10)
       }, function(result, next) {
         acc.push(result.elapsed);
