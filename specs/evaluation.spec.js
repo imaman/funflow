@@ -3,7 +3,7 @@ var comp = require('../lib/dsl').comp;
 var single = require('../lib/dsl').single;
 var fork = require('../lib/dsl').fork;
 var timer = require('../lib/dsl').timer;
-var prepare = require('../lib/evaluation2').prepare;
+var prepare = require('../lib/evaluation2').newFlow;
 var compile = require('../lib/evaluation2').compile;
 
 describe('funflow compilation', function() {
