@@ -704,7 +704,7 @@ describe('funflow compilation', function() {
       if (args[0]) throw args[0];
       expect(args).toEqual([null, 'abAB']);
     });
-    xit('handles forks', function() {
+    it('handles forks', function() {
       var flow = compile({ a: 1, b: 2, d: 4}, {branchOp: 'SINGLE'}).asFunction();
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
