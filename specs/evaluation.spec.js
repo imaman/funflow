@@ -314,7 +314,7 @@ describe('funflow compilation', function() {
       });
       it('does not re-invoke the merge after it called next()', function() {
         var count = 0;
-        var flow = newFlow(fork({
+        var flow = prepare(fork({
           a: single(function (next) { next(null, 'A') }),
           b: single(function (next) { next(null, 'B') }),
           c: single(function (next) { next(null, 'C') }),
@@ -328,6 +328,36 @@ describe('funflow compilation', function() {
         expect(count).toEqual(2);
         expect(args).toEqual([null, 'count=2']);
         if (args[0]) throw args[0];
+      });
+      it('does not re-invoke merge after it called next() - more sophisticated', function(done) {
+        var mergeCount = 0;
+        var count = 0;
+        var acc = [];
+        var flow = prepare([
+          fork({
+            a: single(function (next) { next(null, 'A') }),
+            b: single(function (next) { next(null, 'B') }),
+            c: single(function (next) { next(null, 'C') }),
+          }, function(result, next) {
+            ++mergeCount;
+            next(null, Object.keys(result), mergeCount);
+          }),
+          function(keys, n, next) {
+            acc.push(n + '=>[' + keys.length + ']');
+            count += 1;
+            if (keys.length === 1) process.nextTick(next);
+          }
+        ]);
+        var args;
+        flow(null, function() {
+          args = u_.toArray(arguments);
+          if (args[0]) return done(args[0]);
+
+          expect(count).toEqual(1);
+          expect(mergeCount).toEqual(1);
+          expect(acc.join(' ')).toEqual('1=>[1]');
+          done();
+        });
       });
       it('invokes the merge function with partial results', function() {
         var flow = prepare(fork({
@@ -495,6 +525,26 @@ describe('funflow compilation', function() {
       function check13(v, next) { expect(v).toEqual(13); next() }
     ]);
     test(null, done);
+  });
+  it('invokes every function exactly once', function(done) {
+    var counts = { a: 0, b1: 0, b2: 0, c: 0 };
+    var flow = prepare([
+      function a(v, next) { counts.a += 1; next(null, v + '+a') },
+      {
+        b1: function b1(v, next) { counts.b1 += 1; next(null, '(' + v + ')*b1') },
+        b2: function b2(v, next) { counts.b2 += 1; next(null, '(' + v + ')*b2') }
+      },
+      function c(v, next) {
+        counts.c += 1;
+        process.nextTick(next.bind(null, null, v.b1 + '/' + v.b2));
+      }
+    ]);
+    flow(null, 'x', function(e, v) {
+      if (e) throw e;
+      expect(v).toEqual('(x+a)*b1/(x+a)*b2');
+      expect(counts).toEqual({ a: 1, b1: 1, b2: 1, c: 1 });
+      done();
+    });
   });
   describe('timers', function() {
     it('fires a result for its slot', function(done) {
