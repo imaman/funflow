@@ -624,17 +624,40 @@ describe('funflow compilation', function() {
         done();
       });
     });
+    function benchmark(description, code) {
+      var time = process.hrtime();
+      var d = new Date();
+      code();
+      d = new Date() - d;
+      time = process.hrtime(time);
+      time = (time[0] * 1e9 + time[1]) / 1e6;
+      console.log('\n\n            TIME of "' + description + '" is ' + time + ' ms (or ' + d + ' ms)\n');
+      return time;
+    }
     it('handles long sequences', function() {
-      var arr = u_.times(1570, function() { return 'A' });
+      var sample = [];
+      var arr = u_.times(900, function() { return 'A' });
       arr.push(function(v, next) {
         next(null, v.toLowerCase());
       });
 
-      var flow = prepare(arr);
-      var args;
-      flow(null, function() { args = u_.toArray(arguments) });
-      if (args[0]) throw args[0];
-      expect(args).toEqual([null, 'a']);
+      var i = 0;
+      var top = 11;
+      for (i = 0; i < top; ++i) {
+      var args = undefined;
+        benchmark('compile+execute', function() {
+          var flow = prepare(arr);
+          sample.push(benchmark('execute', function() {
+            flow(null, function() { args = u_.toArray(arguments); });
+          }));
+        });
+        if (args[0]) throw args[0];
+        expect(args).toEqual([null, 'a']);
+        console.log(i);
+      }
+      sample.sort(function(a,b) { return a - b });
+      console.log('50%-ile=' + sample[(top-1)/2]);
+      console.log('90%-ile=' + sample[Math.floor(top*0.9)]);
     });
     it('handles a sequence of identical literals', function() {
       var flow = prepare([100, 100]);
