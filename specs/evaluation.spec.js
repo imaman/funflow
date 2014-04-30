@@ -707,6 +707,12 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
     });
+    it('by default, it treat fork branches as if they were "single()"', function() {
+      var flow = compile({ a: 1, b: 2, d: 4}).asFunction();
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
+    });
   });
   function newCustomFlow(dsl) {
     return compile(dsl, { branchOp: 'MULTI' }).asFunction();
