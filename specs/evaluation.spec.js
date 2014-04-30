@@ -183,9 +183,6 @@ describe('funflow compilation', function() {
     });
   });
   describe('of a fork', function() {
-    function newCustomFlow(dsl) {
-      return compile(dsl, { branchOp: 'MULTI' }).asFunction();
-    }
     it('passes output to the trap function, keyed by the property name', function() {
       var flow = newCustomFlow({
         key: function ab(next) { next(null, 'AB') }
@@ -195,7 +192,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {key: ['AB']}]);
     });
     it('supports multiple outputs', function() {
-      var flow = newFlow({
+      var flow = newCustomFlow({
         key: function f(v1, v2, next) { next(null, v1 + v2, v1 * v2) }
       });
       var args;
@@ -212,7 +209,7 @@ describe('funflow compilation', function() {
       if (args[0]) throw args[0];
     });
     it('passes inputs to the function at the branch', function() {
-      var flow = newFlow({
+      var flow = newCustomFlow({
         key: function ab(v1, v2, next) { next(null, v1 + v2) }
       });
       var args;
@@ -220,7 +217,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {key: ['XY']}]);
     });
     it('handles a two-way fork', function() {
-      var flow = newFlow({
+      var flow = newCustomFlow({
         sum: function plus(v1, v2, next) { next(null, v1 + v2) },
         product: function star(v1, v2, next) { next(null, v1 * v2) }
       });
@@ -479,7 +476,7 @@ describe('funflow compilation', function() {
     expect(count).toEqual(3);
   });
   it('can be evaluated multiple times', function() {
-    var flow = newFlow([
+    var flow = newCustomFlow([
       function f1(a, next) { next(null, a, 10) },
       {
         sum: function sum(a, b, next) { next(null, a + b) },
@@ -711,6 +708,9 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
     });
   });
+  function newCustomFlow(dsl) {
+    return compile(dsl, { branchOp: 'MULTI' }).asFunction();
+  }
 });
 
 
