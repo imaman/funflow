@@ -715,11 +715,17 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) }).inspect();
       expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
     });
-    it('applies single also to sequence inside a fork', function() {
+    it('applies single also to sequences inside a fork', function() {
       var flow = newFlow({b1: 'B1', b2: ['B2']});
       var args;
       var exec = flow(null, function() { args = u_.toArray(arguments) }).inspect();
       expect(args).toEqual([null, {b1: 'B1', b2: 'B2'}]);
+    });
+    it('applies single also to forks inside a fork', function() {
+      var flow = newFlow({b1: 'B1', b2: {b21: 'B21', b22: 'B22'}});
+      var args;
+      var exec = flow(null, function() { args = u_.toArray(arguments) }).inspect();
+      expect(args).toEqual([null, {b1: 'B1', b2: {b21: 'B21', b22: 'B22'}}]);
     });
   });
   function newCustomFlow(dsl) {
