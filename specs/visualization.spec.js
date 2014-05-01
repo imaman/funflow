@@ -152,39 +152,27 @@ describe('visualization', function() {
     });
   });
   describe('diagram of a fully compiled flow', function() {
-    xit('shows IDs', function() {
+    it('shows IDs', function() {
       var executable = compile([
-        'a',
-        {b1: 'B1', b2: {b3: 'B3', b4: 'B4'}},
-        {c1: 'C1', c2: ['C3', 'C4']},
-        'd']);
+        'A',
+        {b1: 'B1', b2: ['B21', 'B22']},
+        'C']);
       expect('\n' + executable.toString()).toEqual(['',
+        '',
         '|',
-        'a',
+        'A',
         '|',
         '|',
-        '+-+--+--+',
-        '  |  |  |',
-        '  B1 B2 |',
-        '  |  |  +-+--+',
-        '  |  |    |  |',
-        '  |  |    B4 B5',
-        '  |  |    |  |',
-        '  |  |    |  |',
-        '  |  |  +-+--+',
-        '  |  |  |',
-        '+-+--+--+',
-        '|',
-        '+-+--+',
-        '  |  |',
-        '  C1 |',
-        '  |  C3',
-        '  |  |',
-        '  |  C4',
-        '  |  |',
-        '  |  |',
-        '+-+--+',
-        'd',
+        '+->-+--+',
+        '    |  |',
+        '    B1 |',
+        '    |  B21',
+        '    |  |',
+        '    |  B22',
+        '    v  |',
+        '    |  |',
+        '+-<-+--+',
+        'C',
         '|'
       ].join('\n'));
     });
