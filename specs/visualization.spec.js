@@ -2,6 +2,7 @@ var Graph = require('../lib/graph');
 var treeFromDsl = require('../lib/dsl').treeFromDsl;
 var comp = require('../lib/dsl').comp;
 var show = require('../lib/visualization').show;
+var compile = require('../lib/evaluation').compile;
 
 describe('visualization', function() {
   describe('diargam', function() {
@@ -120,6 +121,44 @@ describe('visualization', function() {
         {c1: 'C1', c2: ['C3', 'C4']},
         'd']);
       expect('\n' + show(g, {connect: true})).toEqual(['',
+        '|',
+        'a',
+        '|',
+        '|',
+        '+-+--+--+',
+        '  |  |  |',
+        '  B1 B2 |',
+        '  |  |  +-+--+',
+        '  |  |    |  |',
+        '  |  |    B4 B5',
+        '  |  |    |  |',
+        '  |  |    |  |',
+        '  |  |  +-+--+',
+        '  |  |  |',
+        '+-+--+--+',
+        '|',
+        '+-+--+',
+        '  |  |',
+        '  C1 |',
+        '  |  C3',
+        '  |  |',
+        '  |  C4',
+        '  |  |',
+        '  |  |',
+        '+-+--+',
+        'd',
+        '|'
+      ].join('\n'));
+    });
+  });
+  describe('diagram of a fully compiled flow', function() {
+    xit('shows IDs', function() {
+      var executable = compile([
+        'a',
+        {b1: 'B1', b2: {b3: 'B3', b4: 'B4'}},
+        {c1: 'C1', c2: ['C3', 'C4']},
+        'd']);
+      expect('\n' + executable.toString()).toEqual(['',
         '|',
         'a',
         '|',

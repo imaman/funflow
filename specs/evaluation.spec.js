@@ -5,6 +5,8 @@ var fork = require('../lib/dsl').fork;
 var timer = require('../lib/dsl').timer;
 var newFlow = require('../lib/evaluation').newFlow;
 var compile = require('../lib/evaluation').compile;
+var show = require('../lib/visualization').show;
+var treeFromDsl = require('../lib/dsl').treeFromDsl;
 
 describe('funflow compilation', function() {
   describe('of a literal', function() {
@@ -712,6 +714,12 @@ describe('funflow compilation', function() {
       var args;
       flow(null, function() { args = u_.toArray(arguments) }).inspect();
       expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
+    });
+    it('applies single also to sequence inside a fork', function() {
+      var flow = newFlow({b1: 'B1', b2: ['B2']});
+      var args;
+      var exec = flow(null, function() { args = u_.toArray(arguments) }).inspect();
+      expect(args).toEqual([null, {b1: 'B1', b2: 'B2'}]);
     });
   });
   function newCustomFlow(dsl) {
