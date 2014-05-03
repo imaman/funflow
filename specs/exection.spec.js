@@ -15,5 +15,6 @@ describe('Execution', function() {
     expect(execution.outputOf(0)).toEqual([null, '_A']);
     expect(execution.outputOf(1)).toEqual([null, '_AB']);
     expect(execution.outputOf(2)).toEqual([null, '_ABC']);
+    expect(execution.outputOf(3)).toEqual([null, '_']);
   });
 });
