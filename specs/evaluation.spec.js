@@ -191,7 +191,9 @@ describe('funflow compilation', function() {
         key: function ab(next) { next(null, 'AB') }
       });
       var args;
-      flow(null, function() { args = u_.toArray(arguments) });
+      var exec = flow(null, function() { args = u_.toArray(arguments) });
+      exec.inspect();
+      if (args[0]) throw args[0];
       expect(args).toEqual([null, {key: ['AB']}]);
     });
     it('supports multiple outputs', function() {
