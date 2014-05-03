@@ -694,6 +694,14 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 100]);
     });
+    it('newFlow() treats var. args as a seq', function() {
+      var flow = newFlow(
+        function(v, next) { next(null, v + 'A') },
+        function(v, next) { next(null, v + 'B') });
+      var args;
+      flow(null, '_', function() { args = u_.toArray(arguments) });
+      expect(args).toEqual([null, '_AB']);
+    });
     it('passes the external input to the first computation', function() {
       var flow = newFlow([
         function(v, next) { next(null, v + 'A') },
