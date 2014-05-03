@@ -4,7 +4,7 @@ describe('Execution', function() {
   it('reports the IDs of all computation nodes', function() {
     var flow = newFlow('A', 'B', 'C');
     var execution = flow(null, function() {});
-    expect(execution.ids()).toEqual([0, 1, 2, 3]);
+    expect(execution.ids()).toEqual([0, 1, 2]);
   });
   describe('after the fact inspection', function() {
     var flow = newFlow(
