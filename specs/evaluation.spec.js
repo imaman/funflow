@@ -5,6 +5,7 @@ var fork = require('../lib/dsl').fork;
 var timer = require('../lib/dsl').timer;
 var newFlow = require('../lib/compilation').newFlow;
 var compile = require('../lib/compilation').compile;
+var Compiler = require('../lib/compilation').Compiler;
 var show = require('../lib/visualization').show;
 var treeFromDsl = require('../lib/dsl').treeFromDsl;
 
@@ -704,7 +705,7 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 'abAB']);
     });
     it('handles forks', function() {
-      var flow = compile({ a: 1, b: 2, d: 4}, {branchOp: 'SINGLE'}).asFunction();
+      var flow = Compiler.new_({branchOp: 'SINGLE'}).compile({ a: 1, b: 2, d: 4}).asFunction();
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
@@ -729,7 +730,7 @@ describe('funflow compilation', function() {
     });
   });
   function newCustomFlow(dsl) {
-    return compile(dsl, { branchOp: 'MULTI' }).asFunction();
+    return Compiler.new_({ branchOp: 'MULTI' }).compile(dsl).asFunction();
   }
 });
 
