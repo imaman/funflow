@@ -2,7 +2,7 @@ var Graph = require('../lib/graph');
 var treeFromDsl = require('../lib/dsl').treeFromDsl;
 var comp = require('../lib/dsl').comp;
 var show = require('../lib/visualization').show;
-var compile = require('../lib/evaluation').compile;
+var compile = require('../lib/compilation').compile;
 
 describe('visualization', function() {
   describe('diargam', function() {

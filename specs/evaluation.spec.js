@@ -3,8 +3,8 @@ var comp = require('../lib/dsl').comp;
 var single = require('../lib/dsl').single;
 var fork = require('../lib/dsl').fork;
 var timer = require('../lib/dsl').timer;
-var newFlow = require('../lib/evaluation').newFlow;
-var compile = require('../lib/evaluation').compile;
+var newFlow = require('../lib/compilation').newFlow;
+var compile = require('../lib/compilation').compile;
 var show = require('../lib/visualization').show;
 var treeFromDsl = require('../lib/dsl').treeFromDsl;
 
