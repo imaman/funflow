@@ -192,7 +192,7 @@ describe('funflow compilation', function() {
       });
       var args;
       var exec = flow(null, function() { args = u_.toArray(arguments) });
-      exec.inspect();
+      console.log(exec.inspect());
       if (args[0]) throw args[0];
       expect(args).toEqual([null, {key: ['AB']}]);
     });
@@ -723,13 +723,15 @@ describe('funflow compilation', function() {
     it('by default, it treats fork branches as if they were "single()"', function() {
       var flow = compile({ a: 1, b: 2, d: 4}).asFunction();
       var args;
-      flow(null, function() { args = u_.toArray(arguments) }).inspect();
+      var exec = flow(null, function() { args = u_.toArray(arguments) });
+      console.log(exec.inspect());
       expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
     });
     it('applies single also to sequences inside a fork', function() {
       var flow = newFlow({b1: 'B1', b2: ['B2']});
       var args;
-      var exec = flow(null, function() { args = u_.toArray(arguments) }).inspect();
+      var exec = flow(null, function() { args = u_.toArray(arguments) });
+      console.log(exec.inspect());
       expect(args).toEqual([null, {b1: 'B1', b2: 'B2'}]);
     });
     it('applies single also to forks inside a fork', function() {

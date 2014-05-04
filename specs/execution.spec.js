@@ -29,7 +29,7 @@ describe('Execution', function() {
       );
       var execution = flow.newExecution();
       execution.run(null, '*', function() {});
-      expect(execution.inspectX()).toEqual(['',
+      expect(execution.inspect()).toEqual(['',
         '|',
         'fa#0',
         '|',
