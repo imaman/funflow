@@ -13,6 +13,12 @@ describe('flow', function() {
         expect(execution.outputOf(1)).toEqual([null, 'B']);
       });
     });
+    it('an execution can only be run() once', function() {
+      var flow = Compiler.new_().compile('A', 'B');
+      var execution = flow.newExecution();
+      execution.run(null, function() {});
+      expect(function() { execution.run() }).toThrow('An Execution can only run once.');
+    });
   });
 });
 
