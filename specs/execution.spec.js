@@ -51,5 +51,19 @@ describe('Execution', function() {
         '  - 5 => [null,"*AB1_*AB1"]',
       ].join('\n'));
     });
+    it('is contains no outputs before the flow runs', function() {
+      var flow = compile(
+        function fa(v, next) {},
+        function fb(v, next) {}
+      );
+      var execution = flow.newExecution();
+      expect(execution.inspect()).toEqual(['',
+        '|',
+        'fa#0',
+        '|',
+        'fb#1',
+        '|'
+      ].join('\n'));
+    });
   });
 });
