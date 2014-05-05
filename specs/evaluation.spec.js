@@ -192,7 +192,7 @@ describe('funflow compilation', function() {
       });
       var args;
       var exec = flow(null, function() { args = u_.toArray(arguments) });
-      console.log(exec.inspect());
+      console.log(exec.toString());
       if (args[0]) throw args[0];
       expect(args).toEqual([null, {key: ['AB']}]);
     });
@@ -724,20 +724,20 @@ describe('funflow compilation', function() {
       var flow = compile({ a: 1, b: 2, d: 4}).asFunction();
       var args;
       var exec = flow(null, function() { args = u_.toArray(arguments) });
-      console.log(exec.inspect());
+      console.log(exec.toString());
       expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
     });
     it('applies single also to sequences inside a fork', function() {
       var flow = newFlow({b1: 'B1', b2: ['B2']});
       var args;
       var exec = flow(null, function() { args = u_.toArray(arguments) });
-      console.log(exec.inspect());
+      console.log(exec.toString());
       expect(args).toEqual([null, {b1: 'B1', b2: 'B2'}]);
     });
     it('applies single also to forks inside a fork', function() {
       var flow = newFlow({b1: 'B1', b2: {b21: 'B21', b22: 'B22'}});
       var args;
-      var exec = flow(null, function() { args = u_.toArray(arguments) }).inspect();
+      flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {b1: 'B1', b2: {b21: 'B21', b22: 'B22'}}]);
     });
   });

@@ -26,13 +26,13 @@ describe('Execution', function() {
         function fa(v, next) { next(null, v +'A') },
         {
           b1: function fb1(v, next) { next(null, v +'B1') },
-          b2: function(v, next) { next(null, v +'B1') },
+          b2: function(v, next) { next(null, v +'B2') },
         },
         function fc(v, next) { next(null, v.b1 + '_' + v.b2) }
       );
       var execution = flow.newExecution();
       execution.run(null, '*', function() {});
-      expect(execution.inspect()).toEqual(['',
+      expect(execution.toString()).toEqual(['',
         '|',
         'fa#0',
         '|',
@@ -49,9 +49,9 @@ describe('Execution', function() {
         '  - 0 => [null,"*A"]',
         '  - 1 => [null,"*A"]',
         '  - 2 => [null,"*AB1"]',
-        '  - 3 => [null,"*AB1"]',
-        '  - 4 => [null,{"b1":"*AB1","b2":"*AB1"}]',
-        '  - 5 => [null,"*AB1_*AB1"]',
+        '  - 3 => [null,"*AB2"]',
+        '  - 4 => [null,{"b1":"*AB1","b2":"*AB2"}]',
+        '  - 5 => [null,"*AB1_*AB2"]',
       ].join('\n'));
     });
     it('contains no outputs before the flow runs', function() {
@@ -60,7 +60,7 @@ describe('Execution', function() {
         function fb(v, next) {}
       );
       var execution = flow.newExecution();
-      expect(execution.inspect()).toEqual(['',
+      expect(execution.toString()).toEqual(['',
         '|',
         'fa#0',
         '|',
@@ -104,3 +104,7 @@ describe('Execution', function() {
     });
   });
 });
+
+// TODO
+// lookup by name
+// finalize
