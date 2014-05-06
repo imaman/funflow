@@ -740,6 +740,18 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {b1: 'B1', b2: {b21: 'B21', b22: 'B22'}}]);
     });
+    xit('passes an error to a computation with arguments', function() {
+      var flow = newFlow(
+        function(v, next) { next(null, v + 'A') },
+        function(v, next) { next('PROBLEM') },
+        function(v, next) { next(null, v + 'C') }
+      )
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      expect(args.length).toEqual(1);
+      console.log('\n\n##############################\n' + args[0].flowTrace);
+      expect(args[0].message).toEqual('PROBLEM');
+    });
   });
   function newCustomFlow(dsl) {
     return Compiler.new_({ branchOp: 'MULTI' }).compile(dsl).asFunction();

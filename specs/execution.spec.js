@@ -1,3 +1,4 @@
+var comp = require('../lib/dsl').comp;
 var u_ = require('underscore');
 var newFlow = require('../lib/compilation').newFlow;
 var compile = require('../lib/compilation').compile;
@@ -20,8 +21,8 @@ describe('Execution', function() {
       expect(execution.outputOf(2)).toEqual([null, '_ABC']);
     });
   });
-  describe('textual representation', function() {
-    it('contains diagram and outputs after evaluation', function() {
+  describe('introspection', function() {
+    it('provides human-readable representation of the current execution', function() {
       var flow = compile(
         function fa(v, next) { next(null, v +'A') },
         {
@@ -70,41 +71,62 @@ describe('Execution', function() {
     });
     describe('after a failure', function() {
       it('capures the current state at the Exception', function() {
-      var flow = compile(
-        'A',
-        function fb(v, next) { next(null, v + 'B') },
-        function fc(v, next) { next('PROBLEM') },
-        function fd(v, next) { next(null, v + 'D') },
-        function fe(v, next) { next(null, v + 'E') }
-      );
-      var execution = flow.newExecution({translateErrors: true});
-      var args;
-      execution.run(null, function() {
-        args = u_.toArray(arguments);
+        var flow = compile(
+          'A',
+          function fb(v, next) { next(null, v + 'B') },
+          function fc(v, next) { next('PROBLEM') },
+          function fd(v, next) { next(null, v + 'D') },
+          function fe(v, next) { next(null, v + 'E') }
+        );
+        var execution = flow.newExecution({translateErrors: true});
+        var args;
+        execution.run(null, function() {
+          args = u_.toArray(arguments);
+        });
+        expect(args.length).toBe(1);
+        expect(args[0].flowTrace).toEqual(['',
+          '|',
+          'A#0',
+          '|',
+          'fb#1',
+          '|',
+          'fc#2',
+          '|',
+          'fd#3',
+          '|',
+          'fe#4',
+          '|',
+          'Outputs:',
+          '  - 0 => [null,"A"]',
+          '  - 1 => [null,"AB"]',
+          '  - 2 => ["PROBLEM"]',
+        ].join('\n'));
       });
-      expect(args.length).toBe(1);
-      expect(args[0].flowTrace).toEqual(['',
-        '|',
-        'A#0',
-        '|',
-        'fb#1',
-        '|',
-        'fc#2',
-        '|',
-        'fd#3',
-        '|',
-        'fe#4',
-        '|',
-        'Outputs:',
-        '  - 0 => [null,"A"]',
-        '  - 1 => [null,"AB"]',
-        '  - 2 => ["PROBLEM"]',
-      ].join('\n'));
+      xit('can inspect the execution in flight', function() {
+        var captured = {};
+        var flow = compile(
+          function fa(next) { next(null, 'A') },
+          function fb(v, next) { next(null, v + 'B') },
+          function fc(v, next) { next('PROBLEM') },
+          comp(function fd(e, v, next) {
+            console.log(e.flowTrace);
+//            captured.fa = e.execution.outputOf(0);
+//            captured.fb = e.execution.outputOf(1);
+            next(null, 'Y')
+          }),
+          function fe(e, v, next) { next(null, v + 'Z') }
+        );
+        var execution = flow.newExecution({translateErrors: true});
+        var args;
+        execution.run(null, function() { args = u_.toArray(arguments); });
+        if (args[0]) throw args[0];
+        expect(args).toEqual([null, 'YZ']);
       });
     });
   });
 });
 
 // TODO
-// lookup by name
-// finalize
+// - lookup by name
+// - finalize
+// - translateErrors is true by default
