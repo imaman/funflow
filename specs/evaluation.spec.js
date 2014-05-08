@@ -741,16 +741,17 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, {b1: 'B1', b2: {b21: 'B21', b22: 'B22'}}]);
     });
     xit('passes an error to a computation with arguments', function() {
+      console.log('\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
       var flow = newFlow(
-        function(v, next) { next(null, v + 'A') },
-        function(v, next) { next('PROBLEM') },
-        function(v, next) { next(null, v + 'C') }
+        function fa(v, next) { next(null, v + 'A') },
+        function fb(v, next) { next('PROBLEM') },
+        function fc(v, next) { next(null, v + 'C') }
       )
       var args;
-      flow(null, function() { args = u_.toArray(arguments) });
+      flow(null, 'Z', function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
-      console.log('\n\n##############################\n' + args[0].flowTrace);
       expect(args[0].message).toEqual('PROBLEM');
+      console.log('\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
     });
   });
   function newCustomFlow(dsl) {
