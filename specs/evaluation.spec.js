@@ -435,6 +435,28 @@ describe('funflow compilation', function() {
       flow(null, '', function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 'F2 FAILED, AND RESCUED']);
     });
+    xit('receives whichever err that was produced earlier or a value', function() {
+      var flow = newFlow(
+        function f0(v, next) { next(null, v + '0') },
+        function f1(v, next) { next(null, v + '1') },
+        function f2(v, next) {
+          if (v[0] == '-') return next('F2 FAILED')
+          next(null, v + '2', '!!!');
+        },
+        function f3(v, suffix, next) { next(null, v + '3', suffix) },
+        comp(function f(e, v, suffix, next) {
+          next(null, e ? ('e=' + e) : ('v=' + v + suffix))
+        })
+      );
+      var args;
+      flow(null, '-', function() { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
+      exepct(args).toEqual([null, '___']);
+
+      flow(null, '+', function() { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
+      exepct(args).toEqual([null, '___']);
+    });
     it('an exception thrown from a computation is propagated to the trap function', function() {
       var err = new Error();
       var flow = newFlow([
@@ -740,18 +762,27 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {b1: 'B1', b2: {b21: 'B21', b22: 'B22'}}]);
     });
-    xit('passes an error to a computation with arguments', function() {
-      console.log('\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-      var flow = newFlow(
+    it('wraps the client code\'s err value with an exception when translateErrors is true', function() {
+      var flow = Compiler.new_({ translateErrors: true }).compile(
         function fa(v, next) { next(null, v + 'A') },
         function fb(v, next) { next('PROBLEM') },
         function fc(v, next) { next(null, v + 'C') }
-      )
+      ).asFunction();
       var args;
       flow(null, 'Z', function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
       expect(args[0].message).toEqual('PROBLEM');
-      console.log('\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+    });
+    it('passes the client code\'s err value to the termination callback when translateErrors is false', function() {
+      var flow = Compiler.new_({ translateErrors: false }).compile(
+        function fa(v, next) { next(null, v + 'A') },
+        function fb(v, next) { next('PROBLEM') },
+        function fc(v, next) { next(null, v + 'C') }
+      ).asFunction();
+      var args;
+      flow(null, 'Z', function() { args = u_.toArray(arguments) });
+      expect(args.length).toEqual(1);
+      expect(args[0]).toEqual('PROBLEM');
     });
   });
   function newCustomFlow(dsl) {
