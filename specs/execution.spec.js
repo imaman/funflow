@@ -2,6 +2,7 @@ var comp = require('../lib/dsl').comp;
 var u_ = require('underscore');
 var newFlow = require('../lib/compilation').newFlow;
 var compile = require('../lib/compilation').compile;
+var Compiler = require('../lib/compilation').Compiler;
 
 describe('Execution', function() {
   it('reports the IDs of all computation nodes', function() {
@@ -71,14 +72,14 @@ describe('Execution', function() {
     });
     describe('after a failure', function() {
       it('capures the current state at the Exception', function() {
-        var flow = compile(
+        var flow = Compiler.new_({translateErrors: true}).compile(
           'A',
           function fb(v, next) { next(null, v + 'B') },
           function fc(v, next) { next('PROBLEM') },
           function fd(v, next) { next(null, v + 'D') },
           function fe(v, next) { next(null, v + 'E') }
         );
-        var execution = flow.newExecution({translateErrors: true});
+        var execution = flow.newExecution();
         var args;
         execution.run(null, function() {
           args = u_.toArray(arguments);
