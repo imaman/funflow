@@ -774,7 +774,7 @@ describe('funflow compilation', function() {
       expect(args.length).toEqual(1);
       expect(args[0].message).toEqual('PROBLEM');
     });
-    it('passes the client code\'s err value to the termination callback when translateErrors is false', function() {
+    it('keeps the client code\'s err value as-is when translateErrors is false', function() {
       var flow = Compiler.new_({ translateErrors: false }).compile(
         function fa(v, next) { next(null, v + 'A') },
         function fb(v, next) { next('PROBLEM') },
