@@ -435,8 +435,8 @@ describe('funflow compilation', function() {
       flow(null, '', function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, 'F2 FAILED, AND RESCUED']);
     });
-    xit('receives whichever err that was produced earlier or a value', function() {
-      var flow = newFlow(
+    it('receives whichever err that was produced earlier or a value', function() {
+      var flow = compile(
         function f0(v, next) { next(null, v + '0') },
         function f1(v, next) { next(null, v + '1') },
         function f2(v, next) {
@@ -444,18 +444,19 @@ describe('funflow compilation', function() {
           next(null, v + '2', '!!!');
         },
         function f3(v, suffix, next) { next(null, v + '3', suffix) },
-        comp(function f(e, v, suffix, next) {
+        comp(function f4(e, v, suffix, next) {
           next(null, e ? ('e=' + e) : ('v=' + v + suffix))
         })
       );
+      var exec = flow.newExecution();
       var args;
-      flow(null, '-', function() { args = u_.toArray(arguments) });
+      exec.run(null, '-', function() { args = u_.toArray(arguments) });
       if (args[0]) throw args[0];
-      exepct(args).toEqual([null, '___']);
+      expect(args).toEqual([null, 'e=F2 FAILED']);
 
-      flow(null, '+', function() { args = u_.toArray(arguments) });
+      flow.newExecution().run(null, '+', function() { args = u_.toArray(arguments) });
       if (args[0]) throw args[0];
-      exepct(args).toEqual([null, '___']);
+      expect(args).toEqual([null, 'v=+0123!!!']);
     });
     it('an exception thrown from a computation is propagated to the trap function', function() {
       var err = new Error();
