@@ -2,6 +2,16 @@ var compile = require('../lib/compilation').compile;
 var Compiler = require('../lib/compilation').Compiler;
 
 describe('compilation', function() {
+  describe('options', function() {
+    it('yells if an illegal option was passed in', function() {
+      expect(function() {
+        Compiler.new_({'ILLEGAL_OPTION': 'dont_care'})
+      }).toThrow('Unrecognized option(s): ILLEGAL_OPTION in {"ILLEGAL_OPTION":"dont_care"}');
+    });
+    it('does not yell if all options are recorgnized', function() {
+      Compiler.new_({'translateErrors': true, branchOp: ''});
+    });
+  });
   describe('translation of DSL into Flow', function() {
     it('creates a flow when .compile() is called', function() {
       var flow = Compiler.new_().compile(['A', 'B']);
