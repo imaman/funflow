@@ -1,12 +1,11 @@
 var timer = require('../lib/dsl').timer;
-var single = require('../lib/dsl').single;
 var fork = require('../lib/dsl').fork;
 var newFlow = require('../lib/compilation').newFlow;
 
 describe('timers', function() {
   it('fires a result for its slot', function(done) {
     var flow = newFlow(fork({
-      a: single(function(v, next) { next(null, v + 'A') }),
+      a: function(v, next) { next(null, v + 'A') },
       b: function(v, next) {},
       elapsed: timer(1),
     }, function(result, next) {
