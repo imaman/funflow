@@ -719,7 +719,6 @@ describe('funflow compilation', function() {
 // - option for requiring uniqeness of names
 // - option for requiring names
 // - use inspect when showing output in the diagram
-// - turn flow into a function with properties
 // - register shutdown callbacks
 
 
