@@ -1,8 +1,11 @@
 var timer = require('../lib/dsl').timer;
 var fork = require('../lib/dsl').fork;
+var Compiler = require('../lib/compilation').Compiler;
 var newFlow = require('../lib/compilation').newFlow;
+var multi = require('../lib/compilation').multi;
 
-describe('timers', function() {
+
+describe('timer:', function() {
   it('fires a result for its slot', function(done) {
     var flow = newFlow(fork({
       a: function(v, next) { next(null, v + 'A') },
@@ -62,6 +65,29 @@ describe('timers', function() {
       expect(arguments.length).toEqual(1);
       expect(e.message).toEqual('Timeout');
       expect(e.duration).toBeGreaterThan(10);
+      done();
+    });
+  });
+  it('fires only the timeout error when timeout value equals to the frequecny', function(done) {
+    var flow = newFlow({
+      a: timer(10, 10)
+    });
+
+    var args;
+    var exec = flow(null, function(e) {
+      expect(e.message).toEqual('Timeout');
+      expect(arguments.length).toEqual(1);
+      done();
+    });
+  });
+  it('when specified, it fires a result value upon timeout', function(done) {
+    var flow = newFlow({
+      a: timer(10, 10, null, 'SOME_RESULT')
+    });
+
+    flow(null, function(e, v) {
+      expect(e).toBe(null);
+      expect(v).toEqual({a: 'SOME_RESULT'});
       done();
     });
   });
