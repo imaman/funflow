@@ -714,6 +714,8 @@ describe('funflow compilation', function() {
 });
 
 // TODO:
+// - Flow should maintain a list of vertices ordered by key (instead of having
+// the Execution object build it).
 // - option for requiring uniqeness of names
 // - option for requiring names
 // - timers can be named
