@@ -714,7 +714,6 @@ describe('funflow compilation', function() {
 });
 
 // TODO:
-// - graph simplification
 // - option for requiring uniqeness of names
 // - option for requiring names
 // - register shutdown callbacks

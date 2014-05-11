@@ -35,6 +35,28 @@ describe('compilation', function() {
       expect(varArgflow.toString()).toEqual(seqFlow.toString());
     });
   });
+  describe('static checking', function() {
+    it('yells on name conflict when require-unique-names flag is specified', function() {
+      expect(function() {
+        Compiler.new_({ requireUniqueNames: true }).compile(
+          function f1() {},
+          function f1() {}
+        );
+      }).toThrow('Found 2 functions named "f1"');
+    });
+    it('specifies the number of times the function has been used', function() {
+      expect(function() {
+        Compiler.new_({ requireUniqueNames: true }).compile(
+          function fa() {},
+          function fb() {},
+          function fc() {},
+          function fb() {},
+          function fb() {},
+          function fd() {}
+        );
+      }).toThrow('Found 3 functions named "fb"');
+    });
+  });
   describe('optimizations', function() {
     it('inlines nested sequences', function() {
       var flow = compile('A', ['B', ['C', ['D', 'E'], ['F']]]);
