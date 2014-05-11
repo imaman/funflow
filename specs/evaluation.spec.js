@@ -719,7 +719,7 @@ describe('funflow compilation', function() {
 // - timers can be named
 // - forks merges can be named
 // - check uniqueness of names w.r.t to named timers and merges
-// - set strict default behavior (uniqueness of names, single, etc.).
+// - set strict default behavior (uniqueness of names, single, etc.)
 // - register shutdown callbacks
 
 

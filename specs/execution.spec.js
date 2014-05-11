@@ -6,8 +6,7 @@ var Compiler = require('../lib/compilation').Compiler;
 
 describe('Execution', function() {
   it('reports the IDs of all computation nodes', function() {
-    var flow = newFlow('A', 'B', 'C');
-    var execution = flow(null, function() {});
+    var execution = compile('A', 'B', 'C').newExecution();
     expect(execution.ids()).toEqual([0, 1, 2]);
   });
   describe('after the fact inspection', function() {
