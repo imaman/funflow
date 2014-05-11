@@ -42,7 +42,15 @@ describe('compilation', function() {
           function f1() {},
           function f1() {}
         );
-      }).toThrow('Found 2 computations named "f1"');
+      }).toThrow('Found 2 computations named "f1". Each computation should have a unique name.');
+    });
+    it('yells on multiple unnamed functions', function() {
+      expect(function() {
+        Compiler.new_({ requireUniqueNames: true }).compile(
+          function() {},
+          function() {}
+        );
+      }).toThrow('Found 2 computations named "". Each computation should have a unique name.');
     });
     it('specifies the number of times the function has been used', function() {
       expect(function() {
@@ -54,7 +62,7 @@ describe('compilation', function() {
           function fb() {},
           function fd() {}
         );
-      }).toThrow('Found 3 computations named "fb"');
+      }).toThrow('Found 3 computations named "fb". Each computation should have a unique name.');
     });
   });
   describe('optimizations', function() {
