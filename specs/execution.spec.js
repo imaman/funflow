@@ -22,6 +22,11 @@ describe('Execution', function() {
       expect(execution.outputOf('fc')).toEqual([null, '_ABC']);
     });
   });
+  it('it yells if vertex name was not found', function() {
+    var flow = newFlow(function fa(v, next) { next(null, v +'A') }) ;
+    var execution = flow(null, '_', function() {});
+    expect(function() { execution.outputOf('NON_EXISTING_NAME') }).toThrow();
+  });
   describe('introspection', function() {
     it('provides human-readable representation of the current execution', function() {
       var flow = compile(
