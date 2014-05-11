@@ -486,7 +486,7 @@ describe('funflow compilation', function() {
       function(next) { ++count; next(null, count) }
     ]);
     var args;
-    flow.run(null, 5, function() { args = u_.toArray(arguments) });
+    flow(null, 5, function() { args = u_.toArray(arguments) });
     expect(args).toEqual([null, 2]);
   });
   it('can evaluate a sequence where all computations take no arguments and produce no results', function() {
