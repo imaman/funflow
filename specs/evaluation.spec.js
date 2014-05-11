@@ -660,13 +660,13 @@ describe('funflow compilation', function() {
       expect(args).toEqual([null, 'abAB']);
     });
     it('handles forks', function() {
-      var flow = Compiler.new_({branchOp: 'SINGLE'}).compile({ a: 1, b: 2, d: 4}).asFunction();
+      var flow = Compiler.new_({branchOp: 'SINGLE'}).compile({ a: 1, b: 2, d: 4});
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args).toEqual([null, {a: 1, b: 2, d: 4}]);
     });
     it('by default, it treats fork branches as if they were "single()"', function() {
-      var flow = compile({ a: 1, b: 2, d: 4}).asFunction();
+      var flow = compile({ a: 1, b: 2, d: 4});
       var args;
       var exec = flow(null, function() { args = u_.toArray(arguments) });
       console.log(exec.toString());
@@ -690,7 +690,7 @@ describe('funflow compilation', function() {
         function fa(v, next) { next(null, v + 'A') },
         function fb(v, next) { next('PROBLEM') },
         function fc(v, next) { next(null, v + 'C') }
-      ).asFunction();
+      );
       var args;
       flow(null, 'Z', function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
@@ -701,7 +701,7 @@ describe('funflow compilation', function() {
         function fa(v, next) { next(null, v + 'A') },
         function fb(v, next) { next('PROBLEM') },
         function fc(v, next) { next(null, v + 'C') }
-      ).asFunction();
+      );
       var args;
       flow(null, 'Z', function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
@@ -709,7 +709,7 @@ describe('funflow compilation', function() {
     });
   });
   function newCustomFlow(dsl) {
-    return Compiler.new_({ branchOp: 'MULTI' }).compile(dsl).asFunction();
+    return Compiler.new_({ branchOp: 'MULTI' }).compile(dsl);
   }
 });
 

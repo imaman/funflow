@@ -105,7 +105,7 @@ describe('timer:', function() {
   it('can translate the custom error value', function(done) {
     var flow = Compiler.new_({translateErrors: true}).compile({
       a: timer(10, 10, 'SOME_PROBLEM')
-    }).asFunction();
+    });
 
     flow(null, function(e) {
       expect(arguments.length).toEqual(1);
