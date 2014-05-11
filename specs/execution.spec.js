@@ -56,6 +56,28 @@ describe('Execution', function() {
         '  - 5 => [null,"*AB1_*AB2"]',
       ].join('\n'));
     });
+    it('handles circular outputs', function() {
+      var cyclicJson = {};
+      cyclicJson.a = cyclicJson;
+      cyclicJson.b = 'B';
+
+      var flow = compile(
+        function fa(v, next) { cyclicJson.v = v; next(null, cyclicJson) },
+        function fc(v, next) { next(null, v, 'XYZ') }
+      );
+      var execution = flow.newExecution();
+      execution.run(null, '*', function() {});
+      expect(execution.toString()).toEqual(['',
+        '|',
+        'fa#0',
+        '|',
+        'fc#1',
+        '|',
+        'Outputs:',
+        '  - 0 => [ null, { a: [Circular], b: \'B\', v: \'*\' } ]',
+        '  - 1 => [ null, { a: [Circular], b: \'B\', v: \'*\' }, \'XYZ\' ]'
+      ].join('\n'));
+    });
     it('contains no outputs before the flow runs', function() {
       var flow = compile(
         function fa(v, next) {},

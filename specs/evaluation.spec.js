@@ -718,7 +718,6 @@ describe('funflow compilation', function() {
 // - exec.outputOf() should support lookup by name
 // - option for requiring uniqeness of names
 // - option for requiring names
-// - use inspect when showing output in the diagram
 // - register shutdown callbacks
 
 
