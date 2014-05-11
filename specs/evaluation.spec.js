@@ -715,7 +715,6 @@ describe('funflow compilation', function() {
 
 // TODO:
 // - graph simplification
-// - exec.outputOf() should support lookup by name
 // - option for requiring uniqeness of names
 // - option for requiring names
 // - register shutdown callbacks
