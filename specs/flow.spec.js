@@ -9,8 +9,8 @@ describe('flow', function() {
       execution.run(null, function(e, v) {
         expect(e).toBe(null);
         expect(v).toEqual('B');
-        expect(execution.outputOf(0)).toEqual([null, 'A']);
-        expect(execution.outputOf(1)).toEqual([null, 'B']);
+        expect(execution.outputOf('A')).toEqual([null, 'A']);
+        expect(execution.outputOf('B')).toEqual([null, 'B']);
       });
     });
     it('an execution can only be run() once', function() {
