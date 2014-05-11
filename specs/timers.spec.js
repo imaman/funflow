@@ -80,6 +80,17 @@ describe('timer:', function() {
       done();
     });
   });
+  it('when a custom error is specified, it fired instead of the default Timeout error', function(done) {
+    var flow = newFlow({
+      a: timer(10, 10, 'GIVING_UP')
+    });
+
+    flow(null, function(e) {
+      expect(e).toEqual('GIVING_UP');
+      expect(arguments.length).toEqual(1);
+      done();
+    });
+  });
   it('when specified, it fires a result value upon timeout', function(done) {
     var flow = newFlow({
       a: timer(10, 10, null, 'SOME_RESULT')
@@ -88,6 +99,17 @@ describe('timer:', function() {
     flow(null, function(e, v) {
       expect(e).toBe(null);
       expect(v).toEqual({a: 'SOME_RESULT'});
+      done();
+    });
+  });
+  it('can translate the custom error value', function(done) {
+    var flow = Compiler.new_({translateErrors: true}).compile({
+      a: timer(10, 10, 'SOME_PROBLEM')
+    }).asFunction();
+
+    flow(null, function(e) {
+      expect(arguments.length).toEqual(1);
+      expect(e.message).toEqual('SOME_PROBLEM');
       done();
     });
   });

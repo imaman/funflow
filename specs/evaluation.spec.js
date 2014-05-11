@@ -714,7 +714,6 @@ describe('funflow compilation', function() {
 });
 
 // TODO:
-// - timers can have an output to fire
 // - graph simplification
 // - exec.outputOf() should support lookup by name
 // - option for requiring uniqeness of names
