@@ -42,7 +42,7 @@ describe('compilation', function() {
           function f1() {},
           function f1() {}
         );
-      }).toThrow('Found 2 functions named "f1"');
+      }).toThrow('Found 2 computations named "f1"');
     });
     it('specifies the number of times the function has been used', function() {
       expect(function() {
@@ -54,7 +54,7 @@ describe('compilation', function() {
           function fb() {},
           function fd() {}
         );
-      }).toThrow('Found 3 functions named "fb"');
+      }).toThrow('Found 3 computations named "fb"');
     });
   });
   describe('optimizations', function() {
