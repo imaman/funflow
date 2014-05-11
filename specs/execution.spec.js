@@ -103,25 +103,25 @@ describe('Execution', function() {
           '  - 2 => ["PROBLEM"]',
         ].join('\n'));
       });
-      xit('can inspect the execution in flight', function() {
+      it('can inspect the execution in flight', function() {
         var captured = {};
-        var flow = compile(
+        var flow = Compiler.new_({translateErrors: true}).compile(
           function fa(next) { next(null, 'A') },
           function fb(v, next) { next(null, v + 'B') },
           function fc(v, next) { next('PROBLEM') },
           comp(function fd(e, v, next) {
-            console.log(e.flowTrace);
-//            captured.fa = e.execution.outputOf(0);
-//            captured.fb = e.execution.outputOf(1);
+            captured.fa = execution.outputOf(0);
+            captured.fb = execution.outputOf(1);
             next(null, 'Y')
           }),
-          function fe(e, v, next) { next(null, v + 'Z') }
+          function fe(v, next) { next(null, v + 'Z') }
         );
-        var execution = flow.newExecution({translateErrors: true});
+        var execution = flow.newExecution();
         var args;
         execution.run(null, function() { args = u_.toArray(arguments); });
         if (args[0]) throw args[0];
         expect(args).toEqual([null, 'YZ']);
+        expect(captured).toEqual({fa: [null, 'A'], fb: [null, 'AB']});
       });
     });
   });
