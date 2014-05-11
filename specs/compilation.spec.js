@@ -35,6 +35,41 @@ describe('compilation', function() {
       expect(varArgflow.toString()).toEqual(seqFlow.toString());
     });
   });
+  describe('optimizations', function() {
+    it('inlines nested sequences', function() {
+      var flow = compile('A', ['B', ['C', ['D', 'E'], ['F']]]);
+      var execution = flow(null, function() {});
+
+
+      function traverse(v) {
+        var acc = [];
+        var visited = {};
+        var q = [v];
+        while(q.length > 0) {
+          var curr = q.pop();
+          curr.targets().forEach(function(t) {
+            if (visited[t])
+              return;
+
+            visited[t] = true;
+            acc.push(curr + '->' + t);
+            q.push(t);
+          });
+        }
+        acc.sort();
+        return acc;
+      }
+
+      var acc = traverse(execution.realV0_);
+      expect(acc).toEqual([
+        '0->1',
+        '1->2',
+        '2->3',
+        '3->4',
+        '4->5'
+      ]);
+    });
+  });
   describe('diagram of a fully compiled flow', function() {
     it('shows IDs', function() {
       var executable = compile([
