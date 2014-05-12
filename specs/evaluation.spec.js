@@ -714,8 +714,6 @@ describe('funflow compilation', function() {
 });
 
 // TODO:
-// - Flow should maintain a list of vertices ordered by key (instead of having
-// the Execution object build it).
 // - timers can be named
 // - forks merges can be named
 // - check uniqueness of names w.r.t to named timers and merges
