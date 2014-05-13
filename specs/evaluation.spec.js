@@ -714,10 +714,9 @@ describe('funflow compilation', function() {
 });
 
 // TODO:
-// - forks merges can be named
-// - check uniqueness of names w.r.t to named timers and merges
 // - set strict default behavior (uniqueness of names, single, etc.)
-// - register shutdown callbacks
+// - register shutdown (a.k.a finalize) callbacks
 // - custom merge function should be displayed in the trace
+// - operator: sync function
 
 

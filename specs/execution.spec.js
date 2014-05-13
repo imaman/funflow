@@ -223,8 +223,3 @@ describe('Execution:', function() {
     });
   });
 });
-
-// TODO
-// - lookup by name
-// - finalize
-// - translateErrors is true by default
