@@ -33,13 +33,17 @@ describe('Execution:', function() {
     });
     it('can lookup output of a timer', function(done) {
       var flow = newFlow({
-        a: function a() { return 'A' },
+        a: function a(next) { next(null, 'A') },
         t: timer('aTimer', 1)
       });
       var execution = flow.newExecution();
       execution.run(null, function() {
         expect(execution.outputOf('a')).toEqual([null, 'A']);
-        expect(execution.outputOf('t')).toEqual([null, '____']);
+        var timerOutput = execution.outputOf('aTimer');
+        expect(timerOutput.length).toEqual(2);
+        expect(timerOutput[0]).toBe(null);
+        expect(timerOutput[1]).toBeGreaterThan(0);
+        expect(util.isNumber(timerOutput[1])).toBe(true);
         done();
       });
     });
