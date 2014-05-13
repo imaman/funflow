@@ -1,5 +1,6 @@
 var compile = require('../lib/compilation').compile;
 var Compiler = require('../lib/compilation').Compiler;
+var fork = require('../lib/dsl').fork;
 
 describe('compilation:', function() {
   describe('options', function() {
@@ -65,14 +66,32 @@ describe('compilation:', function() {
           );
         }).toThrow('Found 3 computations named "fb". Each computation should have a unique name.');
       });
-      it('should handle forks', function() {
+      it('fires if merge function have conflicing names', function() {
+        expect(function() {
+          Compiler.new_({ requireUniqueNames: true }).compile(
+            fork({
+              a: function fa() {},
+              b: function fb() {}
+            }, function mergeMe() {}),
+            fork({
+              c: function fc() {},
+              d: function fd() {}
+            }, function mergeMe() {})
+          );
+        }).toThrow('Found 2 computations named "mergeMe". Each computation should have a unique name.');
+      });
+      it('does not fire if all computations are uniquely named', function() {
           Compiler.new_({ requireUniqueNames: true }).compile(
             function fa() {},
             {
               b: function fb() {},
               c: function fc() {}
             },
-            function fd() {}
+            {
+              d: function fd() {},
+              e: function fe() {}
+            },
+            function ff() {}
           );
       });
     });
