@@ -1,12 +1,12 @@
 var u_ = require('underscore');
-var comp = require('../lib/dsl').comp;
-var single = require('../lib/dsl').single;
-var fork = require('../lib/dsl').fork;
-var newFlow = require('../lib/compilation').newFlow;
-var compile = require('../lib/compilation').compile;
-var Compiler = require('../lib/compilation').Compiler;
-var show = require('../lib/visualization').show;
-var treeFromDsl = require('../lib/dsl').treeFromDsl;
+var funflow = require('../lib/funflow');
+
+var comp = funflow.comp;
+var single = funflow.single;
+var fork = funflow.fork;
+var newFlow = funflow.newFlow;
+var compile = funflow.compile;
+var Compiler = funflow.Compiler;
 
 describe('funflow compilation', function() {
   describe('of a literal', function() {
@@ -76,28 +76,6 @@ describe('funflow compilation', function() {
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
       expect(args[0]).toBe(error);
-    });
-    xit('yells if no "next" argument was passed-in', function() {
-      var root = treeFromDsl(
-        function f(next) {}
-      );
-      var flow = compile(root);
-      expect(function() { flow(null) }).toThrow('No next() argument was passed in');
-    });
-    xit('yells if no "error" argument was passed-in', function() {
-      var root = treeFromDsl(
-        function f(next) {}
-      );
-      var flow = compile(root);
-      expect(function() { flow() }).toThrow('No error argument was passed in');
-    });
-    xit('yells on number-of-argument mismatch', function() {
-      var root = treeFromDsl(
-        function trenaryFunction(a1, a2, a3, next) {}
-      );
-      var flow = compile(root);
-      function trap() {}
-      expect(function() { flow(null, 'a', 'b', trap) }).toThrow('trenaryFunction() expects 3 arguments but 2 were passed');
     });
   });
   describe('of a sequence', function() {

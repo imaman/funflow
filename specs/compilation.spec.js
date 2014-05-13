@@ -1,7 +1,8 @@
-var compile = require('../lib/compilation').compile;
-var Compiler = require('../lib/compilation').Compiler;
-var fork = require('../lib/dsl').fork;
-var timer = require('../lib/dsl').timer;
+var funflow = require('../lib/funflow');
+var compile = funflow.compile;
+var Compiler = funflow.Compiler;
+var fork = funflow.fork;
+var timer = funflow.timer;
 
 describe('compilation:', function() {
   describe('options', function() {
