@@ -1,7 +1,7 @@
 var compile = require('../lib/compilation').compile;
 var Compiler = require('../lib/compilation').Compiler;
 
-describe('compilation', function() {
+describe('compilation:', function() {
   describe('options', function() {
     it('yells if an illegal option was passed in', function() {
       expect(function() {
@@ -9,7 +9,7 @@ describe('compilation', function() {
       }).toThrow('Unrecognized option(s): ILLEGAL_OPTION in {"ILLEGAL_OPTION":"dont_care"}');
     });
     it('does not yell if all options are recorgnized', function() {
-      Compiler.new_({'translateErrors': true, branchOp: ''});
+      Compiler.new_({translateErrors: true, branchOp: '', requireUniqueNames: true});
     });
   });
   describe('translation of DSL into Flow', function() {
@@ -36,33 +36,45 @@ describe('compilation', function() {
     });
   });
   describe('static checking', function() {
-    it('yells on name conflict when require-unique-names flag is specified', function() {
-      expect(function() {
-        Compiler.new_({ requireUniqueNames: true }).compile(
-          function f1() {},
-          function f1() {}
-        );
-      }).toThrow('Found 2 computations named "f1". Each computation should have a unique name.');
-    });
-    it('yells on multiple unnamed functions', function() {
-      expect(function() {
-        Compiler.new_({ requireUniqueNames: true }).compile(
-          function() {},
-          function() {}
-        );
-      }).toThrow('Found 2 computations named "". Each computation should have a unique name.');
-    });
-    it('specifies the number of times the function has been used', function() {
-      expect(function() {
-        Compiler.new_({ requireUniqueNames: true }).compile(
-          function fa() {},
-          function fb() {},
-          function fc() {},
-          function fb() {},
-          function fb() {},
-          function fd() {}
-        );
-      }).toThrow('Found 3 computations named "fb". Each computation should have a unique name.');
+    describe('name conflict error', function() {
+      it('fires when require-unique-names flag is specified', function() {
+        expect(function() {
+          Compiler.new_({ requireUniqueNames: true }).compile(
+            function f1() {},
+            function f1() {}
+          );
+        }).toThrow('Found 2 computations named "f1". Each computation should have a unique name.');
+      });
+      it('fires when there are at least two unnamed', function() {
+        expect(function() {
+          Compiler.new_({ requireUniqueNames: true }).compile(
+            function() {},
+            function() {}
+          );
+        }).toThrow('Found 2 computations named "". Each computation should have a unique name.');
+      });
+      it('specifies the number of times a computation name has been used', function() {
+        expect(function() {
+          Compiler.new_({ requireUniqueNames: true }).compile(
+            function fa() {},
+            function fb() {},
+            function fc() {},
+            function fb() {},
+            function fb() {},
+            function fd() {}
+          );
+        }).toThrow('Found 3 computations named "fb". Each computation should have a unique name.');
+      });
+      it('should handle forks', function() {
+          Compiler.new_({ requireUniqueNames: true }).compile(
+            function fa() {},
+            {
+              b: function fb() {},
+              c: function fc() {}
+            },
+            function fd() {}
+          );
+      });
     });
   });
   describe('optimizations', function() {

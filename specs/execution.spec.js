@@ -1,10 +1,12 @@
 var comp = require('../lib/dsl').comp;
+var fork = require('../lib/dsl').fork;
 var u_ = require('underscore');
 var newFlow = require('../lib/compilation').newFlow;
 var compile = require('../lib/compilation').compile;
 var Compiler = require('../lib/compilation').Compiler;
+var util = require('util');
 
-describe('Execution', function() {
+describe('Execution:', function() {
   it('reports the IDs of all computation nodes', function() {
     var execution = compile('A', 'B', 'C').newExecution();
     expect(execution.ids()).toEqual([0, 1, 2]);
@@ -19,6 +21,33 @@ describe('Execution', function() {
       expect(execution.outputOf('fa')).toEqual([null, '_A']);
       expect(execution.outputOf('fb')).toEqual([null, '_AB']);
       expect(execution.outputOf('fc')).toEqual([null, '_ABC']);
+    });
+    it('of forks', function() {
+      var flow = newFlow({
+        a: function fa(v, next) { next(null, v + 'A') },
+        b: function fb(v, next) { next(null, v + 'B') }
+      });
+      var execution = flow(null, '_', function() {});
+      expect(execution.outputOf('fa')).toEqual([null, '_A']);
+      expect(execution.outputOf('fb')).toEqual([null, '_B']);
+    });
+    it('of forks with custom merge function', function() {
+      var flow = newFlow(fork({
+        a: function fa(v, next) { next(null, v + 'A') },
+        b: function fb(v, next) { next(null, v + 'B') }
+      }, function x(v, next) {
+        if (v.a && v.b)  {
+          v.both = v.a + v.b;
+          next(null, v)
+        }
+      }));
+      var execution = flow(null, '_', function(e, v) {
+        console.log('e=' + e);
+        console.log('v=' + JSON.stringify(v));
+      });
+      expect(execution.outputOf('fa')).toEqual([null, '_A']);
+      expect(execution.outputOf('fb')).toEqual([null, '_B']);
+      expect(execution.outputOf('x')).toEqual([null, {a: '_A', b: '_B', both: '_A_B'}]);
     });
   });
   it('it yells if vertex name was not found', function() {
