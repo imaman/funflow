@@ -1,6 +1,7 @@
 var compile = require('../lib/compilation').compile;
 var Compiler = require('../lib/compilation').Compiler;
 var fork = require('../lib/dsl').fork;
+var timer = require('../lib/dsl').timer;
 
 describe('compilation:', function() {
   describe('options', function() {
@@ -54,6 +55,28 @@ describe('compilation:', function() {
           );
         }).toThrow('Found 2 computations named "". Each computation should have a unique name.');
       });
+      it('fires when there are two timers with colliding names', function() {
+        expect(function() {
+          Compiler.new_({ requireUniqueNames: true }).compile({
+            t1: timer('TIMER', 1),
+            t2: timer('TIMER', 1)
+          });
+        }).toThrow('Found 2 computations named "TIMER". Each computation should have a unique name.');
+      });
+      it('does not fire when the timers are uniquely named', function() {
+        Compiler.new_({ requireUniqueNames: true }).compile({
+          t1: timer('TIMER_1', 1),
+          t2: timer('TIMER_2', 1)
+        });
+      });
+      it('fires when there are two unnamed timers', function() {
+        expect(function() {
+          Compiler.new_({ requireUniqueNames: true }).compile({
+            t1: timer(1),
+            t2: timer(1)
+          });
+        }).toThrow();
+      });
       it('specifies the number of times a computation name has been used', function() {
         expect(function() {
           Compiler.new_({ requireUniqueNames: true }).compile(
@@ -66,7 +89,7 @@ describe('compilation:', function() {
           );
         }).toThrow('Found 3 computations named "fb". Each computation should have a unique name.');
       });
-      it('fires if merge function have conflicing names', function() {
+      it('fires if merge functions have colliding names', function() {
         expect(function() {
           Compiler.new_({ requireUniqueNames: true }).compile(
             fork({
@@ -79,6 +102,18 @@ describe('compilation:', function() {
             }, function mergeMe() {})
           );
         }).toThrow('Found 2 computations named "mergeMe". Each computation should have a unique name.');
+      });
+      it('does not fire if merge functions have unique names', function() {
+        Compiler.new_({ requireUniqueNames: true }).compile(
+          fork({
+            a: function fa() {},
+            b: function fb() {}
+          }, function firstMerge() {}),
+          fork({
+            c: function fc() {},
+            d: function fd() {}
+          }, function secondMerge() {})
+        );
       });
       it('does not fire if all computations are uniquely named', function() {
           Compiler.new_({ requireUniqueNames: true }).compile(
