@@ -66,10 +66,7 @@ describe('Execution:', function() {
           next(null, v)
         }
       }));
-      var execution = flow(null, '_', function(e, v) {
-        console.log('e=' + e);
-        console.log('v=' + JSON.stringify(v));
-      });
+      var execution = flow(null, '_', function(e, v) {});
       expect(execution.outputOf('fa')).toEqual([null, '_A']);
       expect(execution.outputOf('fb')).toEqual([null, '_B']);
       expect(execution.outputOf('x')).toEqual([null, {a: '_A', b: '_B', both: '_A_B'}]);
