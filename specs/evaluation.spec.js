@@ -714,7 +714,6 @@ describe('funflow compilation', function() {
 });
 
 // TODO:
-// * timers can be named
 // - forks merges can be named
 // - check uniqueness of names w.r.t to named timers and merges
 // - set strict default behavior (uniqueness of names, single, etc.)
