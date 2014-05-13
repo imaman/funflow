@@ -1,4 +1,5 @@
 var comp = require('../lib/dsl').comp;
+var timer = require('../lib/dsl').timer;
 var fork = require('../lib/dsl').fork;
 var u_ = require('underscore');
 var newFlow = require('../lib/compilation').newFlow;
@@ -29,6 +30,18 @@ describe('Execution:', function() {
       var execution = flow(null, '_', function() {});
       expect(execution.outputOf('fa')).toEqual([null, '_A']);
       expect(execution.outputOf('fb')).toEqual([null, '_AB']);
+    });
+    it('can lookup output of a timer', function(done) {
+      var flow = newFlow({
+        a: function a() { return 'A' },
+        t: timer('aTimer', 1)
+      });
+      var execution = flow.newExecution();
+      execution.run(null, function() {
+        expect(execution.outputOf('a')).toEqual([null, 'A']);
+        expect(execution.outputOf('t')).toEqual([null, '____']);
+        done();
+      });
     });
     it('of forks', function() {
       var flow = newFlow({
