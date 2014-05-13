@@ -133,6 +133,32 @@ describe('Execution:', function() {
         '  - 1 => [ null, { a: [Circular], b: \'B\', v: \'*\' }, \'XYZ\' ]'
       ].join('\n'));
     });
+    it('shows custom merge functions', function() {
+      var flow = compile(fork({
+        a: function fa(v, next) { next(null, v + 'A') },
+        b: function fa(v, next) { next(null, v + 'B') }
+      }, function merge(v, next) {
+        if (v.a) next(null, 'A=' + v.a);
+      }));
+      var execution = flow(null, '_', function() {});
+      expect(execution.toString()).toEqual(['',
+        '|',
+        '+->-----+----+',
+        '        |    |',
+        '        fa#1 fa#2',
+        '        |    |',
+        '        |    |',
+        '+-<-----+----+',
+        '|',
+        'merge#3',
+        '|',
+        'Outputs:',
+        '  - 0 => [null,"_"]',
+        '  - 1 => [null,"_A"]',
+        '  - 2 => [null,"_B"]',
+        '  - 3 => [null,"A=_A"]'
+      ].join('\n'));
+    });
     it('contains no outputs before the flow runs', function() {
       var flow = compile(
         function fa(v, next) {},

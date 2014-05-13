@@ -716,7 +716,6 @@ describe('funflow compilation', function() {
 // TODO:
 // - set strict default behavior (uniqueness of names, single, etc.)
 // - register shutdown (a.k.a finalize) callbacks
-// - custom merge function should be displayed in the trace
 // - operator: sync function
 
 
