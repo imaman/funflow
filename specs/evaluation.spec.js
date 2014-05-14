@@ -691,9 +691,4 @@ describe('funflow compilation', function() {
   }
 });
 
-// TODO:
-// - set strict default behavior (uniqueness of names, single, etc.)
-// - register shutdown (a.k.a finalize) callbacks
-// - operator: sync function
-
 

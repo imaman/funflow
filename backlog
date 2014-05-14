@@ -1,0 +1,17 @@
+// TODO:
+// - set strict default behavior (uniqueness of names, single, etc.)
+// - flowTrace should contain a legend
+// - register shutdown (a.k.a finalize) callbacks
+// - in the flowTrace outputs should be keyed by their creation order
+// - flowTrace should indicate executed computations
+// - flowTrace should indicate failed computations
+// - reduce depth (passed to util.inspect()) used for showing the outputs in a
+// flowTrace?
+// - allow a merge function to take errors
+// - be able to name standard flow function (i.e., that take (v, next)).
+// Currently, the comp() operator allows naming only (e, v, next) functions.
+// - get rid of the _temp_ IDs attached to nodes.
+// - operator: sync function
+//
+
+
