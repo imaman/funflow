@@ -7,7 +7,7 @@ var multi = funflow.multi;
 
 describe('timer:', function() {
   function newFlow() {
-    var compiler = Compiler.new_({ requireUniqueNames: false });
+    var compiler = Compiler.new_({ requireUniqueNames: false, translateErrors: true, branchOp: 'SINGLE' });
     return compiler.compile.apply(compiler, arguments);
   }
   it('fires a result for its slot', function(done) {
@@ -59,7 +59,8 @@ describe('timer:', function() {
   });
   it('fires an excpetion after the specified timeout duration', function(done) {
     var acc = [];
-    var flow = newFlow(fork({
+    var compiler = Compiler.new_({ requireUniqueNames: false, translateErrors: false });
+    var flow = compiler.compile(fork({
       elapsed: timer(1, 10)
     }, function(result, next) {
       acc.push(result.elapsed);
@@ -85,7 +86,8 @@ describe('timer:', function() {
     });
   });
   it('when a custom error is specified, it fired instead of the default Timeout error', function(done) {
-    var flow = newFlow({
+    var compiler = Compiler.new_({ requireUniqueNames: false, translateErrors: false });
+    var flow = compiler.compile({
       a: timer(10, 10, 'GIVING_UP')
     });
 
