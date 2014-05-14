@@ -136,7 +136,7 @@ describe('Execution:', function() {
     it('shows custom merge functions', function() {
       var flow = compile(fork({
         a: function fa(v, next) { next(null, v + 'A') },
-        b: function fa(v, next) { next(null, v + 'B') }
+        b: function fb(v, next) { next(null, v + 'B') }
       }, function merge(v, next) {
         if (v.a) next(null, 'A=' + v.a);
       }));
@@ -145,7 +145,7 @@ describe('Execution:', function() {
         '|',
         '+->-----+----+',
         '        |    |',
-        '        fa#1 fa#2',
+        '        fa#1 fb#2',
         '        |    |',
         '        |    |',
         '+-<-----+----+',

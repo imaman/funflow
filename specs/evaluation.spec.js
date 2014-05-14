@@ -9,7 +9,7 @@ var Compiler = funflow.Compiler;
 
 describe('funflow compilation', function() {
   function newFlow() {
-    var compiler = Compiler.new_();
+    var compiler = Compiler.new_({ requireUniqueNames: false });
     return compiler.compile.apply(compiler, arguments);
   }
   describe('of a literal', function() {
@@ -463,8 +463,8 @@ describe('funflow compilation', function() {
   it('continues to the subsequent computation when next() is invoked with no args', function() {
     var count = 0;
     var flow = compile([
-      function(a, next) { ++count; next() },
-      function(next) { ++count; next(null, count) }
+      function fa(a, next) { ++count; next() },
+      function fb(next) { ++count; next(null, count) }
     ]);
     var args;
     flow(null, 5, function() { args = u_.toArray(arguments) });
@@ -678,7 +678,7 @@ describe('funflow compilation', function() {
       expect(args[0].message).toEqual('PROBLEM');
     });
     it('keeps the client code\'s err value as-is when translateErrors is false', function() {
-      var flow = Compiler.new_({ translateErrors: false }).compile(
+      var flow = Compiler.new_({ translateErrors: false, requireUniqueNames: true }).compile(
         function fa(v, next) { next(null, v + 'A') },
         function fb(v, next) { next('PROBLEM') },
         function fc(v, next) { next(null, v + 'C') }
@@ -690,7 +690,7 @@ describe('funflow compilation', function() {
     });
   });
   function newCustomFlow(dsl) {
-    return Compiler.new_({ branchOp: 'MULTI' }).compile(dsl);
+    return Compiler.new_({ branchOp: 'MULTI', requireUniqueNames: false }).compile(dsl);
   }
 });
 

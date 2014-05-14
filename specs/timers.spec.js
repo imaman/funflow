@@ -1,11 +1,15 @@
 var timer = require('../lib/dsl').timer;
 var fork = require('../lib/dsl').fork;
-var Compiler = require('../lib/compilation').Compiler;
-var newFlow = require('../lib/compilation').newFlow;
-var multi = require('../lib/compilation').multi;
+var funflow = require('../lib/funflow');
+var Compiler = funflow.Compiler;
+var multi = funflow.multi;
 
 
 describe('timer:', function() {
+  function newFlow() {
+    var compiler = Compiler.new_({ requireUniqueNames: false });
+    return compiler.compile.apply(compiler, arguments);
+  }
   it('fires a result for its slot', function(done) {
     var flow = newFlow(fork({
       a: function(v, next) { next(null, v + 'A') },
