@@ -4,11 +4,14 @@ var funflow = require('../lib/funflow');
 var comp = funflow.comp;
 var single = funflow.single;
 var fork = funflow.fork;
-var newFlow = funflow.newFlow;
 var compile = funflow.compile;
 var Compiler = funflow.Compiler;
 
 describe('funflow compilation', function() {
+  function newFlow() {
+    var compiler = Compiler.new_();
+    return compiler.compile.apply(compiler, arguments);
+  }
   describe('of a literal', function() {
     it('evaulautes to itself', function() {
       var flow = newFlow('SOME_LITERAL');
