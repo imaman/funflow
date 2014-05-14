@@ -4,7 +4,7 @@
   "author": "imaman",
   "description": "powerful async control-flow based on a data-flow-graph of functions",
   "scripts": {
-    "test": "jasmine-node --captureExceptions specs"
+    "test": "jasmine-node --captureExceptions --verbose specs"
   },
   "main": "./lib/funflow.js",
   "repository": {
