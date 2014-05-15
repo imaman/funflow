@@ -9,7 +9,7 @@ var Compiler = funflow.Compiler;
 
 describe('funflow compilation', function() {
   function newFlow() {
-    var compiler = Compiler.new_({ requireUniqueNames: false });
+    var compiler = Compiler.new_({ requireUniqueNames: false, translateErrors: true });
     return compiler.compile.apply(compiler, arguments);
   }
   describe('of a literal', function() {
@@ -72,7 +72,7 @@ describe('funflow compilation', function() {
     });
     it('passes an exception thrown by the function to the error argument of the trap function', function() {
       var error = new Error('THROWN_ERROR');
-      var flow = newFlow(
+      var flow = Compiler.new_({translateErrors: false}).compile(
         function f(next) { throw error }
       );
       var args;
@@ -152,7 +152,7 @@ describe('funflow compilation', function() {
     });
     it('propagates a thrown error all the way to the trap function', function() {
       var error = new Error('THROWN_ERROR');
-      var flow = newFlow([
+      var flow = Compiler.new_({translateErrors: false}).compile([
         function a(next) { next(null) },
         function b(next) { next(error) },
         function c(next) { next(null) },
@@ -230,7 +230,7 @@ describe('funflow compilation', function() {
       var args;
       flow(null, 5, 8, function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
-      expect(args[0]).toBe(error);
+      expect(args[0].cause).toBe(error);
     });
     it('propagates a failure to the trap function', function() {
       var flow = newFlow({
@@ -239,7 +239,8 @@ describe('funflow compilation', function() {
       });
       var args;
       flow(null, 5, 8, function() { args = u_.toArray(arguments) });
-      expect(args).toEqual(['SOME_PROBLEM']);
+      expect(args[0].cause).toEqual('SOME_PROBLEM');
+      expect(args.length).toEqual(1);
     });
     it('it reports a failure only once, even if multiple brnahces fail', function() {
       var flow = newFlow({
@@ -390,7 +391,8 @@ describe('funflow compilation', function() {
         }));
         var args;
         flow(null, function() { args = u_.toArray(arguments) });
-        expect(args).toEqual(['WE HAVE A PROBLEM']);
+        expect(args[0].cause).toEqual('WE HAVE A PROBLEM');
+        expect(args.length).toEqual(1);
       });
     });
   });
@@ -409,7 +411,7 @@ describe('funflow compilation', function() {
         function f1(v, next) { next(null, v + '1') },
         function f2(v, next) { next('F2 FAILED') },
         function f3(v, next) { next(null, v + '2') },
-        comp(function f(e, next) { next(null, e + ', AND RESCUED')})
+        comp(function f(e, next) { next(null, e.cause + ', AND RESCUED')})
       ]);
       var args;
       flow(null, '', function() { args = u_.toArray(arguments) });
@@ -447,7 +449,7 @@ describe('funflow compilation', function() {
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
       expect(args.length).toEqual(1);
-      expect(args[0]).toBe(err);
+      expect(args[0].cause).toBe(err);
     });
     it('a comp function in a branch does not rescue other branches', function() {
       var err = new Error();
@@ -457,7 +459,8 @@ describe('funflow compilation', function() {
       });
       var args;
       flow(null, function() { args = u_.toArray(arguments) });
-      expect(args).toEqual(['PROBLEM']);
+      expect(args.length).toEqual(1);
+      expect(args[0].cause).toEqual('PROBLEM');
     });
   });
   it('continues to the subsequent computation when next() is invoked with no args', function() {
