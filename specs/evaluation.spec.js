@@ -427,7 +427,7 @@ describe('funflow compilation', function() {
         },
         function f3(v, suffix, next) { next(null, v + '3', suffix) },
         comp(function f4(e, v, suffix, next) {
-          next(null, e ? ('e=' + e) : ('v=' + v + suffix))
+          next(null, e ? ('e=' + e.cause) : ('v=' + v + suffix))
         })
       );
       var exec = flow.newExecution();
