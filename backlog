@@ -1,5 +1,4 @@
 // TODO:
-// - set strict default behavior (uniqueness of names, single, etc.)
 // - flowTrace should contain a legend
 // - register shutdown (a.k.a finalize) callbacks
 // - in the flowTrace outputs should be keyed by their creation order
