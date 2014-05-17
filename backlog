@@ -1,4 +1,11 @@
 // TODO:
+// - in flowTrace ouput should be displayed next to the computation name
+// - an abandon operator: abandon({ after: 100, unit: 'millis', with: [err,
+// value], dsl1, dsl2, dsl3, ...)
+// - execution should also be a function? Decision: currenty not as it can only
+// be invoked once so it's is not a really a function that can be dispatched
+// freely.
+// - rewrite he mongodb example boilerplate using funflow.
 // - flowTrace should contain a legend
 // - register shutdown (a.k.a finalize) callbacks
 // - in the flowTrace outputs should be keyed by their creation order
