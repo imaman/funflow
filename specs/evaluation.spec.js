@@ -556,6 +556,27 @@ describe('funflow compilation', function() {
       done();
     });
   });
+  describe('evaluation context', function() {
+    // non-null this
+    // same this within an execution
+    // unique this across executions
+    // value assigned to a field of this can be subsequently read by a
+    // downstream function.
+    it('a computation has a (non null) this variable', function() {
+      var flow = newFlow(function a(next) { next(null, this) })
+      var args;
+      flow(null, function(e, v) { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
+      expect(args[1]).toBeTruthy();
+    });
+    it('the this varialbe is not the global scope', function() {
+      var flow = newFlow(function a(next) { next(null, this) })
+      var args;
+      flow(null, function(e, v) { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
+      expect(args[1]).not.toBe(global);
+    });
+  });
   describe('newFlow', function() {
     it('handles function literal', function() {
       var flow = newFlow(function(next) { next(null, 8) });
