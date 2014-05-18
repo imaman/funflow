@@ -602,6 +602,12 @@ describe('funflow compilation', function() {
       expect(captured.b).toBe(captured.a);
       expect(captured.c).toBe(captured.a);
     });
+    it('the trap function is bounded to the same this object as the computations', function() {
+      var captured = {};
+      var flow = newFlow(function a(next) { captured.a = this; next() });
+      flow(null, function() { captured.trap = this });
+      expect(captured.trap).toBe(captured.a);
+    });
     it('all computations get the same this variable, including merge and comp()', function() {
       var captured = {};
       var flow = newFlow(
