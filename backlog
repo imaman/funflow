@@ -1,4 +1,5 @@
 // TODO:
+// - external trap function should also be this-bounded
 // - merge function should get the single form of the forks' outputs?
 // - in flowTrace ouput should be displayed next to the computation name
 // - an abandon operator: abandon({ after: 100, unit: 'millis', with: [err,
