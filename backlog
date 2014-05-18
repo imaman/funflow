@@ -6,7 +6,6 @@
 // - execution should also be a function? Decision: currenty not as it can only
 // be invoked once so it's is not a really a function that can be dispatched
 // freely.
-// - rewrite he mongodb example boilerplate using funflow.
 // - flowTrace should contain a legend
 // - register shutdown (a.k.a finalize) callbacks
 // - in the flowTrace outputs should be keyed by their creation order

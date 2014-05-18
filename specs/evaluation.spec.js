@@ -644,12 +644,12 @@ describe('funflow compilation', function() {
         function keepInput(v, next) { this.input = v; next() },
         fork(
           {
-            a: function a(next) { next(null, this.input + '_A') },
-            b: function b(next) { next(null, this.input + '_B') },
+            a: single(function a(next) { next(null, this.input + '_A') }),
+            b: single(function b(next) { next(null, this.input + '_B') })
           },
           function(obj, next) {
             if (obj.a && obj.b) {
-              this.output = [obj.a[0], obj.b[0]];
+              this.output = [obj.a, obj.b];
               next();
             }
           }
