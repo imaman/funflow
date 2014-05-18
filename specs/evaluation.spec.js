@@ -572,6 +572,24 @@ describe('funflow compilation', function() {
       if (args[0]) throw args[0];
       expect(args[1]).not.toBe(global);
     });
+    it('is not the global scope also in comp() computations', function() {
+      var flow = newFlow(
+        comp(function a(e, next) { next(null, this) }))
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
+      expect(args[1]).not.toBe(global);
+    });
+    it('is not the global scope also in merge functions', function() {
+      var flow = newFlow(fork(
+        { a: '_', b: '_'},
+        function merge(obj, next) { next(null, this) }
+      ));
+      var args;
+      flow(null, function() { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
+      expect(args[1]).not.toBe(global);
+    });
     it('all computations get the same this variable', function() {
       var captured = {};
       var flow = newFlow(
@@ -583,6 +601,23 @@ describe('funflow compilation', function() {
       expect(captured.a).not.toBe(global);
       expect(captured.b).toBe(captured.a);
       expect(captured.c).toBe(captured.a);
+    });
+    it('all computations get the same this variable, including merge and comp()', function() {
+      var captured = {};
+      var flow = newFlow(
+        function a(next) { captured.a = this; next() },
+        fork({
+            b: function b(next) { captured.b = this; next() },
+            c: function b(next) { captured.c = this; next() }
+          }, function d(obj, next) { captured.d = this; next() }
+        ),
+        comp(function e(next) { captured.e = this; next() }));
+      flow(null, function() {});
+      expect(captured.a).not.toBe(global);
+      expect(captured.b).toBe(captured.a);
+      expect(captured.c).toBe(captured.a);
+      expect(captured.d).toBe(captured.a);
+      expect(captured.e).toBe(captured.a);
     });
     it('the this varialbe is unique across executions', function() {
       var captured = [];
@@ -600,15 +635,25 @@ describe('funflow compilation', function() {
     });
     it('allows computations to pass data around', function() {
       var flow = newFlow(
-        function keepInput(v, next) { this.input = v; this.acc = []; next() },
-        function a(next) { this.acc.push(this.input + '_A'); next() },
-        function b(next) { this.acc.push(this.input + '_B'); next() },
-        function c(next) { next(null, this.acc) }
+        function keepInput(v, next) { this.input = v; next() },
+        fork(
+          {
+            a: function a(next) { next(null, this.input + '_A') },
+            b: function b(next) { next(null, this.input + '_B') },
+          },
+          function(obj, next) {
+            if (obj.a && obj.b) {
+              this.output = [obj.a[0], obj.b[0]];
+              next();
+            }
+          }
+        ),
+        comp(function exposeThis(e, next) { next(null, this) })
       );
       var args;
-      flow(null, '*', function() { args = u_.toArray(arguments) });
+      var exec = flow(null, '*', function() { args = u_.toArray(arguments) });
       if (args[0]) throw args[0];
-      expect(args[1]).toEqual([ '*_A', '*_B' ]);
+      expect(args[1]).toEqual({input: '*', output: ['*_A', '*_B']});
     });
   });
   describe('newFlow', function() {
