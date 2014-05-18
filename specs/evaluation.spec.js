@@ -644,8 +644,8 @@ describe('funflow compilation', function() {
         function keepInput(v, next) { this.input = v; next() },
         fork(
           {
-            a: single(function a(next) { next(null, this.input + '_A') }),
-            b: single(function b(next) { next(null, this.input + '_B') })
+            a: function a(next) { next(null, this.input + '_A') },
+            b: function b(next) { next(null, this.input + '_B') }
           },
           function(obj, next) {
             if (obj.a && obj.b) {
@@ -799,7 +799,7 @@ describe('funflow compilation', function() {
     });
   });
   function newCustomFlow(dsl) {
-    return Compiler.new_({ branchOp: 'MULTI', requireUniqueNames: false }).compile(dsl);
+    return Compiler.new_({ branchOp: 'X', requireUniqueNames: false }).compile(dsl);
   }
 });
 

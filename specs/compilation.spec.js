@@ -14,6 +14,11 @@ describe('compilation:', function() {
     it('does not yell if all options are recorgnized', function() {
       Compiler.new_({translateErrors: true, branchOp: '', requireUniqueNames: true});
     });
+    it('are kept on a per-Compiler basis', function() {
+      var c1 = Compiler.new_({branchOp: 'BRANCH_OP_OF_C1'});
+      var c2 = Compiler.new_();
+      expect(c2.options_.branchOp).not.toEqual('BRANCH_OP_OF_C1');
+    });
   });
   describe('translation of DSL into Flow', function() {
     it('creates a flow when .compile() is called', function() {
