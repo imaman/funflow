@@ -557,11 +557,7 @@ describe('funflow compilation', function() {
     });
   });
   describe('evaluation context', function() {
-    // non-null this
-    // same this within an execution
-    // unique this across executions
-    // value assigned to a field of this can be subsequently read by a
-    // downstream function.
+    // also in comp(), single(), merge
     it('a computation has a (non null) this variable', function() {
       var flow = newFlow(function a(next) { next(null, this) })
       var args;
@@ -575,6 +571,44 @@ describe('funflow compilation', function() {
       flow(null, function(e, v) { args = u_.toArray(arguments) });
       if (args[0]) throw args[0];
       expect(args[1]).not.toBe(global);
+    });
+    it('all computations get the same this variable', function() {
+      var captured = {};
+      var flow = newFlow(
+        function a(next) { captured.a = this; next() },
+        function b(next) { captured.b = this; next() },
+        function c(next) { captured.c = this; next() }
+      );
+      flow(null, function() {});
+      expect(captured.a).not.toBe(global);
+      expect(captured.b).toBe(captured.a);
+      expect(captured.c).toBe(captured.a);
+    });
+    it('the this varialbe is unique across executions', function() {
+      var captured = [];
+      var flow = newFlow(
+        function a(next) { captured.push(this); next() },
+        function b(next) { captured.push(this); next() }
+      );
+      flow(null, function() {});
+      flow(null, function() {});
+      expect(captured.length).toEqual(4);
+
+      expect(captured[0]).toBe(captured[1]);
+      expect(captured[2]).toBe(captured[3]);
+      expect(captured[1]).not.toBe(captured[2]);
+    });
+    it('allows computations to pass data around', function() {
+      var flow = newFlow(
+        function keepInput(v, next) { this.input = v; this.acc = []; next() },
+        function a(next) { this.acc.push(this.input + '_A'); next() },
+        function b(next) { this.acc.push(this.input + '_B'); next() },
+        function c(next) { next(null, this.acc) }
+      );
+      var args;
+      flow(null, '*', function() { args = u_.toArray(arguments) });
+      if (args[0]) throw args[0];
+      expect(args[1]).toEqual([ '*_A', '*_B' ]);
     });
   });
   describe('newFlow', function() {
