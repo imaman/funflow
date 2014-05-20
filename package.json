@@ -1,6 +1,6 @@
 {
   "name": "funflow",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "imaman",
   "description": "powerful async control-flow based on a data-flow-graph of functions",
   "scripts": {
